@@ -1,0 +1,14 @@
+﻿/build*
+*.pdf
+install/
+install
+cpu_time.txt
+config.cmake
+*.user
+ca
+*-cache/
+vscode*/
+.DS_Store
+*.zip
+/CMakeUserPresets.json
+/out
