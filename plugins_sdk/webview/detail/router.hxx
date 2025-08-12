@@ -7,7 +7,7 @@
 #include <utility/utils/query.hxx>
 
 #include <iguana/json.hpp>
-#include <utility/json/reader.h>
+#include <utility/json/reader.hxx>
 
 #include <functional>
 #include <string>
