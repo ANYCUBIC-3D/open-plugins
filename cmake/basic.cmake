@@ -1,64 +1,25 @@
-﻿
-if(CMAKE_HOST_WIN32)
-    set(OS_PREFIX ${CMAKE_PROJECT_NAME}/win)
-elseif(CMAKE_HOST_APPLE)
-    set(OS_PREFIX ${CMAKE_PROJECT_NAME}/mac)
-elseif(CMAKE_HOST_LINUX)
-    set(OS_PREFIX ${CMAKE_PROJECT_NAME}/linux)
-endif()
-
-
-macro(module_install suffix)
-    if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug") 
-        foreach(h  ${ARGN})
-            if(EXISTS ${h})
-                set(current_file ${h})
-            else()
-                set(current_file ${${h}})
-            endif()
-
-            INSTALL(FILES ${current_file} DESTINATION ${suffix})
-        endforeach() 
-    endif()
+﻿macro(module_install suffix)    
+    foreach(h  ${ARGN})
+        if(EXISTS ${h})
+            set(current_file ${h})
+        else()
+            set(current_file ${${h}})
+        endif()
+        INSTALL(FILES ${ARGN} DESTINATION ${suffix})
+    endforeach() 
 endmacro()
 
 
 macro(file_install target)
     if(TARGET ${target})
-        set(suffix ${target})
-    endif()
-    if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug") 
-        foreach(h  ${ARGN})
-            if(EXISTS ${h})
-                INSTALL(FILES ${h} DESTINATION ${OS_PREFIX}/include/${suffix})
-            else()
-                INSTALL(FILES ${${h}} DESTINATION ${OS_PREFIX}/include/${suffix})
-            endif()
-        endforeach() 
+        set_target_properties(${target} PROPERTIES PUBLIC_HEADER ${ARGN})
     endif()
 endmacro()
 
-
-
 macro(SetInstall target)
     # 配置安装
-    
     INSTALL(TARGETS ${target}
-        RUNTIME DESTINATION ${OS_PREFIX}/$<$<CONFIG:Debug>:Debug/>bin/${CMAKE_OSX_ARCHITECTURES}
-        LIBRARY DESTINATION ${OS_PREFIX}/$<$<CONFIG:Debug>:Debug/>lib/${CMAKE_OSX_ARCHITECTURES}
-        ARCHIVE DESTINATION ${OS_PREFIX}/$<$<CONFIG:Debug>:Debug/>lib/${CMAKE_OSX_ARCHITECTURES}
-    )
-    file_install(${target} ${ARGN})
-    if(CMAKE_HOST_WIN32)
-        get_target_property(PDB_NAME ${target} PDB_NAME)
-        
-        if(NOT PDB_NAME)
-            file(GLOB_RECURSE PDB_NAME "${OUTPUT_PATH}/${target}*.pdb" )
-            # set(PDB_NAME ${OUTPUT_PATH}/${target}$<$<CONFIG:Debug>:${CMAKE_DEBUG_POSTFIX}>.pdb)
-        endif()
-        INSTALL(FILES ${PDB_NAME} DESTINATION ${OS_PREFIX}/$<$<CONFIG:Debug>:Debug/>pdb)
-    endif()
-    file_install(${target} ${ARGN})
+            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${target})
 endmacro()
 
 macro(depend_librarys out)

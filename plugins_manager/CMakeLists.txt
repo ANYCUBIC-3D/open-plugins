@@ -7,8 +7,8 @@ file(GLOB_RECURSE HXXDRS_G "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
 
 include(${wxWidgets_USE_FILE})
 add_static(${sub_project_name} PM_EXPORT ${SRCS_G} ${HXXDRS_G})
-setTartetBasic(${sub_project_name}  INSTALL_HEADERS HXXDRS_G) 
-
+setTartetBasic(${sub_project_name}) 
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} TYPE INCLUDE FILES_MATCHING PATTERN "*.hxx")
 set(AES_PASSWORD "anycubic.com" CACHE STRING "AES加密密码")
 set(FILE_SIGN "anycubic.com" CACHE STRING "文件签名")
 

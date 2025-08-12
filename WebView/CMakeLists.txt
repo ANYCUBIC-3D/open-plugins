@@ -192,7 +192,7 @@ target_link_libraries(${sub_project_name} PRIVATE ${wxWidgets_LIBRARIES} )
 target_include_directories(${sub_project_name} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${WEBKIT2GTK_INCLUDE_DIRS} ${GTK3_INCLUDE_DIRS})
 target_include_directories(${sub_project_name} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${sub_project_name} PRIVATE  "${wxWidgets_INCLUDE_DIRS};${CMAKE_BINARY_DIR}/${sub_project_name};${DIR}")
-target_compile_definitions(${sub_project_name} PUBLIC USE_WEBVIEW=1 wxDEBUG_LEVEL=0)
+target_compile_definitions(${sub_project_name} PUBLIC USE_WEBVIEW=1 wxDEBUG_LEVEL=0 WXMAKINGDLL_WEBVIEW=1)
 target_compile_definitions(${sub_project_name} PRIVATE DEVTOOL_ENALBED="${DEVTOOL_ENALBED}")
 
 
@@ -219,5 +219,5 @@ foreach(WEBVIEW_FILE ${WEBVIEW_FILES})
         OUTPUT_VARIABLE REL_PATH
     )
     cmake_path(NORMAL_PATH REL_PATH)  
-    INSTALL(FILES ${WEBVIEW_FILE} DESTINATION "${OS_PREFIX}/include/webview/${REL_PATH}")
+    INSTALL(FILES ${WEBVIEW_FILE} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/webview/${REL_PATH}")
 endforeach()
