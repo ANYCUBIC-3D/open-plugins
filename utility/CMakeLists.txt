@@ -1,6 +1,6 @@
 ﻿file(GLOB_RECURSE SRCS_G "${CMAKE_CURRENT_SOURCE_DIR}/*.c*"  "${CMAKE_CURRENT_SOURCE_DIR}/*.h*")
 
-foreach(DIR IN ITEMS utils codec encrypt)
+foreach(DIR IN ITEMS utils codec encrypt json)
     file(GLOB_RECURSE HXXDRS_G "${CMAKE_CURRENT_SOURCE_DIR}/${DIR}/*.hxx")
     module_install(${OS_PREFIX}/include/utility/${DIR} ${HXXDRS_G})
 endforeach()
