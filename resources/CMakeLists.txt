@@ -13,7 +13,7 @@ set(HDRS ${CMAKE_CURRENT_SOURCE_DIR}/common.hxx)
 if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/resources_export.hxx)
 list(APPEND HDRS "${CMAKE_CURRENT_BINARY_DIR}/resources_export.hxx")
 endif()
-install(FILES ${HDRS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/resources)
+install(FILES ${HDRS} DESTINATION include/resources)
 
 set(DOCS ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
 install(FILES ${DOCS} TYPE DOC)

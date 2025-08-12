@@ -19,7 +19,7 @@ endmacro()
 macro(SetInstall target)
     # 配置安装
     INSTALL(TARGETS ${target}
-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${target})
+            PUBLIC_HEADER DESTINATION include/${target})
 endmacro()
 
 macro(depend_librarys out)
