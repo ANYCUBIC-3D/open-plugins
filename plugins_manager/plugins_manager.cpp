@@ -34,9 +34,10 @@ bool GetPluginsPackageInfo(const char *plugins, PluginsPackageInfo *info) {
   return true;
 }
 
-PluginsManager *SetupPM(const char *plugins, const char *tmp_dir) {
+PluginsManager *SetupPM(const char *plugins, CreateWebView_t CreateWebView,
+                        const char *tmp_dir) {
   assert(wxIsMainThread());
-  auto p = new PluginsManagerImpl(plugins, tmp_dir);
+  auto p = new PluginsManagerImpl(plugins, tmp_dir, CreateWebView);
   if (p->CheckPackage())
     return p;
   delete p;

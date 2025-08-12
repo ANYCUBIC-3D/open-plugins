@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <time.h>
 
+#include <functional>
+
 /**
  * @brief 插件配置管理接口
  * @note 实现类应提供持久化存储能力
@@ -78,6 +80,12 @@ struct PluginsManager {
 };
 
 extern "C" {
+class wxWebView;
+class wxWindow;
+class wxWebViewConfiguration;
+typedef wxWebView *(*CreateWebView_t)(
+    wxWindow *parent, const wxString &url, wxWebViewConfiguration *conf,
+    const std::function<void(wxWebView *)> &visitor);
 /**
  * @brief 插件包元信息结构体
  */
@@ -99,7 +107,8 @@ bool GetPluginsPackageInfo(const char *plugins, PluginsPackageInfo *info);
  * @brief 初始化插件管理器
  * @param tmp_dir 临时解压目录，默认使用系统临时目录
  */
-PluginsManager *SetupPM(const char *plugins, const char *tmp_dir = nullptr);
+PluginsManager *SetupPM(const char *plugins, CreateWebView_t CreateWebView,
+                        const char *tmp_dir = nullptr);
 
 /**
  * @brief 关闭插件管理器并释放资源

@@ -1,17 +1,19 @@
 ﻿#include "xh_webview.hpp"
 
-#include <slic3r/GUI/Widgets/WebView.hpp>
-
 #include <plugins_base/plugins.hxx>
+
+#include <webview.h>
 
 wxIMPLEMENT_DYNAMIC_CLASS(WebviewHandler, wxXmlResourceHandler);
 
-WebviewHandler::WebviewHandler() : WebviewHandler(nullptr) {}
+WebviewHandler::WebviewHandler() : WebviewHandler(nullptr, nullptr) {}
 
 WebviewHandler::WebviewHandler(
+    CreateWebView_t CreateWebView,
     const std::function<struct Anycubic::Plugins::Plugin *(const wxString &)>
         &getPlugin)
-    : wxXmlResourceHandler(), getPlugin_(getPlugin) {}
+    : wxXmlResourceHandler(), getPlugin_(getPlugin),
+      CreateWebView_(CreateWebView) {}
 
 wxObject *WebviewHandler::DoCreateResource() {
   wxString url = GetParamValue(wxASCII_STR("url"));
@@ -27,7 +29,7 @@ wxObject *WebviewHandler::DoCreateResource() {
     confg.ClearCookies();
   }
   wxWebView *webview =
-      WebView::CreateWebView(nullptr, url, &confg, [plugin](wxWebView *view) {
+      CreateWebView_(nullptr, url, &confg, [plugin](wxWebView *view) {
         if (plugin == nullptr) {
           return;
         }

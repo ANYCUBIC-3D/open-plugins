@@ -13,8 +13,10 @@
 
 extern create_library_t create_library_array[];
 
-PluginsManagerImpl::PluginsManagerImpl(const char *plugins, const char *tmp_dir)
-    : plugins_(plugins), tmp_dir_(tmp_dir), config_(nullptr) {
+PluginsManagerImpl::PluginsManagerImpl(const char *plugins, const char *tmp_dir,
+                                       CreateWebView_t CreateWebView)
+    : plugins_(plugins), tmp_dir_(tmp_dir), config_(nullptr),
+      CreateWebView_(CreateWebView) {
   static bool init = false;
   if (init == false) {
     init = true;
@@ -25,8 +27,10 @@ PluginsManagerImpl::PluginsManagerImpl(const char *plugins, const char *tmp_dir)
   }
   wxFileSystem::AddHandler(&fs_handler_);
   wxXmlResource::Get()->InitAllHandlers();
-  wxXmlResource::Get()->AddHandler(new WebviewHandler(
-      [this](const wxString &name) { return GetPlugin(name.utf8_str()); }));
+  wxXmlResource::Get()->AddHandler(
+      new WebviewHandler(CreateWebView_, [this](const wxString &name) {
+        return GetPlugin(name.utf8_str());
+      }));
 }
 
 PluginsManagerImpl::~PluginsManagerImpl() {

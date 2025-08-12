@@ -15,7 +15,8 @@ class LibraryBase;
 class PluginsManagerImpl : public PluginsManager,
                            public Anycubic::Plugins::PluginHost {
 public:
-  PluginsManagerImpl(const char *plugins, const char *tmp_dir = nullptr);
+  PluginsManagerImpl(const char *plugins, const char *tmp_dir,
+                     CreateWebView_t CreateWebView);
   ~PluginsManagerImpl();
   bool CheckPackage();
   // PluginsManager
@@ -59,4 +60,6 @@ private:
       instances_;                       ///< 插件实例列表
   std::shared_ptr<EventRouter> router_; ///< 调用路由
   wxMemoryFSHandler fs_handler_;
+
+  CreateWebView_t CreateWebView_;
 };
