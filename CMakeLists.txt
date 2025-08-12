@@ -1,10 +1,10 @@
 ﻿cmake_minimum_required(VERSION 3.20.1)
-project(WebEngine VERSION 1 LANGUAGES  CXX C)
+project(OpenPlugins VERSION 1 LANGUAGES  CXX C)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 11.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
+set(CMAKE_OSX_DEPLOYMENT_TARGET 11.5)
 
 
 
@@ -58,13 +58,11 @@ include(config OPTIONAL)
 include(basic)
 include(subdir)
 include(build)
-
-
-
+include(generate)
 
 set(CMAKE_DEBUG_POSTFIX d)
 generate_build_header(${CMAKE_BINARY_DIR}/build_info.h)
 
 find_package(wxWidgets 3.1 REQUIRED COMPONENTS core base)
-add_subdirs(WebView plugins_base plugins_sdk plugins plugins_manager )
-add_subdirsDemos(sample)
+add_subdirs(3rdparty easy_log utility WebView resources plugins_base plugins_sdk plugins plugins_manager)
+

@@ -1,0 +1,29 @@
+﻿#include "@ProjectName@_export.hxx"
+#include "common.hxx"
+
+// clang-format off
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+#define PACKAGE_NAME "@PACKAGE_NAME@"
+#define PACKAGE_MD5 "@PACKAGE_MD5@"
+#define PACKAGE_SIZE @PACKAGE_SIZE@
+#define PACKAGE_PWD "@PACKAGE_PWD@"
+static const uint8_t PACKAGE_DATA[] = {@PACKAGE_DATA@};
+
+PackageInfo *@EXPORT@ getPackageInfo(void) {
+  static PackageInfo info = {PACKAGE_NAME,
+                             PACKAGE_MD5,
+                             PACKAGE_PWD,
+                             PACKAGE_NAME,
+                             PACKAGE_DATA,
+                             PACKAGE_SIZE,
+                             1};
+  return &info;
+}
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+
+// clang-format on

@@ -1,0 +1,115 @@
+﻿get_filename_component(ROOTDIR "${CMAKE_CURRENT_LIST_DIR}/../../" ABSOLUTE)
+set(project_name @CMAKE_PROJECT_NAME@)
+if(CMAKE_HOST_WIN32)
+    set(@CMAKE_PROJECT_NAME@_ROOTDIR ${ROOTDIR}/${project_name}/win CACHE PATH "" FORCE)
+elseif(CMAKE_HOST_APPLE)
+    set(@CMAKE_PROJECT_NAME@_ROOTDIR ${ROOTDIR}/${project_name}/mac CACHE PATH "" FORCE)
+elseif(CMAKE_HOST_LINUX OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(@CMAKE_PROJECT_NAME@_ROOTDIR ${ROOTDIR}/${project_name}/linux CACHE PATH "" FORCE)
+else()
+    message(FATAL_ERROR "Unsupported platform")
+endif()
+
+
+set(PM_DEPS "@PM_DEPS@")
+
+
+
+macro(check_required_components _NAME)
+  message(check_required_components: ${${_NAME}_FIND_COMPONENTS})
+  foreach(comp ${${_NAME}_FIND_COMPONENTS})
+    if(NOT ${_NAME}_${comp}_FOUND)
+      if(${_NAME}_FIND_REQUIRED_${comp})
+        set(${_NAME}_FOUND FALSE)
+      endif()
+    endif()
+  endforeach()
+endmacro()
+
+
+include(${CMAKE_CURRENT_LIST_DIR}/${project_name}Target.cmake)
+foreach(libname ${${project_name}_FIND_COMPONENTS})
+    if(NOT TARGET ${project_name}::${libname})
+        create_target(${project_name} ${libname})
+        set(name ${libname})
+
+        # set variables used in check_required_components
+        list(APPEND ${project_name}_COMPONENTS ${name})
+        set(${project_name}_${name}_FOUND 1)
+        set(${project_name}_FIND_REQUIRED_${name} 1)
+
+        # use the Release configuration for MinSizeRel and RelWithDebInfo configurations
+        # only when Release target exists, and MinSizeRel/RelWithDebInfo doesn't exist
+        get_target_property(configs ${project_name}::${libname} IMPORTED_CONFIGURATIONS)
+        list(FIND configs "RELEASE" idxSrc)
+        if(idxSrc GREATER -1)
+            list(FIND configs "MINSIZEREL" idxSrc)
+            list(FIND CMAKE_CONFIGURATION_TYPES "MinSizeRel" idxDst)
+            if(idxSrc EQUAL -1 AND (idxDst GREATER -1 OR CMAKE_BUILD_TYPE STREQUAL "MinSizeRel"))
+                set_target_properties(${project_name}::${libname} PROPERTIES MAP_IMPORTED_CONFIG_MINSIZEREL "Release")
+            endif()
+            list(FIND configs "RELWITHDEBINFO" idxSrc)
+            list(FIND CMAKE_CONFIGURATION_TYPES "RelWithDebInfo" idxDst)
+            if(idxSrc EQUAL -1 AND (idxDst GREATER -1 OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
+                set_target_properties(${project_name}::${libname} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO "Release")
+            endif()
+        endif()
+
+
+
+
+        list(FIND ${project_name}_FIND_COMPONENTS ${name} idx)
+        message(STATUS "Checking for ${name} component ${idx}")
+        if(NOT ${project_name}_FIND_COMPONENTS OR idx GREATER -1)
+            message(STATUS "Found ${name}: ${${project_name}_${name}_LIBRARY}")
+            list(APPEND ${project_name}_LIBRARIES ${project_name}::${name})
+        endif()
+    endif()
+endforeach()
+if(TARGET ${project_name}::ACWebView)
+    if(CMAKE_HOST_APPLE)
+        set_target_properties(${project_name}::ACWebView PROPERTIES 
+            INTERFACE_LINK_LIBRARIES "-framework Cocoa" "-framework WebKit"
+            INTERFACE_COMPILE_DEFINITIONS "USE_WEBVIEW=1" "wxDEBUG_LEVEL=0"
+        )
+    else()
+        set_target_properties(${project_name}::ACWebView PROPERTIES 
+            INTERFACE_COMPILE_DEFINITIONS "USE_WEBVIEW=1" "wxDEBUG_LEVEL=0"
+        )
+    endif()
+endif()
+list(LENGTH PM_DEPS PM_DEPS_LENGTH)
+if(TARGET ${project_name}::plugins_manager AND PM_DEPS_LENGTH GREATER 0)
+    GET_TARGET_PROPERTY(PM_LIBRARIES_RELEASE ${project_name}::plugins_manager IMPORTED_LOCATION_RELEASE)
+    GET_TARGET_PROPERTY(PM_LIBRARIES_DEBUG ${project_name}::plugins_manager IMPORTED_LOCATION_DEBUG)
+    foreach(suffix ${PM_DEPS})
+        if(CMAKE_HOST_APPLE)
+            list(APPEND PM_LIBRARIES_RELEASE "${@CMAKE_PROJECT_NAME@_ROOTDIR}/lib/${CMAKE_OSX_ARCHITECTURES}/lib${suffix}_s.a")
+            list(APPEND PM_LIBRARIES_DEBUG "${@CMAKE_PROJECT_NAME@_ROOTDIR}/Debug/lib/${CMAKE_OSX_ARCHITECTURES}/lib${suffix}_sd.a")
+        elseif(CMAKE_HOST_WIN32)
+            list(APPEND PM_LIBRARIES_RELEASE  "${@CMAKE_PROJECT_NAME@_ROOTDIR}/lib/${suffix}_s.lib")
+            list(APPEND PM_LIBRARIES_DEBUG "${@CMAKE_PROJECT_NAME@_ROOTDIR}/Debug/lib/${suffix}_sd.lib")
+        elseif(CMAKE_HOST_LINUX)
+            list(APPEND PM_LIBRARIES_RELEASE "${@CMAKE_PROJECT_NAME@_ROOTDIR}/lib/${CMAKE_OSX_ARCHITECTURES}/lib${suffix}_s.a")
+            list(APPEND PM_LIBRARIES_DEBUG "${@CMAKE_PROJECT_NAME@_ROOTDIR}/Debug/lib/${CMAKE_OSX_ARCHITECTURES}/lib${suffix}_sd.a")
+        endif()
+    endforeach()
+    set_target_properties(${project_name}::plugins_manager PROPERTIES
+            IMPORTED_LOCATION_RELEASE ${PM_LIBRARIES_RELEASE}
+            IMPORTED_LOCATION_DEBUG ${PM_LIBRARIES_DEBUG}
+        )
+endif()
+
+if(NOT ${project_name}_FIND_COMPONENTS)
+    set(${project_name}_FIND_COMPONENTS ${${project_name}_COMPONENTS})
+endif()
+
+set(${project_name}_INCLUDE_DIRS ${@CMAKE_PROJECT_NAME@_ROOTDIR}/include)
+set(${project_name}_USE_FILE ${CMAKE_CURRENT_LIST_DIR}/generate.cmake)
+set(${project_name}_CMAKE_DIR ${CMAKE_CURRENT_LIST_DIR})
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(${project_name} 
+    REQUIRED_VARS ${project_name}_INCLUDE_DIRS ${project_name}_USE_FILE ${project_name}_CMAKE_DIR
+)
+check_required_components(${project_name})

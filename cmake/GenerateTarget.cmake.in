@@ -1,0 +1,5 @@
+﻿set(resouce_module @GENERATE_LIST@)
+foreach(libname ${resouce_module})
+    create_shared_target(${project_name} ${libname})
+endforeach()
+
