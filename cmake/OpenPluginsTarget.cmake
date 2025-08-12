@@ -44,8 +44,8 @@ function(create_shared_target prefix suffix)
     )
     if(CMAKE_HOST_APPLE)
         set_target_properties(${projectname} PROPERTIES
-            IMPORTED_LOCATION_RELEASE "${ROOT_DIR}/lib/$lib${suffix}.dylib"
-            IMPORTED_LOCATION_DEBUG "${ROOT_DIR}/lib/$lib${suffix}${POSTFIX}.dylib"
+            IMPORTED_LOCATION_RELEASE "${ROOT_DIR}/lib/lib${suffix}.dylib"
+            IMPORTED_LOCATION_DEBUG "${ROOT_DIR}/lib/lib${suffix}${POSTFIX}.dylib"
         )
     elseif(CMAKE_HOST_WIN32)
         set_target_properties(${projectname} PROPERTIES
@@ -58,8 +58,8 @@ function(create_shared_target prefix suffix)
         )
     elseif(CMAKE_HOST_LINUX)
         set_target_properties(${projectname} PROPERTIES
-            IMPORTED_LOCATION_RELEASE "${ROOT_DIR}/lib/$lib${suffix}.so"
-            IMPORTED_LOCATION_DEBUG "${ROOT_DIR}/lib/$lib${suffix}${POSTFIX}.so"
+            IMPORTED_LOCATION_RELEASE "${ROOT_DIR}/lib/lib${suffix}.so"
+            IMPORTED_LOCATION_DEBUG "${ROOT_DIR}/lib/lib${suffix}${POSTFIX}.so"
         )
     endif()
 endfunction()
@@ -70,13 +70,12 @@ function(create_target prefix suffix)
         return()
     endif()
 
-    find_library(IMPORTED_LOCATION NAMES ${suffix} ${suffix}${POSTFIX} PATHS PATH "${ROOT_DIR}/lib" NO_DEFAULT_PATH)
-    if(NOT IMPORTED_LOCATION)
+    find_library(${suffix}_IMPORTED_LOCATION NAMES ${suffix} ${suffix}${POSTFIX} ${suffix}_s ${suffix}_s${POSTFIX} PATHS PATH "${ROOT_DIR}lib" NO_DEFAULT_PATH)
+    if(NOT ${suffix}_IMPORTED_LOCATION)
         message(FATAL_ERROR "Cannot find library ${suffix} or ${suffix}${POSTFIX}")
     endif()
-
-    cmake_path(GET IMPORTED_LOCATION STEM STEM)
-    if(STEM MATCHES ".a$|.lib$")
+    
+    if(${${suffix}_IMPORTED_LOCATION} MATCHES ".*\\.(a|lib)$")
         create_static_target(${prefix} ${suffix})
     else()
         create_shared_target(${prefix} ${suffix})
