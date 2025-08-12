@@ -1,4 +1,4 @@
-﻿#include "webview_rc_handler.hpp"
+﻿#include "webview_rc_handler.hxx"
 
 #include <easy_log/log.hxx>
 #include <resources/common.hxx>

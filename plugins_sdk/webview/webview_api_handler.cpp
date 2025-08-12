@@ -1,5 +1,5 @@
-﻿#include "webview_api_handler.hpp"
-#include "detail/router.hpp"
+﻿#include "webview_api_handler.hxx"
+#include "detail/router.hxx"
 
 #include <wx/log.h>
 namespace Anycubic::Plugins::SDK {

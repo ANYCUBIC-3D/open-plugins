@@ -1,6 +1,7 @@
 ﻿set(sub_project_name ACWebView)
 
-
+# 设置安装路径规范化策略
+cmake_policy(SET CMP0177 NEW)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -210,7 +211,7 @@ endif()
 # 过滤WEBVIEW_FILES中头文件，并根据目录执行安装
 file(GLOB_RECURSE WEBVIEW_FILES "${WEBVIEW_FILES}" "*.h")
 
-
+SetInstall(${sub_project_name})
 foreach(WEBVIEW_FILE ${WEBVIEW_FILES})
     cmake_path(GET WEBVIEW_FILE PARENT_PATH WEBVIEW_FILE_PATH)
     cmake_path(RELATIVE_PATH WEBVIEW_FILE_PATH
