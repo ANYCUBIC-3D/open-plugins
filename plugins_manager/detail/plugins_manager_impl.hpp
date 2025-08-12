@@ -23,6 +23,9 @@ public:
 private:
   bool AddWidget(const class wxString &position,
                  class wxWindow *widget) override;
+
+  bool AddStaticPlugins(create_library_t *create, size_t count) override;
+
   bool SetConfig(class PMConfig *config) override;
 
   size_t Plugins(void) const override;
@@ -57,9 +60,9 @@ private:
   std::vector<WidgetsNode> widgets_;                    ///< 插件可用窗口列表
   std::vector<std::shared_ptr<LibraryBase>> libraries_; ///< 动态插件库列表
   std::map<wxString, std::shared_ptr<struct Anycubic::Plugins::Plugin>>
-      instances_;                       ///< 插件实例列表
-  std::shared_ptr<EventRouter> router_; ///< 调用路由
-  wxMemoryFSHandler fs_handler_;
-
-  CreateWebView_t CreateWebView_;
+      instances_;                                ///< 插件实例列表
+  std::shared_ptr<EventRouter> router_;          ///< 调用路由
+  wxMemoryFSHandler fs_handler_;                 ///< 内存文件系统处理器
+  CreateWebView_t CreateWebView_;                ///< 创建webview的函数指针
+  std::vector<create_library_t> static_plugins_; ///< 动态增加的静态插件列表
 };

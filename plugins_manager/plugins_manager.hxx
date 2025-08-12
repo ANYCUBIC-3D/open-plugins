@@ -4,7 +4,10 @@
 #include <time.h>
 
 #include <functional>
+#include <memory>
 
+class LibraryBase;
+typedef std::shared_ptr<LibraryBase> (*create_library_t)(void);
 /**
  * @brief 插件配置管理接口
  * @note 实现类应提供持久化存储能力
@@ -62,6 +65,16 @@ struct PluginsManager {
    */
   virtual bool AddWidget(const class wxString &position,
                          class wxWindow *widget) = 0;
+
+  /**
+   * @brief 添加静态插件
+   *
+   * @param create  插件创建函数指针数组
+   * @param count 插件数量
+   * @return true 成功
+   * @return false  失败
+   */
+  virtual bool AddStaticPlugins(create_library_t *create, size_t count) = 0;
 
   /**
    * @brief 设置配置管理器

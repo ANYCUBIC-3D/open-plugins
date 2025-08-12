@@ -53,6 +53,12 @@ bool PluginsManagerImpl::AddWidget(const wxString &position, wxWindow *widget) {
   return true;
 }
 
+bool PluginsManagerImpl::AddStaticPlugins(create_library_t *create,
+                                          size_t count) {
+  std::copy(create, create + count, std::back_inserter(static_plugins_));
+  return true;
+}
+
 bool PluginsManagerImpl::SetConfig(PMConfig *config) {
   config_ = config;
   return true;
@@ -82,9 +88,13 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
     }
     plugins.push_back(filename);
   }
-  libraries_.reserve(plugins.size() + PLUGINS_LIST_SIZE);
+  libraries_.reserve(plugins.size() + PLUGINS_LIST_SIZE +
+                     static_plugins_.size());
   for (int idx = 0; idx < PLUGINS_LIST_SIZE; idx++) {
     libraries_.push_back(create_library_array[idx]());
+  }
+  for (int idx = 0; idx < static_plugins_.size(); idx++) {
+    libraries_.push_back(static_plugins_[idx]());
   }
   std::transform(plugins.begin(), plugins.end(), std::back_inserter(libraries_),
                  [](const wxString &filename) -> std::shared_ptr<LibraryBase> {
