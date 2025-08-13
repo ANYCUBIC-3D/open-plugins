@@ -1,5 +1,4 @@
 #pragma once
-#include "package.hpp"
 
 #include <plugins_base/plugins.hxx>
 
@@ -59,5 +58,3 @@ public:
   void UnloadLibrary() override;
   inline bool Loaded(void) const override { return true; }
 };
-
-typedef std::shared_ptr<LibraryBase> (*create_library_t)(void);

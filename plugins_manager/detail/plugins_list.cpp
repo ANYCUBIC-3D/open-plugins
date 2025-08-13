@@ -1,6 +1,6 @@
-﻿#include "LibraryBase.hxx"
-
-#include "plugins_list.h"
+﻿#include "plugins_list.h"
+#include "LibraryBase.hxx"
+#include "plugins_manager.hxx"
 
 #include <boost/preprocessor.hpp>
 
