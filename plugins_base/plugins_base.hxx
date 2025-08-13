@@ -8,9 +8,9 @@ struct PluginHost;
 
 #define PLUGIN_API_VERSION 1
 #define PLUGIN_EXPORT_GETINFO(export, plugin_name)                             \
-  extern "C" PluginInfo *export plugin_name##_getInfo()
+  PluginInfo *export plugin_name##_getInfo()
 #define PLUGIN_EXPORT_SETUP(export, plugin_name)                               \
-  extern "C" struct Anycubic::Plugins::Plugin *export plugin_name##_setup(     \
+  struct Anycubic::Plugins::Plugin *export plugin_name##_setup(                \
       struct Anycubic::Plugins::PluginHost *host)
 
 extern "C" {
