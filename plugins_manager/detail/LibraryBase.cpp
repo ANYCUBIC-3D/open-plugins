@@ -1,4 +1,4 @@
-#include "LibraryBase.hpp"
+#include "LibraryBase.hxx"
 #include <assert.h>
 
 PluginInfo *LibraryBase::GetPluginInfo() const {

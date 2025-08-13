@@ -1,4 +1,4 @@
-﻿#include "LibraryBase.hpp"
+﻿#include "LibraryBase.hxx"
 
 #include "plugins_list.h"
 

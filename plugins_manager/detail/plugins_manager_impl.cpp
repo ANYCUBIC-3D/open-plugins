@@ -1,5 +1,5 @@
 ﻿#include "plugins_manager_impl.hpp"
-#include "LibraryBase.hpp"
+#include "LibraryBase.hxx"
 #include "package.hpp"
 #include "xrc/xh_webview.hpp"
 
