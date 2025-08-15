@@ -25,5 +25,12 @@ private:
 
   wxDECLARE_DYNAMIC_CLASS_NO_ASSIGN(wxPluginEvent);
 };
+typedef void (wxEvtHandler::*wxPluginEventFunction)(wxPluginEvent &);
 
 } // namespace Anycubic::Plugins::SDK
+// 静态事件表支持
+#define wxPluginEventHandler(func)                                             \
+  wxEVENT_HANDLER_CAST(wxPluginEventFunction, func)
+
+#define EVT_PLUGIN_EVT(evt, id, fn)                                            \
+  wx__DECLARE_EVT1(evt, id, wxPluginEventHandler(fn))
