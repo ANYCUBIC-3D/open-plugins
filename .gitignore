@@ -12,3 +12,4 @@ vscode*/
 *.zip
 /CMakeUserPresets.json
 /out
+*_export.hxx
