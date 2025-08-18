@@ -9,6 +9,11 @@ extern "C" {
 
 #include <boost/scope_exit.hpp>
 
+#if _WIN32
+#include <locale.h>
+#endif // _WIN32
+
+
 void md5Sum(const char *src, size_t srcLen, char md5[MD5LEN]) {
   cMd5 ctx;
   ctx.write(src, srcLen);

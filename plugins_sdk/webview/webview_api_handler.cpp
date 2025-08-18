@@ -7,8 +7,8 @@ WebviewApiHandler::WebviewApiHandler(const wxString &scheme,
                                      ExecuteBase *executer)
     : wxWebViewHandler(scheme), router_(new Router()), executer_(executer) {
   assert(executer_ != nullptr);
-#if __WXMSW__
-  SetVirtualHostName("ac.localhost");
+#if defined(__WXMSW__)
+  SetVirtualHost("ac.localhost");
 #endif
 }
 

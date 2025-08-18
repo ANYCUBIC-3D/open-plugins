@@ -138,8 +138,7 @@ bool PluginsManagerImpl::CreateInstances(void) {
     router_->SetPluginName(info->name);
     if (auto instance = lib->SetupPlugin(this)) {
       instances_.emplace(wxString::FromUTF8(info->name),
-                         std::shared_ptr<Anycubic::Plugins::Plugin>(
-                             instance, [](auto p) { p->Destroy(); }));
+                         std::shared_ptr<Anycubic::Plugins::Plugin>(instance, [](Anycubic::Plugins::Plugin* p) { p->Destroy(); }));
     } else {
       LOG_ERROR("Setup plugin {} failed", info->name);
     }

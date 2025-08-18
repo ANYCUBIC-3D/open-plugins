@@ -11,8 +11,7 @@ bool EventRouter::AddFunction(const char *fname,
   if (funcs_.find(key) != funcs_.end()) {
     return false;
   }
-  funcs_[key] = std::shared_ptr<Anycubic::Plugins::RequestHandler>(
-      handler, [](auto p) { p->Destroy(); });
+  funcs_[key] = std::shared_ptr<Anycubic::Plugins::RequestHandler>(handler, [](Anycubic::Plugins::RequestHandler* p) { p->Destroy(); });
   return true;
 }
 

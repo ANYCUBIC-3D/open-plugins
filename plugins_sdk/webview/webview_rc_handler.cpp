@@ -15,7 +15,6 @@
 
 #ifdef __WXMSW__
 #include <Windows.h>
-#define errno GetLastError()
 #else
 #include <sys/errno.h>
 #endif //
@@ -36,7 +35,7 @@ WebviewRCHandler::WebviewRCHandler(const wxString &scheme,
                                    const wxString &dllPath)
     : wxWebViewHandler(scheme), m_dllPath(dllPath) {
   // 构造函数实现
-#if __WXMSW__
+#if defined(__WXMSW__)
   SetVirtualHost("localhost");
 #endif
 

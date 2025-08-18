@@ -177,10 +177,13 @@ if(USE_WEBVIEW_EDGE)
     endif()
     cmake_path(APPEND WEBVIEW2_PACKAGE_DIR build/native/include OUTPUT_VARIABLE WEBVIEW2_INCLUDE_DIR)
     cmake_path(APPEND WEBVIEW2_PACKAGE_DIR build/native/x64/WebView2LoaderStatic.lib OUTPUT_VARIABLE WEBVIEW2_STATIC_LIBRARY)
-    
+    message("=======> WEBVIEW2_INCLUDE_DIR ${WEBVIEW2_INCLUDE_DIR}")
+    message("=======> WEBVIEW2_STATIC_LIBRARY ${WEBVIEW2_STATIC_LIBRARY}")
     set_target_properties(${sub_project_name} PROPERTIES 
         INTERFACE_LINK_LIBRARIES "${WEBVIEW2_STATIC_LIBRARY}"
     )
+    target_link_libraries(${sub_project_name} PRIVATE "${WEBVIEW2_STATIC_LIBRARY}")
+
     target_include_directories(${sub_project_name} PUBLIC "${WEBVIEW2_INCLUDE_DIR}")
 endif()
 

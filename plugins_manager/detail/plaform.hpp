@@ -4,7 +4,7 @@
 #define PLUGIN_EXT wxASCII_STR(".dylib")
 #elif __linux__
 #define PLUGIN_EXT wxASCII_STR(".so")
-#elif __WIN32__
+#elif _WIN32
 #define PLUGIN_EXT wxASCII_STR(".dll")
 #else
 #error "unknown platform"

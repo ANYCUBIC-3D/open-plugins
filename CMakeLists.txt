@@ -6,7 +6,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 11.5)
 
-
+if(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
+endif(MSVC)
 
 #这个是为了支持Visual Studio的工程分组功能
 set_property(GLOBAL PROPERTY USE_FOLDERS  On)
