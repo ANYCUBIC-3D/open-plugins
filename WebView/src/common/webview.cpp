@@ -15,6 +15,7 @@
 #include "wx/filesys.h"
 #include "wx/mstream.h"
 #include "wx/string.h"
+#include "private/webview.h" // 添加完整类型定义
 
 
 
@@ -81,9 +82,9 @@ public:
 wxWebViewConfiguration::wxWebViewConfiguration(const wxString& backend, wxWebViewConfigurationImpl* impl):
     m_backend(backend), m_impl(impl)
 { }
+wxWebViewConfiguration::~wxWebViewConfiguration() { m_impl.reset(); }
 
-void* wxWebViewConfiguration::GetNativeConfiguration() const
-{
+void* wxWebViewConfiguration::GetNativeConfiguration() const {
     return m_impl->GetNativeConfiguration();
 }
 
