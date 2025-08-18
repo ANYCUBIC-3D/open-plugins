@@ -38,12 +38,11 @@ public:
         // Adds one escape level.
         const char *charsNeededToBeEscaped = "\\\"\n\r\v\t\b\f";
         m_escapedCode.reserve(js.size());
-        for (wxString::const_iterator it = js.begin(); it != js.end(); ++it)
-        {
-            if (wxStrchr(charsNeededToBeEscaped, *it))
+        for (int idx = 0, size = js.size(); idx < size;++idx) {
+            if (wxStrchr(charsNeededToBeEscaped, js[idx]))
             {
                 m_escapedCode += '\\';
-                switch ((wxChar) *it)
+                switch ((wxChar)js[idx])
                 {
                 case 0x0A: // '\n'
                     m_escapedCode += 'n';
@@ -64,11 +63,11 @@ public:
                     m_escapedCode += 'f';
                     break;
                 default:
-                    m_escapedCode += *it;
+                    m_escapedCode += js[idx];
                 }
             }
             else
-                m_escapedCode += *it;
+                m_escapedCode += js[idx];
         }
     }
 
