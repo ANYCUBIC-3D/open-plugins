@@ -13,3 +13,4 @@ vscode*/
 /CMakeUserPresets.json
 /out
 *_export.hxx
+WebView/include/setup.h
