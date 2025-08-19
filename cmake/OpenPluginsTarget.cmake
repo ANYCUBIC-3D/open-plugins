@@ -2,10 +2,13 @@
 function(create_static_target prefix suffix)
     
     set(projectname ${prefix}::${suffix})
+
     if(TARGET ${projectname})
         return()
     endif()
-    message("Creating ${projectname}")
+
+    message("Create create_static_target: ${projectname}")
+    
     add_library(${projectname} SHARED IMPORTED)
     set_property(TARGET ${projectname} APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
     set_property(TARGET ${projectname} APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
@@ -32,8 +35,12 @@ endfunction()
 
 
 function(create_shared_target prefix suffix)
-    
+
     set(projectname ${prefix}::${suffix})
+    if(TARGET ${projectname})
+        return()
+    endif()
+    message("Create create_shared_target: ${projectname}")
 
  
     add_library(${projectname} SHARED IMPORTED)
@@ -51,9 +58,9 @@ function(create_shared_target prefix suffix)
         set_target_properties(${projectname} PROPERTIES
             IMPORTED_IMPLIB_RELEASE "${ROOT_DIR}/lib/${suffix}.lib"
             IMPORTED_LOCATION_RELEASE "${ROOT_DIR}/bin/${suffix}.dll"
-            IMPORTED_IMPLIB_DEBUG "${ROOT_DIR}/lib/${suffix}${POSTFIX}.lib"
-            IMPORTED_LOCATION_DEBUG "${ROOT_DIR}/bin/${suffix}${POSTFIX}.dll"
-            PDB_NAME_DEBUG  "${ROOT_DIR}/pdb/${suffix}${POSTFIX}.pdb"
+            IMPORTED_IMPLIB_DEBUG "${ROOT_DIR}/lib/${suffix}.lib"
+            IMPORTED_LOCATION_DEBUG "${ROOT_DIR}/bin/${suffix}.dll"
+            PDB_NAME_DEBUG  "${ROOT_DIR}/pdb/${suffix}.pdb"
             PDB_NAME_RELEASE "${ROOT_DIR}/pdb/${suffix}.pdb"
         )
     elseif(CMAKE_HOST_LINUX)
@@ -69,15 +76,23 @@ function(create_target prefix suffix)
     if(TARGET ${target_name})
         return()
     endif()
-
-    find_library(${suffix}_IMPORTED_LOCATION NAMES ${suffix} ${suffix}${POSTFIX} ${suffix}_s ${suffix}_s${POSTFIX} PATHS PATH "${ROOT_DIR}lib" NO_DEFAULT_PATH)
-    if(NOT ${suffix}_IMPORTED_LOCATION)
-        message(FATAL_ERROR "Cannot find library ${suffix} or ${suffix}${POSTFIX}")
+    if(CMAKE_HOST_WIN32)
+        set(file_suffix "dll")
+    elseif(cmake_HOST_APPLE)
+        set(file_suffix "dylib")
+    elseif(CMAKE_HOST_LINUX)
+        set(file_suffix "so")
     endif()
-    
-    if(${${suffix}_IMPORTED_LOCATION} MATCHES ".*\\.(a|lib)$")
-        create_static_target(${prefix} ${suffix})
-    else()
+
+
+
+    find_file (${suffix}_IS_SHARED_TYPE NAMES ${suffix}.${file_suffix} ${suffix}${POSTFIX}.${file_suffix} ${suffix}_s.${file_suffix} ${suffix}_s${POSTFIX}.${file_suffix} PATHS PATH "${ROOT_DIR}bin" NO_DEFAULT_PATH)
+    if(${suffix}_IS_SHARED_TYPE)
+        message("create ${target_name}:${${suffix}_IS_SHARED_TYPE}")
         create_shared_target(${prefix} ${suffix})
+        unset(${suffix}_IS_SHARED_TYPE)
+    else()
+        message("create ${target_name}")
+        create_static_target(${prefix} ${suffix})
     endif()
 endfunction(create_target)
