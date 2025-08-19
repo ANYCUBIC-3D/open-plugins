@@ -59,12 +59,12 @@ endforeach()
 if(TARGET ${project_name}::ACWebView)
     if(CMAKE_HOST_APPLE)
         set_target_properties(${project_name}::ACWebView PROPERTIES 
-            INTERFACE_LINK_LIBRARIES "-framework Cocoa" "-framework WebKit"
-            INTERFACE_COMPILE_DEFINITIONS "USE_WEBVIEW=1" "wxDEBUG_LEVEL=0"
+            INTERFACE_LINK_LIBRARIES "-framework Cocoa;-framework WebKit"
+            INTERFACE_COMPILE_DEFINITIONS "USE_WEBVIEW=1;wxDEBUG_LEVEL=0"
         )
     else()
         set_target_properties(${project_name}::ACWebView PROPERTIES 
-            INTERFACE_COMPILE_DEFINITIONS "USE_WEBVIEW=1" "wxDEBUG_LEVEL=0"
+            INTERFACE_COMPILE_DEFINITIONS "USE_WEBVIEW=1;wxDEBUG_LEVEL=0"
         )
     endif()
 endif()
