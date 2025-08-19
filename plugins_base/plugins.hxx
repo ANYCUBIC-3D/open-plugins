@@ -10,13 +10,15 @@ class wxBitmap;
 class wxString;
 
 namespace Anycubic::Plugins {
+struct IStream;
+struct OStream;
 struct RequestHandler {
   /**
    * @brief 执行插件请求处理
    * @param data 输入数据流
    * @param result 输出结果流
    */
-  virtual void Execute(struct IStream *data, struct OStream *result) = 0;
+  virtual void Execute(IStream *data,  OStream *result) = 0;
 
   /**
    * @brief 销毁处理器资源

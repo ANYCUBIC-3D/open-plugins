@@ -12,12 +12,12 @@
                                             &type::func, this))
 
 namespace Anycubic::Plugins {
-typedef std::function<void(struct IStream *data, struct OStream *result)>
+typedef std::function<void( IStream *data,  OStream *result)>
     FuncationType;
 class FuncationWrapper : public RequestHandler {
 public:
   FuncationWrapper(const FuncationType &func) : func_(func) {}
-  void Execute(IStream *data, struct OStream *result) override {
+  void Execute(IStream *data,  OStream *result) override {
     func_(data, result);
   }
   void Destroy() override { delete this; }
@@ -29,7 +29,7 @@ private:
 template <typename Function, typename Self>
 RequestHandler *make_call(const Function &func, Self *self) {
   typedef function_traits<Function> func_traits;
-  auto h = [func, self](struct IStream *data, struct OStream *result) {
+  auto h = [func, self]( IStream *data,  OStream *result) {
     using ret_type = typename func_traits::return_type;
     typename func_traits::bare_tuple_type args;
     if constexpr (std::tuple_size_v<typename func_traits::bare_tuple_type> >
