@@ -60,8 +60,6 @@ function(create_shared_target prefix suffix)
             IMPORTED_LOCATION_RELEASE "${ROOT_DIR}/bin/${suffix}.dll"
             IMPORTED_IMPLIB_DEBUG "${ROOT_DIR}/lib/${suffix}.lib"
             IMPORTED_LOCATION_DEBUG "${ROOT_DIR}/bin/${suffix}.dll"
-            PDB_NAME_DEBUG  "${ROOT_DIR}/pdb/${suffix}.pdb"
-            PDB_NAME_RELEASE "${ROOT_DIR}/pdb/${suffix}.pdb"
         )
     elseif(CMAKE_HOST_LINUX)
         set_target_properties(${projectname} PROPERTIES
