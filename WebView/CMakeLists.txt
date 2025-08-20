@@ -1,7 +1,6 @@
 ﻿set(sub_project_name ACWebView)
 
-# 设置安装路径规范化策略
-cmake_policy(SET CMP0177 NEW)
+
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
