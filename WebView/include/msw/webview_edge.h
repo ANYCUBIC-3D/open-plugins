@@ -19,7 +19,7 @@
 
 class wxWebViewEdgeImpl;
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewEdge : public wxWebView
+class ACWEBVIEW_API wxWebViewEdge : public wxWebView
 {
 public:
 
@@ -131,7 +131,7 @@ private:
     friend class wxWebViewEdgeImpl;
 };
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewFactoryEdge : public wxWebViewFactory
+class ACWEBVIEW_API wxWebViewFactoryEdge : public wxWebViewFactory
 {
 public:
     virtual wxWebView* Create() override { return new wxWebViewEdge; }

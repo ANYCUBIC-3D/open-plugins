@@ -13,7 +13,7 @@
 
 #if USE_WEBVIEW && (USE_WEBVIEW_IE || USE_WEBVIEW_EDGE) && defined(__WXMSW__)
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewHistoryItem
+class ACWEBVIEW_API wxWebViewHistoryItem
 {
 public:
     wxWebViewHistoryItem(const wxString& url, const wxString& title) :

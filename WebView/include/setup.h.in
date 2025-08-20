@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include "ACWebView_export.h"
 #define USE_WEBVIEW 1
 #ifdef __WXMSW__
 #define USE_WEBVIEW_EDGE_STATIC 1

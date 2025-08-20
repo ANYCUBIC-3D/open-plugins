@@ -14,7 +14,7 @@
 
 #if USE_WEBVIEW && defined(__WXGTK__)
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewHistoryItem
+class ACWEBVIEW_API wxWebViewHistoryItem
 {
 public:
     wxWebViewHistoryItem(const wxString& url, const wxString& title) :

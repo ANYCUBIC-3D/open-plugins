@@ -30,7 +30,7 @@ using wxStringToWebHandlerMap = std::unordered_map<wxString, wxSharedPtr<wxWebVi
 
 class wxWebViewConfigurationImplWebKit;
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewWebKit : public wxWebView
+class ACWEBVIEW_API wxWebViewWebKit : public wxWebView
 {
 public:
     explicit wxWebViewWebKit(const wxWebViewConfiguration& config, WX_NSObject request = nullptr);
@@ -117,7 +117,7 @@ private:
     void Init();
 };
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewFactoryWebKit : public wxWebViewFactory
+class ACWEBVIEW_API wxWebViewFactoryWebKit : public wxWebViewFactory
 {
 public:
     virtual wxWebView* Create() override { return CreateWithConfig(CreateConfiguration()); }

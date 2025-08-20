@@ -127,7 +127,7 @@ enum wxWebViewBrowsingDataTypes
     wxWEBVIEW_BROWSING_DATA_ALL         = 0x0f
 };
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewHandlerRequest
+class ACWEBVIEW_API wxWebViewHandlerRequest
 {
 public:
     virtual ~wxWebViewHandlerRequest() = default;
@@ -139,14 +139,14 @@ public:
     virtual wxString GetHeader(const wxString& name) const = 0;
 };
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewHandlerResponseData
+class ACWEBVIEW_API wxWebViewHandlerResponseData
 {
 public:
     virtual ~wxWebViewHandlerResponseData() = default;
     virtual wxInputStream* GetStream() = 0;
 };
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewHandlerResponse
+class ACWEBVIEW_API wxWebViewHandlerResponse
 {
 public:
     virtual ~wxWebViewHandlerResponse() = default;
@@ -159,7 +159,7 @@ public:
 };
 
 //Base class for custom scheme handlers
-class WXDLLIMPEXP_WEBVIEW wxWebViewHandler
+class ACWEBVIEW_API wxWebViewHandler
 {
 public:
     wxWebViewHandler(const wxString& scheme)
@@ -181,7 +181,7 @@ private:
 
 class wxWebViewConfigurationImpl;
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewConfiguration
+class ACWEBVIEW_API wxWebViewConfiguration
 {
 public:
     explicit wxWebViewConfiguration(const wxString& backend, wxWebViewConfigurationImpl* impl);
@@ -207,7 +207,7 @@ extern WXDLLIMPEXP_DATA_WEBVIEW(const char) wxWebViewBackendIE[];
 extern WXDLLIMPEXP_DATA_WEBVIEW(const char) wxWebViewBackendEdge[];
 extern WXDLLIMPEXP_DATA_WEBVIEW(const char) wxWebViewBackendWebKit[];
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewFactory : public wxObject
+class ACWEBVIEW_API wxWebViewFactory : public wxObject
 {
 public:
     virtual wxWebView* Create() = 0;
@@ -230,7 +230,7 @@ public:
 
 using wxStringWebViewFactoryMap = std::unordered_map<wxString, wxSharedPtr<wxWebViewFactory>>;
 
-class WXDLLIMPEXP_WEBVIEW wxWebView : public wxControl
+class ACWEBVIEW_API wxWebView : public wxControl
 {
 public:
     wxWebView()
@@ -397,7 +397,7 @@ private:
     wxDECLARE_ABSTRACT_CLASS(wxWebView);
 };
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewWindowFeatures
+class ACWEBVIEW_API wxWebViewWindowFeatures
 {
 public:
     wxWebViewWindowFeatures(wxWebView* childWebView);
@@ -423,7 +423,7 @@ protected:
     std::unique_ptr<wxWebView> m_childWebView;
 };
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewEvent : public wxNotifyEvent
+class ACWEBVIEW_API wxWebViewEvent : public wxNotifyEvent
 {
 public:
     wxWebViewEvent() = default;
@@ -465,22 +465,22 @@ private:
 
 
 
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_CREATED, wxWebViewEvent );
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_NAVIGATING, wxWebViewEvent );
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_NAVIGATED, wxWebViewEvent );
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_LOADED, wxWebViewEvent );
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_ERROR, wxWebViewEvent );
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_NEWWINDOW, wxWebViewEvent );
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_NEWWINDOW_FEATURES, wxWebViewEvent );
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_WINDOW_CLOSE_REQUESTED, wxWebViewEvent);
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_TITLE_CHANGED, wxWebViewEvent );
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_FULLSCREEN_CHANGED, wxWebViewEvent);
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_SCRIPT_MESSAGE_RECEIVED, wxWebViewEvent);
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_SCRIPT_RESULT, wxWebViewEvent);
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_BROWSING_DATA_CLEARED, wxWebViewEvent);
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_DOWNLOAD_START, wxWebViewEvent);
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_DOWNLOAD_FINISHED, wxWebViewEvent);
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW, wxEVT_WEBVIEW_DOWNLOAD_SUGGESTED, wxWebViewEvent);
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_CREATED, wxWebViewEvent );
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_NAVIGATING, wxWebViewEvent );
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_NAVIGATED, wxWebViewEvent );
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_LOADED, wxWebViewEvent );
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_ERROR, wxWebViewEvent );
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_NEWWINDOW, wxWebViewEvent );
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_NEWWINDOW_FEATURES, wxWebViewEvent );
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_WINDOW_CLOSE_REQUESTED, wxWebViewEvent);
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_TITLE_CHANGED, wxWebViewEvent );
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_FULLSCREEN_CHANGED, wxWebViewEvent);
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_SCRIPT_MESSAGE_RECEIVED, wxWebViewEvent);
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_SCRIPT_RESULT, wxWebViewEvent);
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_BROWSING_DATA_CLEARED, wxWebViewEvent);
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_DOWNLOAD_START, wxWebViewEvent);
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_DOWNLOAD_FINISHED, wxWebViewEvent);
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_DOWNLOAD_SUGGESTED, wxWebViewEvent);
 
 typedef void (wxEvtHandler::*wxWebViewEventFunction)
              (wxWebViewEvent&);

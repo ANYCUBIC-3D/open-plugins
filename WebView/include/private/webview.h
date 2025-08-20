@@ -13,7 +13,7 @@
 #ifndef _
 #define _(x) x
 #endif
-class WXDLLIMPEXP_WEBVIEW wxWebViewConfigurationImpl
+class ACWEBVIEW_API wxWebViewConfigurationImpl
 {
 public:
     virtual ~wxWebViewConfigurationImpl() = default;

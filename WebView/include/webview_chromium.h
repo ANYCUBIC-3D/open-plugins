@@ -30,7 +30,7 @@ class ClientHandler;
 struct ImplData;
 }
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewChromium : public wxWebView
+class ACWEBVIEW_API wxWebViewChromium : public wxWebView
 {
 public:
     wxWebViewChromium() { Init(); }
@@ -246,7 +246,7 @@ class CefProcessMessage;
 //
 // It provides the message received from another process and a frame that can
 // be used to send the reply back.
-class WXDLLIMPEXP_WEBVIEW wxWebViewChromiumEvent : public wxCommandEvent
+class ACWEBVIEW_API wxWebViewChromiumEvent : public wxCommandEvent
 {
 public:
     wxWebViewChromiumEvent() = default;
@@ -270,7 +270,7 @@ private:
     wxDECLARE_DYNAMIC_CLASS_NO_ASSIGN_DEF_COPY(wxWebViewChromiumEvent);
 };
 
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_WEBVIEW,
+wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API,
                           wxEVT_WEBVIEW_CHROMIUM_MESSAGE_RECEIVED,
                           wxWebViewChromiumEvent );
 

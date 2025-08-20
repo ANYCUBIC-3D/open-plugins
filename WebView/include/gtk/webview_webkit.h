@@ -30,7 +30,7 @@ typedef struct _WebKitBackForwardListItem WebKitBackForwardListItem;
 
 class wxWebKitRunScriptParams;
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewWebKit : public wxWebView
+class ACWEBVIEW_API wxWebViewWebKit : public wxWebView
 {
 public:
     wxWebViewWebKit();
@@ -211,7 +211,7 @@ private:
     wxDECLARE_DYNAMIC_CLASS(wxWebViewWebKit);
 };
 
-class WXDLLIMPEXP_WEBVIEW wxWebViewFactoryWebKit : public wxWebViewFactory
+class ACWEBVIEW_API wxWebViewFactoryWebKit : public wxWebViewFactory
 {
 public:
     virtual wxWebView* Create() override { return new wxWebViewWebKit; }

@@ -139,6 +139,9 @@ else()
 endif()
 
 add_library(${sub_project_name} ${LIB_TYPE} ${WEBVIEW_FILES})
+include(GenerateExportHeader)
+
+generate_export_header(${sub_project_name} EXPORT_MACRO_NAME ACWEBVIEW_API EXPORT_FILE_NAME ${CMAKE_CURRENT_LIST_DIR}/include/${sub_project_name}_export.h)
 
 if(USE_WEBVIEW_EDGE)
     set(WEBVIEW2_VERSION "1.0.3179.45")
@@ -196,7 +199,7 @@ target_include_directories(${sub_project_name} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR
 target_include_directories(${sub_project_name} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${sub_project_name} PRIVATE  "${wxWidgets_INCLUDE_DIRS};${CMAKE_BINARY_DIR}/${sub_project_name};${DIR}")
 target_compile_definitions(${sub_project_name} PUBLIC USE_WEBVIEW=1 wxDEBUG_LEVEL=0 WXMAKINGDLL_WEBVIEW=1)
-target_compile_definitions(${sub_project_name} PRIVATE DEVTOOL_ENALBED="${DEVTOOL_ENALBED}")
+target_compile_definitions(${sub_project_name} PRIVATE DEVTOOL_ENALBED="${DEVTOOL_ENALBED}" ACWebView_EXPORTS=1)
 
 
 if(CMAKE_HOST_APPLE)
