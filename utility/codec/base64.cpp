@@ -8,6 +8,8 @@ extern "C" {
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/scope_exit.hpp>
 
+#include <math.h>
+
 std::string base64Encode(const std::string &src) {
   assert(!src.empty());
   auto bufferLength = src.size();
