@@ -9,7 +9,11 @@
 
 #ifndef _WX_PRIVATE_WEBVIEW_H_
 #define _WX_PRIVATE_WEBVIEW_H_
-
+#ifdef DEVTOOL_ENALBED
+#include "ACWebView_export.h"
+#else
+#include "webview/ACWebView_export.h"
+#endif
 #ifndef _
 #define _(x) x
 #endif
