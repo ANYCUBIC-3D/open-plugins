@@ -51,6 +51,8 @@
 #define wxDECLARE_DYNAMIC_CLASS_NO_ASSIGN_DEF_COPY(name) \
     wxDECLARE_NO_ASSIGN_DEF_COPY(name); \
     wxDECLARE_DYNAMIC_CLASS(name);
+#define DATA_WEBVIEW(type) ACWEBVIEW_API type
+
 
 class wxFSFile;
 class wxFileSystem;
@@ -200,12 +202,12 @@ private:
     wxSharedPtr<wxWebViewConfigurationImpl> m_impl;
 };
 
-extern WXDLLIMPEXP_DATA_WEBVIEW(const char) wxWebViewNameStr[];
-extern WXDLLIMPEXP_DATA_WEBVIEW(const char) wxWebViewDefaultURLStr[];
-extern WXDLLIMPEXP_DATA_WEBVIEW(const char) wxWebViewBackendDefault[];
-extern WXDLLIMPEXP_DATA_WEBVIEW(const char) wxWebViewBackendIE[];
-extern WXDLLIMPEXP_DATA_WEBVIEW(const char) wxWebViewBackendEdge[];
-extern WXDLLIMPEXP_DATA_WEBVIEW(const char) wxWebViewBackendWebKit[];
+extern DATA_WEBVIEW(const char) wxWebViewNameStr[];
+extern DATA_WEBVIEW(const char) wxWebViewDefaultURLStr[];
+extern DATA_WEBVIEW(const char) wxWebViewBackendDefault[];
+extern DATA_WEBVIEW(const char) wxWebViewBackendIE[];
+extern DATA_WEBVIEW(const char) wxWebViewBackendEdge[];
+extern DATA_WEBVIEW(const char) wxWebViewBackendWebKit[];
 
 class ACWEBVIEW_API wxWebViewFactory : public wxObject
 {
