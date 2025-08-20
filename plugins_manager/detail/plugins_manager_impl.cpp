@@ -10,9 +10,9 @@
 #include <wx/dir.h>
 #include <wx/filename.h>
 #include <wx/xrc/xmlres.h>
-
-extern create_library_t create_library_array[];
-
+#if PLUGINS_LIST_SIZE > 0
+create_library_t *GetCreateLibraryArray();
+#endif
 PluginsManagerImpl::PluginsManagerImpl(const char *plugins, const char *tmp_dir,
                                        CreateWebView_t CreateWebView)
     : plugins_(plugins), tmp_dir_(tmp_dir), config_(nullptr),
@@ -95,11 +95,14 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
   }
   libraries_.reserve(plugins.size() + PLUGINS_LIST_SIZE +
                      static_plugins_.size());
+#if PLUGINS_LIST_SIZE > 0
+  auto create_library_array = GetCreateLibraryArray();
   for (int idx = 0; idx < PLUGINS_LIST_SIZE; idx++) {
     if (create_library_array[idx] != nullptr) {
       libraries_.push_back(create_library_array[idx]());
     }
   }
+#endif
   for (int idx = 0; idx < static_plugins_.size(); idx++) {
     libraries_.push_back(static_plugins_[idx]());
   }

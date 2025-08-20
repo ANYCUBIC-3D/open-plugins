@@ -5,7 +5,7 @@
 #include <boost/preprocessor.hpp>
 
 #include "plugins_base/plugins_base.hxx"
-
+#if PLUGINS_LIST_SIZE > 0
 #define PLUGINS_LIST_SEQ                                                       \
   BOOST_PP_SEQ_POP_BACK(BOOST_PP_TUPLE_TO_SEQ(PLUGINS_LIST))
 
@@ -28,3 +28,6 @@ BOOST_PP_SEQ_FOR_EACH(DEFINED_FUNCTION, _create, PLUGINS_LIST_SEQ)
 
 create_library_t create_library_array[] = {
     BOOST_PP_SEQ_FOR_EACH(DECLARE_FUNCTION, _create, PLUGINS_LIST_SEQ) nullptr};
+
+create_library_t *GetCreateLibraryArray() { return create_library_array; }
+#endif
