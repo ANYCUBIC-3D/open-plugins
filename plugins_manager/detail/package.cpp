@@ -1,4 +1,4 @@
-﻿#include "package.hpp"
+﻿#include "package.hxx"
 #include "plaform.hpp"
 
 #include <easy_log/stackstrace.hxx>
@@ -6,6 +6,7 @@
 #include <utility/codec/md5.hxx>
 #include <utility/encrypt/aes.hxx>
 
+#include <wx/dir.h>
 #include <wx/file.h>
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
@@ -52,6 +53,15 @@ bool Decode(std::vector<char> &buffer) {
   buffer.assign(str.begin(), str.end());
   return true;
 }
+
+bool Eecode(std::vector<char> &buffer) {
+  auto str =
+      aesEncrypt(std::string(buffer.data(), buffer.size()), AES_PASSWORD);
+  if (str.empty())
+    return false;
+  buffer.assign(str.begin(), str.end());
+  return true;
+}
 namespace boost::json {
 // 反序列化
 template <typename T>
@@ -86,6 +96,28 @@ static T tag_invoke(const value_to_tag<T> &, const value &jv) {
   }
   return c;
 }
+// 序列化
+template <typename T>
+void tag_invoke(const value_from_tag &, value &jv, T const &t) {
+  auto names = boost::pfr::names_as_array<T>();
+  object obj;
+
+  boost::pfr::for_each_field(t, [&obj, &names](auto &field, auto index) {
+    using value_type = std::decay_t<decltype(field)>;
+
+    if constexpr (std::is_same_v<value_type, int64_t>) {
+      obj[names[index]] = field;
+    } else {
+      object nested;
+      for (auto &[k, v] : field) {
+        nested.emplace(k, v);
+      }
+      obj[names[index]] = nested;
+    }
+  });
+
+  jv = obj;
+}
 } // namespace boost::json
 
 bool ParseInfo(const std::vector<char> &buffer, Package *info) {
@@ -104,6 +136,28 @@ bool ParseInfo(const std::vector<char> &buffer, Package *info) {
   }
 }
 
+bool SaveInfo(const Package &info, std::vector<char> &buffer) {
+  try {
+    // 将结构体序列化为JSON
+    boost::json::value json = boost::json::value_from(info);
+
+    // 序列化JSON字符串
+    std::string json_str = boost::json::serialize(json);
+
+    // 加密数据
+    auto encrypted = aesEncrypt(json_str, AES_PASSWORD);
+    if (encrypted.empty()) {
+      return false;
+    }
+
+    // 写入buffer
+    buffer.assign(encrypted.begin(), encrypted.end());
+    return true;
+  } catch (std::exception &e) {
+    FUNC_LEAVE2("SaveInfo failed: {}", e.what());
+    return false;
+  }
+}
 bool LoadMD5(const char *plugins, std::map<std::string, std::string> &md5s) {
   // 步骤1：打开zip文件
   wxFileInputStream fileStream(wxString::FromUTF8(plugins));
@@ -219,4 +273,64 @@ bool Unzip(const std::string &in_zip, const std::string &out_dir) {
     }
   }
   return !hasError; // 返回实际解压状态
+}
+
+bool Zip(const std::string &dir, const std::string &zip_path) {
+  wxFileOutputStream out(wxString::FromUTF8(zip_path));
+  if (!out.IsOk())
+    return false;
+
+  wxZipOutputStream zip(out);
+  if (!zip.IsOk())
+    return false;
+
+  wxDir traverser;
+  if (!traverser.Open(wxString::FromUTF8(dir)))
+    return false;
+
+  wxString filename;
+  bool hasError = false;
+
+  // 递归遍历目录
+  for (bool cont = traverser.GetFirst(&filename, wxEmptyString,
+                                      wxDIR_FILES | wxDIR_DIRS);
+       cont && !hasError; cont = traverser.GetNext(&filename)) {
+
+    wxFileName file_path(wxString::FromUTF8(dir), filename);
+
+    if (file_path.IsDir()) {
+      // 添加目录条目
+      auto *entry = new wxZipEntry(file_path.GetFullName() +
+                                   wxFileName::GetPathSeparator());
+      entry->SetIsDir();
+      if (!zip.PutNextEntry(entry)) {
+        delete entry;
+        hasError = true;
+        break;
+      }
+    } else {
+      // 添加文件条目
+      wxFileInputStream in(file_path.GetFullPath());
+      if (!in.IsOk()) {
+        hasError = true;
+        break;
+      }
+
+      auto *entry = new wxZipEntry(file_path.GetFullName());
+      if (!zip.PutNextEntry(entry)) {
+        delete entry;
+        hasError = true;
+        break;
+      }
+
+      zip.Write(in);
+      if (zip.GetLastError() != wxSTREAM_NO_ERROR) {
+        hasError = true;
+        break;
+      }
+    }
+  }
+
+  zip.Close();
+  return !hasError;
 }

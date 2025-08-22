@@ -1,6 +1,6 @@
 ﻿#include "plugins_manager_impl.hpp"
 #include "LibraryBase.hxx"
-#include "package.hpp"
+#include "package.hxx"
 #include "xrc/xh_webview.hpp"
 
 #include <plugins_base/plugins_base.hxx>
@@ -140,8 +140,10 @@ bool PluginsManagerImpl::CreateInstances(void) {
     }
     router_->SetPluginName(info->name);
     if (auto instance = lib->SetupPlugin(this)) {
-      instances_.emplace(wxString::FromUTF8(info->name),
-                         std::shared_ptr<Anycubic::Plugins::Plugin>(instance, [](Anycubic::Plugins::Plugin* p) { p->Destroy(); }));
+      instances_.emplace(
+          wxString::FromUTF8(info->name),
+          std::shared_ptr<Anycubic::Plugins::Plugin>(
+              instance, [](Anycubic::Plugins::Plugin *p) { p->Destroy(); }));
     } else {
       LOG_ERROR("Setup plugin {} failed", info->name);
     }

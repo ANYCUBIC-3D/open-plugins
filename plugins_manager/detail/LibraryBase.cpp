@@ -1,5 +1,5 @@
 #include "LibraryBase.hxx"
-#include "package.hpp"
+#include "package.hxx"
 
 #include <assert.h>
 

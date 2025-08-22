@@ -1,6 +1,6 @@
 ﻿#include "plugins_manager.hxx"
 
-#include "detail/package.hpp"
+#include "detail/package.hxx"
 #include "detail/plugins_manager_impl.hpp"
 
 #include <utility/codec/bin2ascii.hxx>
