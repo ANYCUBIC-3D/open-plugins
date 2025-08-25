@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "plugins_base_export.hxx"
+#include "utility/json/arrry_wraper.hxx"
 
 #include <stddef.h>
 
@@ -25,6 +26,10 @@ struct PLGINS_EXPORT IStream {
       return sizeof(T) == Read(*data, sizeof(T));
     } else {
     }
+  }
+  template <typename T> bool Read(ac::json::ArrayWrapper<T> *data) {
+    return Read(&data->size_) > 0 &&
+           Read(static_cast<void *>(&(data->data_)), sizeof(intptr_t));
   }
 
 private:
@@ -54,6 +59,10 @@ struct PLGINS_EXPORT OStream {
       return sizeof(T) == Write(data, sizeof(T));
     } else {
     }
+  }
+
+  template <typename T> bool Write(const ac::json::ArrayWrapper<T> &data) {
+    return Write(data->size_) > 0 && Write(static_cast<intptr_t>(data->data_));
   }
 
 private:

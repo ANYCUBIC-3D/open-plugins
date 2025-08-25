@@ -7,24 +7,31 @@
 
 #include <wx/string.h>
 
-namespace Anycubic::Plugins {
-template <typename Ty> int decode(Ty &ret, struct IStream *data) {
+#include <iguana/detail/traits.hpp>
 
-  if constexpr (std::is_arithmetic_v<Ty>) {
+namespace Anycubic::Plugins {
+
+template <typename Ty> int decode(Ty &ret, struct IStream *data) {
+  using value_type = std::decay_t<Ty>;
+  // 如果 Ty 是算术类型
+  if constexpr (std::is_arithmetic_v<value_type>) {
     data->Read(&ret);
-  } else if constexpr (std::is_pointer_v<Ty>) {
+  } else if constexpr (std::is_pointer_v<value_type>) {
     decode(*ret, data);
-  } else if constexpr (std::is_same_v<Ty, std::string>) {
+  } else if constexpr (std::is_same_v<value_type, std::string>) {
     uint16_t bytes;
     auto pos = data->Tellg();
     data->Read(&bytes);
     data->Seekg(pos);
     ret.resize(bytes);
     data->Read(ret.data(), bytes);
-  } else if constexpr (std::is_same_v<Ty, wxString>) {
+  } else if constexpr (std::is_same_v<value_type, wxString>) {
     std::string val;
     decode(val, data);
     ret = wxString::FromUTF8(val);
+  } else if constexpr (iguana::is_template_instant_of<ac::json::ArrayWrapper,
+                                                      value_type>::value) {
+    data->Read(&ret);
   } else {
     boost::pfr::for_each_field(ret,
                                [data](auto &field) { decode(field, data); });
@@ -48,6 +55,9 @@ template <typename Ty> void pack_result(struct OStream *result, Ty &&ret) {
     result->Write(ret);
   } else if constexpr (std::is_same_v<value_type, std::string>) {
     result->Write(ret.data(), ret.size());
+  } else if constexpr (iguana::is_template_instant_of<ac::json::ArrayWrapper,
+                                                      value_type>::value) {
+    result->Write(ret);
   } else {
     boost::pfr::for_each_field(
         ret, [result](auto &field) { pack_result(result, field); });
