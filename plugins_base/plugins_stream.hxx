@@ -15,8 +15,7 @@ constexpr bool is_trivial_v =
     (std::is_class_v<T> && std::is_standard_layout_v<T> &&
      std::is_trivial_v<T>);
 template <typename T>
-constexpr bool is_std_string_v =
-    std::is_same_v<std::remove_cvref_t<T>, std::string>;
+constexpr bool is_std_string_v = std::is_same_v<std::decay_t<T>, std::string>;
 
 template <typename T>
 constexpr bool is_pointer_v =

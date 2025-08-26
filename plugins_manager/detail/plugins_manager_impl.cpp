@@ -130,7 +130,7 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
 
 template <typename T> static inline void delete_plugin(T *plugin) {
   if (plugin != nullptr) {
-    LOG_API("Delete plugin");
+    LOG_DEBUG("Delete plugin");
     plugin->Destroy();
   }
 }
