@@ -1,90 +1,31 @@
 ﻿#pragma once
 #include "plugins_stream.hxx"
 
-#include <boost/pfr.hpp>
-
-#include <type_traits>
-
 #include <wx/string.h>
-
-#include <iguana/detail/traits.hpp>
 
 namespace Anycubic::Plugins {
 
-template <typename Ty> int decode(Ty &ret, struct IStream *data) {
-  using value_type = std::decay_t<Ty>;
-  // 如果 Ty 是算术类型
-  if constexpr (std::is_arithmetic_v<value_type>) {
-    data->Read(&ret);
-  } else if constexpr (std::is_pointer_v<value_type>) {
-    decode(*ret, data);
-  } else if constexpr (std::is_same_v<value_type, std::string>) {
-    uint16_t bytes;
-    auto pos = data->Tellg();
-    data->Read(&bytes);
-    data->Seekg(pos);
-    ret.resize(bytes);
-    data->Read(ret.data(), bytes);
-  } else if constexpr (std::is_same_v<value_type, wxString>) {
-    std::string val;
-    decode(val, data);
-    ret = wxString::FromUTF8(val);
-  } else if constexpr (iguana::is_template_instant_of<ac::json::ArrayWrapper,
-                                                      value_type>::value) {
-    data->Read(&ret);
-  } else {
-    boost::pfr::for_each_field(ret,
-                               [data](auto &field) { decode(field, data); });
-  }
-  return 0;
+template <typename... Args>
+void unpack_args_read(struct IStream *stream, Args &...args) {
+  (stream->Read(args), ...);
 }
 
-template <int32_t I = 0, typename... Args>
-void unpack_args(std::tuple<Args...> &args, struct IStream *data) {
-  if constexpr (I < sizeof...(Args)) {
-    decode(std::get<I>(args), data);
-    unpack_args<I + 1>(args, data);
-  }
+template <typename... Args>
+void unpack_args(std::tuple<Args...> &args, struct IStream *stream) {
+  auto &&packed_args = std::tuple_cat(std::make_tuple(stream), args);
+  std::apply(
+      [](auto &&stream, auto &&...args) {
+        return unpack_args_read(std::forward<decltype(stream)>(stream),
+                                std::forward<decltype(args)>(args)...);
+      },
+      packed_args);
 }
 
-template <typename Ty> void pack_result(struct OStream *result, Ty &&ret) {
-  using value_type = std::decay_t<Ty>;
-  if constexpr (std::is_arithmetic_v<value_type>) {
-    result->Write(ret);
-  } else if constexpr (std::is_pointer_v<value_type>) {
-    result->Write(ret);
-  } else if constexpr (std::is_same_v<value_type, std::string>) {
-    result->Write(ret.data(), ret.size());
-  } else if constexpr (iguana::is_template_instant_of<ac::json::ArrayWrapper,
-                                                      value_type>::value) {
-    result->Write(ret);
-  } else {
-    boost::pfr::for_each_field(
-        ret, [result](auto &field) { pack_result(result, field); });
-  }
+template <typename... Args>
+void pack_result(struct OStream *stream, Args &&...args) {
+  (stream->Write(args), ...);
 }
-
-template <int32_t I = 0, typename... Args>
-void pack_result(struct OStream *result, const std::tuple<Args...> &args) {
-  if constexpr (I < sizeof...(Args)) {
-    pack_result(result, std::get<I>(args));
-    pack_result<I + 1>(result, args);
-  }
-}
-template <typename T, typename... Args> size_t get_bytes(T &t, Args... args) {
-  size_t bytes = 0;
-  if constexpr (std::is_arithmetic_v<T>) {
-    bytes = sizeof(T);
-  } else if constexpr (std::is_same_v<T, std::string>) {
-    bytes = sizeof(uint16_t) + t.size();
-  } else {
-    boost::pfr::for_each_field(
-        t, [&bytes](auto &field) { bytes += get_bytes(field); });
-  }
-
-  if constexpr (sizeof...(args) > 0)
-    return bytes + get_bytes(args...);
-  else
-    return bytes;
+template <typename... Args> size_t get_bytes(Args... args) {
+  return (sizeof(Args) + ...);
 }
 } // namespace Anycubic::Plugins

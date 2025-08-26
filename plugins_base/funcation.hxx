@@ -54,7 +54,7 @@ ret_type dispatch_call(PluginRouter *router, const char *plugin,
     auto bytes = get_bytes(args...);
     argsData.resize(bytes);
     OStream os(argsData.data(), bytes);
-    (os.Write(args), ...);
+    pack_result(&os, std::forward<Args>(args)...);
   }
 
   IStream is(argsData.empty() ? nullptr : argsData.data(), argsData.size());
@@ -64,7 +64,7 @@ ret_type dispatch_call(PluginRouter *router, const char *plugin,
   if constexpr (!std::is_void_v<ret_type>) {
     IStream rs(os.Data(), os.Size());
     ret_type ret;
-    decode(ret, &rs);
+    unpack_args_read(&rs, ret);
     return ret;
   }
 }

@@ -28,20 +28,6 @@ size_t IStream::Read(void *data, size_t size) {
 
   return size;
 }
-size_t IStream::Read(char *buffer, size_t size) {
-  auto pos = Tellg();
-  uint16_t bytes = 0;
-  if (!Read(&bytes)) {
-    Seekg(pos);
-    return 0;
-  }
-  if (bytes > size) {
-    // 保证下一次读取有效
-    Seekg(pos);
-    return 0;
-  }
-  return Read(buffer, bytes);
-}
 
 size_t IStream::Size() const { return size_; }
 size_t IStream::Tellg(void) const { return pos_; }
@@ -64,13 +50,7 @@ OStream::~OStream(void) {
     data_ = nullptr;
   }
 }
-size_t OStream::Write(const char *buffer, size_t size) {
-  if (pos_ + size + sizeof(uint16_t) > size_) {
-    return 0;
-  }
-  Write(static_cast<uint16_t>(size));
-  return Write(buffer, size);
-}
+
 size_t OStream::Write(const void *data, size_t size) {
   if (pos_ + size > size_) {
     return 0;
