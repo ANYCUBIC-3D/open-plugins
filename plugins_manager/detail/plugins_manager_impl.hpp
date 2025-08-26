@@ -50,6 +50,9 @@ private:
   void Free(const char *value) override;
 
 private:
+  bool InitPlugin(std::shared_ptr<LibraryBase> &lib);
+
+private:
   std::string plugins_; ///< 插件压缩包
   std::string tmp_dir_; ///< 插件解压目录
   PMConfig *config_;    ///< 插件配置
@@ -63,6 +66,6 @@ private:
       instances_;                                ///< 插件实例列表
   std::shared_ptr<EventRouter> router_;          ///< 调用路由
   wxMemoryFSHandler fs_handler_;                 ///< 内存文件系统处理器
-  CreateWebView_t CreateWebView_;                ///< 创建webview的函数指针
+  CreateWebView_t create_webview_;               ///< 创建webview的函数指针
   std::vector<create_library_t> static_plugins_; ///< 动态增加的静态插件列表
 };

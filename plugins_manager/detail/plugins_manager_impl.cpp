@@ -16,7 +16,7 @@ create_library_t *GetCreateLibraryArray();
 PluginsManagerImpl::PluginsManagerImpl(const char *plugins, const char *tmp_dir,
                                        CreateWebView_t CreateWebView)
     : plugins_(plugins), tmp_dir_(tmp_dir), config_(nullptr),
-      CreateWebView_(CreateWebView) {
+      create_webview_(CreateWebView) {
   static bool init = false;
   if (init == false) {
     init = true;
@@ -28,7 +28,7 @@ PluginsManagerImpl::PluginsManagerImpl(const char *plugins, const char *tmp_dir,
   wxFileSystem::AddHandler(&fs_handler_);
   wxXmlResource::Get()->InitAllHandlers();
   wxXmlResource::Get()->AddHandler(
-      new WebviewHandler(CreateWebView_, [this](const wxString &name) {
+      new WebviewHandler(create_webview_, [this](const wxString &name) {
         return GetPlugin(name.utf8_str());
       }));
 }
@@ -128,26 +128,57 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
   return libraries_.size();
 }
 
-bool PluginsManagerImpl::CreateInstances(void) {
+template <typename T> static inline void delete_plugin(T *plugin) {
+  if (plugin != nullptr) {
+    LOG_API("Delete plugin");
+    plugin->Destroy();
+  }
+}
+bool PluginsManagerImpl::InitPlugin(std::shared_ptr<LibraryBase> &lib) {
   FUNC_ENTRY
-  for (auto &lib : libraries_) {
-    assert(lib != nullptr);
-
-    auto info = lib->GetPluginInfo();
-    if (info == nullptr) {
-      LOG_ERROR("Get plugin info failed");
-      continue;
-    }
-    router_->SetPluginName(info->name);
-    if (auto instance = lib->SetupPlugin(this)) {
-      instances_.emplace(
-          wxString::FromUTF8(info->name),
-          std::shared_ptr<Anycubic::Plugins::Plugin>(
-              instance, [](Anycubic::Plugins::Plugin *p) { p->Destroy(); }));
-    } else {
-      LOG_ERROR("Setup plugin {} failed", info->name);
+  auto info = lib->GetPluginInfo();
+  if (info == nullptr) {
+    FUNC_LEAVE2("Get plugin info failed");
+    return false;
+  }
+  for (auto idx = 0; idx < info->dependency_count; idx++) {
+    if (!HasPlugin(info->dependency[idx])) {
+      FUNC_LEAVE2("plugin {} dependency {} not found", info->name,
+                  info->dependency[idx]);
+      return false;
     }
   }
+  router_->SetPluginName(info->name);
+  if (auto instance = lib->SetupPlugin(this)) {
+    instances_.emplace(wxString::FromUTF8(info->name),
+                       std::shared_ptr<Anycubic::Plugins::Plugin>(
+                           instance, delete_plugin<Anycubic::Plugins::Plugin>));
+    LOG_INFO("Init plugin {} success", info->name);
+  } else {
+    LOG_ERROR("Setup plugin {} failed", info->name);
+  }
+
+  FUNC_LEAVE
+  // 让上层清理lib
+  return true;
+}
+bool PluginsManagerImpl::CreateInstances(void) {
+  FUNC_ENTRY
+  size_t previous_size = 0;
+  std::vector<std::shared_ptr<LibraryBase>> libraries;
+  std::swap(libraries_, libraries);
+  do {
+    previous_size = std::erase_if(libraries, [this](auto &lib) {
+      if (InitPlugin(lib)) {
+        libraries_.push_back(lib);
+        return true; // 删除已初始化的元素
+      }
+      return false;
+    });
+  } while (previous_size > 0 && !libraries.empty());
+
+  LOG_ERROR_IF(!libraries.empty(), "未解决的循环依赖，剩余库: {}",
+               libraries.size());
   FUNC_LEAVE
   return !instances_.empty();
 }
