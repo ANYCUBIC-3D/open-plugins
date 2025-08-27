@@ -19,6 +19,10 @@ public:
 public:
   wxString GetValue(const wxString &key) const;
   void SetValue(const wxString &key, const wxString &value);
+  bool IsSuccess(void) const;
+  void SetSuccess(bool success);
+  int32_t GetCode(void) const;
+  void SetCode(int32_t code);
 
 private:
   wxPluginEventPrivate *m_private;

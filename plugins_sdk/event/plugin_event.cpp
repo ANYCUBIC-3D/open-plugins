@@ -44,5 +44,36 @@ wxString wxPluginEvent::GetValue(const wxString &key) const {
 }
 void wxPluginEvent::SetValue(const wxString &key, const wxString &value) {}
 
+#define SUCCESS_MASK 0x40000000
+#define CODE_MASK 0x3FFFFFFF
+
+bool wxPluginEvent::IsSuccess(void) const {
+  auto val = GetInt();
+  return (val & SUCCESS_MASK) != 0;
+}
+
+void wxPluginEvent::SetSuccess(bool success) {
+  auto val = GetInt();
+  if (success) {
+    val |= SUCCESS_MASK;
+  } else {
+    val &= CODE_MASK;
+  }
+  SetInt(val);
+}
+
+int32_t wxPluginEvent::GetCode(void) const {
+  auto val = GetInt();
+  return val & CODE_MASK;
+}
+
+void wxPluginEvent::SetCode(int32_t code) {
+  assert(code <= CODE_MASK);
+  auto val = GetInt();
+  val &= SUCCESS_MASK;
+  val |= code;
+  SetInt(val);
+}
+
 wxIMPLEMENT_DYNAMIC_CLASS(wxPluginEvent, wxNotifyEvent);
 } // namespace Anycubic::Plugins::SDK
