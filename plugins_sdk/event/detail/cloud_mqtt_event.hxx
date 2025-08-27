@@ -1,6 +1,5 @@
 ﻿#pragma once
-
-#include "plugin_event.hxx"
+#include "../plugin_event.hxx"
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/seq.hpp>
