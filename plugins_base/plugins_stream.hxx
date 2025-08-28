@@ -5,6 +5,7 @@
 #include <stddef.h>
 
 #include <numeric>
+#include <string>
 #include <type_traits>
 
 namespace Anycubic::Plugins {
