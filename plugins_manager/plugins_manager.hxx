@@ -7,13 +7,14 @@
 #include <memory>
 
 class LibraryBase;
-typedef std::shared_ptr<LibraryBase> (*create_library_t)(void);
+using create_library_t = std::shared_ptr<LibraryBase> (*)(void);
 /**
  * @brief 插件配置管理接口
  * @note 实现类应提供持久化存储能力
  */
 class PMConfig {
 public:
+  virtual ~PMConfig() = default;
   /**
    * @brief 获取配置项
    * @param key 配置键值，支持两级结构如 "section/key"
@@ -58,6 +59,7 @@ enum class EventType : int8_t {
  * @brief 插件管理器核心接口
  */
 struct PluginsManager {
+  virtual ~PluginsManager() = default;
   /**
    * @brief 添加插件窗口组件
    * @param position 窗口位置标识符
@@ -91,11 +93,9 @@ struct PluginsManager {
    */
   virtual size_t Plugins(void) const = 0;
 };
-
-extern "C" {
 class wxWebView;
-class wxWindow;
 class wxWebViewConfiguration;
+extern "C" {
 typedef wxWebView *(*CreateWebView_t)(
     wxWindow *parent, const wxString &url, wxWebViewConfiguration *conf,
     const std::function<void(wxWebView *)> &visitor);

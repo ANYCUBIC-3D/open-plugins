@@ -47,7 +47,7 @@ bool LoadSignture(const char *plugins, std::vector<char> &buffer) {
 
 bool Decode(std::vector<char> &buffer) {
   auto str =
-      aesDecrypt(std::string(buffer.data(), buffer.size()), AES_PASSWORD);
+      ::aesDecrypt(std::string(buffer.data(), buffer.size()), AES_PASSWORD);
   if (str.empty())
     return false;
   buffer.assign(str.begin(), str.end());
@@ -56,7 +56,7 @@ bool Decode(std::vector<char> &buffer) {
 
 bool Eecode(std::vector<char> &buffer) {
   auto str =
-      aesEncrypt(std::string(buffer.data(), buffer.size()), AES_PASSWORD);
+      ::aesEncrypt(std::string(buffer.data(), buffer.size()), AES_PASSWORD);
   if (str.empty())
     return false;
   buffer.assign(str.begin(), str.end());
@@ -130,7 +130,7 @@ bool ParseInfo(const std::vector<char> &buffer, Package *info) {
   try {
     *info = boost::json::value_to<Package>(json);
     return true;
-  } catch (std::exception &e) {
+  } catch (const boost::json::system_error &e) {
     FUNC_LEAVE2("failed,errno={1}, msg={0}", e.what());
     return false;
   }
@@ -145,7 +145,7 @@ bool SaveInfo(const Package &info, std::vector<char> &buffer) {
     std::string json_str = boost::json::serialize(json);
 
     // 加密数据
-    auto encrypted = aesEncrypt(json_str, AES_PASSWORD);
+    auto encrypted = ::aesEncrypt(json_str, AES_PASSWORD);
     if (encrypted.empty()) {
       return false;
     }
@@ -153,12 +153,13 @@ bool SaveInfo(const Package &info, std::vector<char> &buffer) {
     // 写入buffer
     buffer.assign(encrypted.begin(), encrypted.end());
     return true;
-  } catch (std::exception &e) {
+  } catch (const boost::json::system_error &e) {
     FUNC_LEAVE2("SaveInfo failed: {}", e.what());
     return false;
   }
 }
-bool LoadMD5(const char *plugins, std::map<std::string, std::string> &md5s) {
+
+bool LoadMD5(const char *plugins, map_type &md5s) {
   // 步骤1：打开zip文件
   wxFileInputStream fileStream(wxString::FromUTF8(plugins));
   if (!fileStream.IsOk()) {
@@ -169,30 +170,30 @@ bool LoadMD5(const char *plugins, std::map<std::string, std::string> &md5s) {
   wxZipInputStream zipStream(fileStream);
   wxZipEntry *entry = nullptr;
 
-  char buffer[1024 * 1024] = {0}; // 1MB
+  std::string buffer(1024 * 1024, 0); // 1MB的缓冲区
   // 步骤3：遍历zip条目查找签名文件（签名文件名为"signature.bin"）
   while ((entry = zipStream.GetNextEntry()) != nullptr) {
     BOOST_SCOPE_EXIT(entry) { delete entry; }
     BOOST_SCOPE_EXIT_END
 
-    if (auto filename = entry->GetName(); IsPlugins(entry->GetName())) {
+    if (auto filename = entry->GetName(); ::IsPlugins(entry->GetName())) {
 
       cMd5 md5sum;
       size_t totalRead = entry->GetSize();
       while (totalRead > 0) {
-        size_t toRead = (std::min)(sizeof(buffer), totalRead);
-        size_t read = zipStream.Read(buffer, toRead).LastRead();
+        size_t toRead = (std::min)(buffer.size(), totalRead);
+        size_t read = zipStream.Read(buffer.data(), toRead).LastRead();
         // if (read == 0) {
         //   break;
         //   //理论不出现的，每次都判断一下有点丑，选写在这里如果有问题，去除注释
         // }
         totalRead -= read;
-        md5sum.write(buffer, read);
+        md5sum.write(buffer.data(), read);
       }
-      md5sum.sum(buffer + 32);
-      bin2hex(buffer, buffer + 32, MD5LEN);
+      md5sum.sum(buffer.data() + 32);
+      ::bin2hex(buffer.data(), buffer.data() + 32, MD5LEN);
       buffer[32] = '\0';
-      md5s.emplace(filename.utf8_string(), buffer);
+      md5s.try_emplace(filename.utf8_string(), buffer);
     }
   }
   return !md5s.empty();
@@ -204,7 +205,7 @@ bool IsPlugins(const wxString &filename) {
 }
 
 wxString GetPluginName(const wxString &filename) {
-  if (!IsPlugins(filename)) {
+  if (!::IsPlugins(filename)) {
     return wxString();
   }
   auto name = filename.BeforeFirst(wxT('.'));
@@ -292,43 +293,38 @@ bool Zip(const std::string &dir, const std::string &zip_path) {
   bool hasError = false;
 
   // 递归遍历目录
-  for (bool cont = traverser.GetFirst(&filename, wxEmptyString,
+  for (bool cont = traverser.GetFirst(&filename, ::wxEmptyString,
                                       wxDIR_FILES | wxDIR_DIRS);
        cont && !hasError; cont = traverser.GetNext(&filename)) {
+    hasError = true;
 
-    wxFileName file_path(wxString::FromUTF8(dir), filename);
-
-    if (file_path.IsDir()) {
+    if (wxFileName file_path(wxString::FromUTF8(dir), filename);
+        file_path.IsDir()) {
       // 添加目录条目
-      auto *entry = new wxZipEntry(file_path.GetFullName() +
-                                   wxFileName::GetPathSeparator());
+      auto entry = std::make_unique<wxZipEntry>(file_path.GetFullName() +
+                                                wxFileName::GetPathSeparator());
       entry->SetIsDir();
-      if (!zip.PutNextEntry(entry)) {
-        delete entry;
-        hasError = true;
+      if (!zip.PutNextEntry(entry.get())) {
         break;
       }
     } else {
       // 添加文件条目
       wxFileInputStream in(file_path.GetFullPath());
       if (!in.IsOk()) {
-        hasError = true;
         break;
       }
 
-      auto *entry = new wxZipEntry(file_path.GetFullName());
-      if (!zip.PutNextEntry(entry)) {
-        delete entry;
-        hasError = true;
+      if (auto entry = std::make_unique<wxZipEntry>(file_path.GetFullName());
+          !zip.PutNextEntry(entry.get())) {
         break;
       }
 
       zip.Write(in);
       if (zip.GetLastError() != wxSTREAM_NO_ERROR) {
-        hasError = true;
         break;
       }
     }
+    hasError = false;
   }
 
   zip.Close();

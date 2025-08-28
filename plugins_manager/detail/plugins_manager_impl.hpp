@@ -17,7 +17,7 @@ class PluginsManagerImpl : public PluginsManager,
 public:
   PluginsManagerImpl(const char *plugins, const char *tmp_dir,
                      CreateWebView_t CreateWebView);
-  ~PluginsManagerImpl();
+  ~PluginsManagerImpl() override;
   bool CheckPackage();
   // PluginsManager
 private:
@@ -50,7 +50,7 @@ private:
   void Free(const char *value) override;
 
 private:
-  bool InitPlugin(std::shared_ptr<LibraryBase> &lib);
+  bool InitPlugin(std::shared_ptr<LibraryBase> lib);
 
 private:
   std::string plugins_; ///< 插件压缩包

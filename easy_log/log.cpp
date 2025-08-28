@@ -37,7 +37,7 @@ bool enable_debug(void) {
   return true;
 }
 
-bool register_logger(const char *mname, bool compression) {
+bool register_logger(const char *mname, bool) {
   try {
     spdlog::drop(mname);
     auto sink = std::make_shared<dist_sink_mt>();

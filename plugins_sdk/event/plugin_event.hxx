@@ -13,10 +13,9 @@ public:
   wxPluginEvent();
   wxPluginEvent(wxEventType type, int id);
   wxPluginEvent(const wxPluginEvent &event);
-  virtual ~wxPluginEvent(void);
+  ~wxPluginEvent(void) override;
   wxEvent *Clone() const override;
 
-public:
   wxString GetValue(const wxString &key) const;
   void SetValue(const wxString &key, const wxString &value);
   bool IsSuccess(void) const;
@@ -29,7 +28,7 @@ private:
 
   wxDECLARE_DYNAMIC_CLASS_NO_ASSIGN(wxPluginEvent);
 };
-typedef void (wxEvtHandler::*wxPluginEventFunction)(wxPluginEvent &);
+using wxPluginEventFunction = void (wxEvtHandler::*)(wxPluginEvent &);
 
 } // namespace Anycubic::Plugins::SDK
 // 静态事件表支持

@@ -7,7 +7,7 @@ struct Plugin;
 struct PluginHost;
 } // namespace Anycubic::Plugins
 
-#define PLUGIN_API_VERSION 1
+constexpr int PLUGIN_API_VERSION = 1;
 #define PLUGIN_EXPORT_GETINFO(export, plugin_name)                             \
   PluginInfo *export BOOST_PP_CAT(plugin_name, _getInfo)()
 #define PLUGIN_EXPORT_SETUP(export, plugin_name)                               \

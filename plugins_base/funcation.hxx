@@ -12,7 +12,7 @@
                                             &type::func, this))
 
 namespace Anycubic::Plugins {
-typedef std::function<void(IStream *data, OStream *result)> FuncationType;
+using FuncationType = std::function<void(IStream *data, OStream *result)>;
 class FuncationWrapper : public RequestHandler {
 public:
   FuncationWrapper(const FuncationType &func) : func_(func) {}
@@ -25,7 +25,7 @@ private:
 
 template <typename Function, typename Self>
 RequestHandler *make_call(const Function &func, Self *self) {
-  typedef function_traits<Function> func_traits;
+  using func_traits = function_traits<Function>;
   auto h = [func, self](IStream *data, OStream *result) {
     using ret_type = std::decay_t<typename func_traits::return_type>;
     typename func_traits::bare_tuple_type args;

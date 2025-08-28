@@ -7,18 +7,18 @@
 namespace Anycubic::Plugins {
 template <typename T>
 using remove_const_reference_t =
-    typename std::remove_const<typename std::remove_reference<T>::type>::type;
+    std::remove_const_t<std::remove_reference_t<T>>;
 
 template <typename T> struct function_traits;
 
 template <typename Ret, typename... Args> struct function_traits<Ret(Args...)> {
 public:
   enum { arity = sizeof...(Args) }; ///< 参数数量
-  typedef Ret return_type;          ///< 返回值类型
-  typedef Ret (*pointer)(Args...);  ///< 函数指针
+  using return_type = Ret;          ///< 返回值类型
+  using pointer = Ret (*)(Args...); ///< 函数指针
 
-  typedef std::tuple<remove_const_reference_t<Args>...>
-      bare_tuple_type; ///< 简单参数类型（反序列化不能的引用和const)
+  using bare_tuple_type = std::tuple<remove_const_reference_t<
+      Args>...>; ///< 简单参数类型（反序列化不能的引用和const)
 };
 
 /**

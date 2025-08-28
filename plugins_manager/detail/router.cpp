@@ -8,10 +8,11 @@ bool EventRouter::AddFunction(const char *fname,
                               Anycubic::Plugins::RequestHandler *handler) {
   assert(!plugin_name_.IsEmpty());
   auto key = KeyName(plugin_name_, wxASCII_STR(fname));
-  if (funcs_.find(key) != funcs_.end()) {
+  if (funcs_.contains(key)) {
     return false;
   }
-  funcs_[key] = std::shared_ptr<Anycubic::Plugins::RequestHandler>(handler, [](Anycubic::Plugins::RequestHandler* p) { p->Destroy(); });
+  funcs_[key] = std::shared_ptr<Anycubic::Plugins::RequestHandler>(
+      handler, [](Anycubic::Plugins::RequestHandler *p) { p->Destroy(); });
   return true;
 }
 
@@ -19,7 +20,7 @@ bool EventRouter::ExecuteFunction(const char *plugin, const char *fname,
                                   Anycubic::Plugins::IStream *data,
                                   Anycubic::Plugins::OStream *result) {
   auto key = KeyName(wxASCII_STR(plugin), wxASCII_STR(fname));
-  if (funcs_.find(key) == funcs_.end()) {
+  if (funcs_.contains(key)) {
     return false;
   }
   funcs_[key]->Execute(data, result);

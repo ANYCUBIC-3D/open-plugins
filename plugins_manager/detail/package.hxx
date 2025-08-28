@@ -6,19 +6,21 @@
 
 #include <wx/string.h>
 
+using map_type = std::map<std::string, std::string, std::less<>>;
+
 bool LoadSignture(const char *plagin, std::vector<char> &buffer);
 bool Decode(std::vector<char> &buffer);
 bool Eecode(std::vector<char> &buffer);
 struct Package {
   int64_t version;
   int64_t build_time;
-  std::map<std::string, std::string> files;
+  map_type files;
 };
 
 bool ParseInfo(const std::vector<char> &buffer, Package *info);
 bool SaveInfo(const Package &info, std::vector<char> &buffer);
 
-bool LoadMD5(const char *plagin, std::map<std::string, std::string> &md5s);
+bool LoadMD5(const char *plagin, map_type &md5s);
 
 bool IsPlugins(const wxString &filename);
 wxString GetPluginName(const wxString &filename);

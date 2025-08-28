@@ -13,6 +13,7 @@ namespace Anycubic::Plugins {
 struct IStream;
 struct OStream;
 struct RequestHandler {
+  virtual ~RequestHandler() = default;
   /**
    * @brief 执行插件请求处理
    * @param data 输入数据流
@@ -27,6 +28,7 @@ struct RequestHandler {
 };
 
 struct PluginRouter {
+  virtual ~PluginRouter() = default;
   /**
    * @brief 添加插件函数处理器
    *
@@ -53,6 +55,7 @@ struct PluginRouter {
 };
 
 struct Plugin {
+  virtual ~Plugin() = default;
   /**
    * @brief 插件名称
    *
@@ -111,6 +114,7 @@ struct Plugin {
 };
 
 struct PluginHost {
+  virtual ~PluginHost() = default;
   /**
    * @brief 获取路由管理器
    *

@@ -19,7 +19,7 @@ macro(add_rc_shared sub_project_name MACRO_NAME)
         C_VISIBILITY_PRESET hidden
         VISIBILITY_INLINES_HIDDEN ON
     )
-    target_compile_options(${sub_project_name} PRIVATE -fvisibility=hidden -Wl,--exclude-libs,ALL)
+    target_compile_options(${sub_project_name} PRIVATE -fvisibility=hidden)
     generate_export_header(${sub_project_name} 
         EXPORT_MACRO_NAME ${MACRO_NAME}
         EXPORT_FILE_NAME ${sub_project_name}_export.hxx

@@ -6,8 +6,9 @@ namespace Anycubic::Plugins::SDK {
 
 class wxPluginEventPrivate {
 public:
-  wxPluginEventPrivate() {}
-  wxPluginEventPrivate(const wxPluginEventPrivate &other) {}
+  wxPluginEventPrivate() = default;
+  wxPluginEventPrivate(const wxPluginEventPrivate &other)
+      : m_keyValueMap(other.m_keyValueMap) {}
   wxString GetValue(const wxString &key) const {
     if (auto itr = m_keyValueMap.find(key); itr == m_keyValueMap.end()) {
       return wxString();
@@ -40,12 +41,14 @@ wxPluginEvent::wxPluginEvent(const wxPluginEvent &event)
 wxPluginEvent::~wxPluginEvent(void) { delete m_private; }
 wxEvent *wxPluginEvent::Clone() const { return new wxPluginEvent(*this); }
 wxString wxPluginEvent::GetValue(const wxString &key) const {
-  return wxString();
+  return m_private->GetValue(key);
 }
-void wxPluginEvent::SetValue(const wxString &key, const wxString &value) {}
+void wxPluginEvent::SetValue(const wxString &key, const wxString &value) {
+  m_private->SetValue(key, value);
+}
 
-#define SUCCESS_MASK 0x40000000
-#define CODE_MASK 0x3FFFFFFF
+constexpr int SUCCESS_MASK = 0x40000000;
+constexpr int CODE_MASK = 0x3FFFFFFF;
 
 bool wxPluginEvent::IsSuccess(void) const {
   auto val = GetInt();

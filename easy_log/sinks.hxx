@@ -16,7 +16,8 @@ class dist_sink : public spdlog::sinks::base_sink<Mutex> {
 
 public:
   dist_sink() = default;
-  explicit dist_sink(std::vector<spdlog::sink_ptr> sinks) : sinks_(sinks) {}
+  explicit dist_sink(std::vector<spdlog::sink_ptr> &&sinks)
+      : sinks_(std::move(sinks)) {}
 
   dist_sink(const dist_sink &) = delete;
   dist_sink &operator=(const dist_sink &) = delete;
@@ -28,8 +29,9 @@ public:
 
   void remove_sink(spdlog::sink_ptr sub_sink) {
     std::lock_guard<Mutex> lock(base_sink::mutex_);
-    sinks_.erase(std::remove(sinks_.begin(), sinks_.end(), sub_sink),
-                 sinks_.end());
+    std::erase_if(sinks_, [&sub_sink](const spdlog::sink_ptr &sink) {
+      return sink == sub_sink;
+    });
   }
 
   void set_sinks(std::vector<spdlog::sink_ptr> sinks) {
@@ -42,14 +44,14 @@ public:
 protected:
   void sink_it_(const spdlog::details::log_msg &msg) override {
     if (base_sink::should_log(msg.level)) {
-      for (auto &sub_sink : sinks_) {
+      for (auto sub_sink : sinks_) {
         sub_sink->log(msg);
       }
     }
   }
 
   void flush_() override {
-    for (auto &sub_sink : sinks_) {
+    for (auto sub_sink : sinks_) {
       sub_sink->flush();
     }
   }
@@ -62,7 +64,7 @@ protected:
   void
   set_formatter_(std::unique_ptr<spdlog::formatter> sink_formatter) override {
     base_sink::formatter_ = std::move(sink_formatter);
-    for (auto &sub_sink : sinks_) {
+    for (auto sub_sink : sinks_) {
       sub_sink->set_formatter(base_sink::formatter_->clone());
     }
   }

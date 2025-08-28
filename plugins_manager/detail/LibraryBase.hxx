@@ -6,11 +6,12 @@
 
 #include <type_traits>
 
-typedef struct PluginInfo *(*plugin_getInfo_t)(void);
-typedef struct Anycubic::Plugins::Plugin *(*plugin_setup_t)(
-    struct Anycubic::Plugins::PluginHost *host);
+using plugin_getInfo_t = struct PluginInfo *(*)(void);
+using plugin_setup_t = struct Anycubic::Plugins::Plugin
+    *(*)(struct Anycubic::Plugins::PluginHost *host);
 
 struct LibraryBase {
+  virtual ~LibraryBase() = default;
   struct PluginInfo *GetPluginInfo() const;
   struct Anycubic::Plugins::Plugin *
   SetupPlugin(struct Anycubic::Plugins::PluginHost *host) const;
@@ -26,7 +27,7 @@ protected:
 struct LibraryShared : public LibraryBase {
 public:
   LibraryShared();
-  virtual ~LibraryShared();
+  ~LibraryShared() override;
 
 public:
   inline bool Loaded(void) const override { return m_library.IsLoaded(); }
@@ -52,7 +53,7 @@ private:
 struct LibraryStatic : public LibraryBase {
 public:
   LibraryStatic(plugin_getInfo_t getInfo, plugin_setup_t setup);
-  virtual ~LibraryStatic();
+  ~LibraryStatic() override;
 
   bool LoadLibrary(wxString libName) override;
   void UnloadLibrary() override;
