@@ -2,6 +2,7 @@
 find_package(Boost CONFIG REQUIRED)
 
 add_static(utility NONE ${SRCS_G})
+target_compile_definitions(utility PRIVATE BOOST_ALL_NO_LIB)
 target_link_libraries(utility PRIVATE fmt)
 target_include_directories(utility PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 target_include_directories(utility INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
