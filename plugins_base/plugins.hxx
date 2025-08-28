@@ -18,7 +18,7 @@ struct RequestHandler {
    * @param data 输入数据流
    * @param result 输出结果流
    */
-  virtual void Execute(IStream *data,  OStream *result) = 0;
+  virtual void Execute(IStream *data, OStream *result) = 0;
 
   /**
    * @brief 销毁处理器资源
@@ -53,6 +53,19 @@ struct PluginRouter {
 };
 
 struct Plugin {
+  /**
+   * @brief 插件名称
+   *
+   * @return const char* 插件名称字符串
+   */
+  virtual const char *Name(void) = 0;
+  /**
+   * @brief 插件启动函数
+   *
+   * @return true 启动成功
+   * @return false 启动失败
+   */
+  virtual bool Start(void) = 0;
   /**
    * @brief 附加事件处理器
    *
