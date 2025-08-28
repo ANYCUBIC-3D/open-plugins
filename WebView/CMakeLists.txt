@@ -223,6 +223,10 @@ foreach(WEBVIEW_FILE ${WEBVIEW_FILES})
         BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include"
         OUTPUT_VARIABLE REL_PATH
     )
-    cmake_path(NORMAL_PATH REL_PATH)  
+    if(REL_PATH STREQUAL ".")
+        set(REL_PATH "")
+    else()
+        cmake_path(NORMAL_PATH REL_PATH) 
+    endif()
     INSTALL(FILES ${WEBVIEW_FILE} DESTINATION "include/webview/${REL_PATH}")
 endforeach()
