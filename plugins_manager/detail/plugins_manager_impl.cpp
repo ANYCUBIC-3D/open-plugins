@@ -160,7 +160,8 @@ bool PluginsManagerImpl::InitPlugin(std::shared_ptr<LibraryBase> &lib) {
     }
   }
   router_->SetPluginName(info->name);
-  if (auto instance = lib->SetupPlugin(this)) {
+  if (Anycubic::Plugins::Plugin *instance = lib->SetupPlugin(this);
+      instance != nullptr) {
     instances_.emplace(wxString::FromUTF8(instance->Name()),
                        std::shared_ptr<Anycubic::Plugins::Plugin>(
                            instance, delete_plugin<Anycubic::Plugins::Plugin>));
@@ -191,7 +192,8 @@ bool PluginsManagerImpl::CreateInstances(void) {
   LOG_ERROR_IF(!libraries.empty(), "未解决的循环依赖，剩余库: {}",
                libraries.size());
   for (auto &lib : instances_) {
-    LOG_ERROR_IF(!lib->Start(), "plugin start failed: {}", lib->Name());
+    LOG_ERROR_IF(!lib.second->Start(), "plugin start failed: {}",
+                 lib.second->Name());
   }
   FUNC_LEAVE
   return !instances_.empty();
