@@ -4,7 +4,6 @@
 
 #include <sstream>
 
-
 template <typename _Ty> inline auto to_string(_Ty &&val) {
   using type_v = std::decay_t<_Ty>;
   if constexpr (std::is_same_v<type_v, wxString>) {
@@ -41,23 +40,26 @@ template <typename _Ty> inline auto to_string(_Ty &&val) {
     return val;
   }
 }
-static bool IsTestScript(){
+static bool IsTestScript() {
   auto value = std::getenv("TESTS_SCRIPT");
-  return value != nullptr && strcmp(value, "1") == 0;
+  return value != nullptr && ::strcmp(value, "1") == 0;
 }
 
 template <typename... Args>
 wxString ScriptFormat(const wxString &func, Args &&...args) {
   std::stringstream ss;
-  static bool isTest = IsTestScript();//确保切换不太影响性能
-  static auto value = std::getenv("SCRIPT_NAME");
-  if(isTest && value!=nullptr && strncmp(value, func.utf8_str(),strlen(value))==0 ){
-    //仅对特定的脚本进行调试
-    static std::atomic<int> counter = 0;
+  static bool isTest = ::IsTestScript(); // 确保切换不太影响性能
+
+  if (static auto value = std::getenv("SCRIPT_NAME");
+      isTest && value != nullptr &&
+      ::strncmp(value, func.utf8_str(), ::strlen(value)) == 0) {
+    // 仅对特定的脚本进行调试
+    static std::atomic_int counter = 0;
     std::string testFuncName = "test_" + std::to_string(counter++);
     // Rest/Spread参数语法 (...args)
     ss << "function " << testFuncName << "(...args) {\n"
-       << "  console.group('Calling js wrapper " << func.utf8_string() << "');\n"
+       << "  console.group('Calling js wrapper " << func.utf8_string()
+       << "');\n"
        << "  console.log('Arguments:', ...args);\n"
        << "  try {\n"
        << func.utf8_string() << "(...args);\n"
@@ -70,8 +72,8 @@ wxString ScriptFormat(const wxString &func, Args &&...args) {
        << "  }\n"
        << "}\n";
     ss << "debugger;\n";
-    ss  << testFuncName;
-  }else{
+    ss << testFuncName;
+  } else {
     ss << func.utf8_string();
   }
 

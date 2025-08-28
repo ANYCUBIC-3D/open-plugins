@@ -9,7 +9,7 @@ class ExecuteBase;
 class Router;
 
 struct InstanceBase {
-  virtual ~InstanceBase() {}
+  virtual ~InstanceBase() = default;
   virtual void Reload(void) = 0;
   virtual void RegisterApi(Router *router, ExecuteBase *executer) = 0;
 };
@@ -17,8 +17,8 @@ struct InstanceBase {
 template <typename _Ty> class Instance : public InstanceBase {
 public:
   Instance() : instance_(std::make_unique<_Ty>()) {}
-  Instance(_Ty *instance) : instance_(instance) {}
-  ~Instance() { instance_.reset(); }
+  explicit Instance(_Ty *instance) : instance_(instance) {}
+  ~Instance() override { instance_.reset(); }
   void Reload(void) override { instance_->Reload(); }
   void RegisterApi(Router *router, ExecuteBase *executer) override {
     instance_->RegisterApi(router, executer);
@@ -32,7 +32,7 @@ private:
 class WebviewApiHandler : public wxWebViewHandler {
 public:
   WebviewApiHandler(const wxString &scheme, ExecuteBase *executer);
-  ~WebviewApiHandler();
+  ~WebviewApiHandler() override;
 
   void Reload(void);
 

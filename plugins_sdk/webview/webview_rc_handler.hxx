@@ -8,7 +8,7 @@
 class WebviewRCHandler : public wxWebViewHandler {
 public:
   WebviewRCHandler(const wxString &scheme, const wxString &dllPath);
-  ~WebviewRCHandler();
+  ~WebviewRCHandler() override;
   void StartRequest(wxWebViewHandlerRequest &request,
                     wxSharedPtr<wxWebViewHandlerResponse> response) override;
   wxFSFile *GetFile(const wxString &uri) override;

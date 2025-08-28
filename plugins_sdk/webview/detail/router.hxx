@@ -32,7 +32,7 @@ public:
 class ExecuteScript : public ExecuteBase {
 public:
   std::function<void(const wxString &)> execute;
-  virtual void execute_script(const wxString &script) override {
+  void execute_script(const wxString &script) override {
     return execute(script);
   }
 };
@@ -121,7 +121,7 @@ public:
 
 class RegexMatcher final : public MatcherBase {
 public:
-  RegexMatcher(const wxString &pattern) : regex_(pattern) {}
+  explicit RegexMatcher(const wxString &pattern) : regex_(pattern) {}
 
   bool match(const wxString &request) const override;
 
@@ -131,17 +131,16 @@ private:
 
 class handlerStringResponseData : public wxWebViewHandlerResponseData {
 public:
-  handlerStringResponseData(wxString &data);
+  explicit handlerStringResponseData(wxString &data);
 
-  virtual wxInputStream *GetStream() override;
+  wxInputStream *GetStream() override;
 
 private:
   wxStringInputStream m_stream;
 };
 
-typedef std::function<bool(wxWebViewHandlerRequest &request,
-                           wxSharedPtr<wxWebViewHandlerResponse>)>
-    Handler;
+using Handler = std::function<bool(wxWebViewHandlerRequest &request,
+                                   wxSharedPtr<wxWebViewHandlerResponse>)>;
 
 #if defined(DELETE) && defined(__WXMSW__)
 // windows下有个宏定义 DELETE
@@ -169,26 +168,26 @@ public:
   template <typename Function, typename Self>
   bool Post(const wxString &pattern, const Function &func, Self *self,
             std::vector<wxString> &&param_names) {
-    return add_handler(MethodPOST, pattern,
-                       make_handler(func, self, param_names, [](auto &req) {
-                         return req.GetDataString();
-                       }));
+    return add_handler(
+        MethodPOST, pattern,
+        make_handler(func, self, std::move(param_names),
+                     [](auto &req) { return req.GetDataString(); }));
   }
   template <typename Function, typename Self>
   bool Delete(const wxString &pattern, const Function &func, Self *self,
               std::vector<wxString> &&param_names) {
-    return add_handler(MethodDELETE, pattern,
-                       make_handler(func, self, param_names, [](auto &req) {
-                         return req.GetDataString();
-                       }));
+    return add_handler(
+        MethodDELETE, pattern,
+        make_handler(func, self, std::move(param_names),
+                     [](auto &req) { return req.GetDataString(); }));
   }
   template <typename Function, typename Self>
   bool Put(const wxString &pattern, const Function &func, Self *self,
            std::vector<wxString> &&param_names) {
-    return add_handler(MethodPUT, pattern,
-                       make_handler(func, self, param_names, [](auto &req) {
-                         return req.GetDataString();
-                       }));
+    return add_handler(
+        MethodPUT, pattern,
+        make_handler(func, self, std::move(param_names),
+                     [](auto &req) { return req.GetDataString(); }));
   }
 
 public:
@@ -216,12 +215,12 @@ private:
     iguana::json::to_json(ss, obj);
     return ss.str();
   }
-  template <typename _Ty> static wxString create_response(_Ty &&val) {
+  template <typename _Ty> static wxString create_response(const _Ty &val) {
     ac::json::reader writer;
     writer["code"] = 200;
     writer["msg"] = "OK";
 
-    using data_type = std::decay_t<decltype(val)>;
+    using data_type = std::decay_t<_Ty>;
     if constexpr (std::is_same_v<data_type, wxString>) {
       writer["data"] = val.utf8_string();
     } else if constexpr (std::is_same_v<data_type, std::string> ||
@@ -253,7 +252,8 @@ private:
     }
   }
   template <typename _Ty>
-  static void transform_json(_Ty &&ret, ac::json::reader::value_type &val) {
+  static void transform_json(_Ty &ret,
+                             const ac::json::reader::value_type &val) {
     using ret_type = std::decay_t<_Ty>;
     if constexpr (std::is_same_v<bool, ret_type>) {
       ret = val;
@@ -277,7 +277,7 @@ private:
                            const query_type &list) {
     if constexpr (I < sizeof...(Args)) {
       assert(sizeof...(Args) <= names.size());
-      typedef decltype(std::get<I>(tuple)) arg_type;
+      using arg_type = decltype(std::get<I>(tuple));
       static_assert(!(std::is_const_v<arg_type>), "");
       auto pair = list.find(names[I].ToStdString());
       assert(pair != list.end());
@@ -293,8 +293,8 @@ private:
                           ac::json::reader &read) {
     if constexpr (I < sizeof...(Args)) {
       assert(sizeof...(Args) <= names.size());
-      typedef decltype(std::get<I>(tuple)) arg_type;
-      static_assert(!(std::is_const_v<arg_type>), "");
+      using arg_type = decltype(std::get<I>(tuple));
+      static_assert(!(std::is_const_v<arg_type>));
       auto pair = read.find(names[I].ToStdString());
       assert(pair != read.end());
       if (pair != read.end()) {
@@ -304,7 +304,7 @@ private:
     }
   }
   template <bool query, typename _Ty>
-  static void decode(_Ty &&val, const wxString &str,
+  static void decode(_Ty &val, const wxString &str,
                      const std::vector<wxString> &names) {
     std::string jsonstr;
     if constexpr (query) {
@@ -314,7 +314,7 @@ private:
     }
 
     if constexpr (query) {
-      auto args = parse_query(jsonstr);
+      auto args = ::parse_query(jsonstr);
       assign_query(val, names, args);
     } else if (ac::json::reader reader;
                ac::json::parse_json(reader, jsonstr.data(), jsonstr.size())) {
@@ -325,10 +325,9 @@ private:
             typename ParamFunc>
   Handler make_handler(const Function &func, Self *self,
                        const std::vector<wxString> &param_names,
-                       const ParamFunc &get_str) {
-    typedef Anycubic::Plugins::function_traits<Function> func_traits;
-    Handler h = [param_names, func, self, get_str](auto &req,
-                                                   auto res) -> bool {
+                       const ParamFunc &get_str) const {
+    using func_traits = Anycubic::Plugins::function_traits<Function>;
+    Handler h = [param_names, func, self, get_str](auto &req, auto res) {
       typename func_traits::bare_tuple_type args;
       using ret_type = typename func_traits::return_type;
       wxString resBody = R"({"code":500,"msg":"Internal Server Error"})";

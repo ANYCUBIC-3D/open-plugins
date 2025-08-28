@@ -10,25 +10,29 @@
 #include <wx/mimetype.h>
 #include <wx/mstream.h>
 #include <wx/uri.h>
-#include <wx/wfstream.h>
 #include <wx/zipstrm.h>
 
 #ifdef __WXMSW__
 #include <Windows.h>
 #else
-#include <sys/errno.h>
+
 #endif //
 
 class WebViewHandlerResponseDataMemory : public wxWebViewHandlerResponseData {
 public:
-  WebViewHandlerResponseDataMemory(wxMemoryInputStream *stream)
-      : m_stream(stream) {}
-  virtual ~WebViewHandlerResponseDataMemory() { delete m_stream; }
+  explicit WebViewHandlerResponseDataMemory(
+      std::unique_ptr<wxMemoryInputStream> &&stream)
+      : m_stream(std::move(stream)) {}
+  WebViewHandlerResponseDataMemory(const WebViewHandlerResponseDataMemory &) =
+      delete;
+  WebViewHandlerResponseDataMemory &
+  operator=(const WebViewHandlerResponseDataMemory &) = delete;
+  ~WebViewHandlerResponseDataMemory() override = default;
 
-  virtual wxInputStream *GetStream() override { return m_stream; }
+  wxInputStream *GetStream() override { return m_stream.get(); }
 
 private:
-  wxMemoryInputStream *m_stream;
+  std::unique_ptr<wxMemoryInputStream> m_stream;
 };
 
 WebviewRCHandler::WebviewRCHandler(const wxString &scheme,
@@ -55,9 +59,9 @@ bool WebviewRCHandler::LoadPackageData() {
   }
 
   // 获取getPackageInfo函数
-  typedef PackageInfo *(*GetPackageInfoFunc)();
-  GetPackageInfoFunc getPackageInfo =
-      (GetPackageInfoFunc)dll.GetSymbol("getPackageInfo");
+  using GetPackageInfoFunc = PackageInfo *(*)(void);
+  auto getPackageInfo =
+      reinterpret_cast<GetPackageInfoFunc>(dll.GetSymbol("getPackageInfo"));
 
   if (!getPackageInfo) {
     LOG_ERROR("Failed to get getPackageInfo symbol from DLL");
@@ -73,18 +77,18 @@ bool WebviewRCHandler::LoadPackageData() {
   }
   // 计算md5 保数据完整性
   char calMd5[MD5LEN] = {0};
-  md5Sum(reinterpret_cast<const char *>(packageInfo->data), packageInfo->size,
-         calMd5);
+  ::md5Sum(reinterpret_cast<const char *>(packageInfo->data), packageInfo->size,
+           calMd5);
   char orgMD5[MD5LEN] = {0};
-  hex2bin(const_cast<char *>(packageInfo->md5), orgMD5, 2 * MD5LEN);
-  if (memcmp(calMd5, orgMD5, MD5LEN) != 0) {
+  ::hex2bin(const_cast<char *>(packageInfo->md5), orgMD5, 2 * MD5LEN);
+  if (::memcmp(calMd5, orgMD5, MD5LEN) != 0) {
     LOG_ERROR("md5 check failed");
     return false;
   }
 
   // 解析zip数据并建立文件映射
-  wxMemoryInputStream memStream(
-      reinterpret_cast<const void *>(packageInfo->data), packageInfo->size);
+  wxMemoryInputStream memStream(static_cast<const void *>(packageInfo->data),
+                                packageInfo->size);
   wxZipInputStream zipStream(memStream);
 
   wxZipEntry *entry;
@@ -98,7 +102,6 @@ bool WebviewRCHandler::LoadPackageData() {
         zipStream.Read(buffer.data(), fileSize);
       }
     }
-    delete entry;
   }
   return true;
 }
@@ -136,7 +139,8 @@ void WebviewRCHandler::StartRequest(
     response->SetHeader("Access-Control-Allow-Origin", "*");
     response->SetHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     response->Finish(wxSharedPtr<wxWebViewHandlerResponseData>(
-        new WebViewHandlerResponseDataMemory(stream)));
+        new WebViewHandlerResponseDataMemory(
+            std::unique_ptr<wxMemoryInputStream>(stream))));
   } else {
     LOG_WARN("File not found: {}", url.utf8_string());
     response->SetStatus(404);
@@ -162,8 +166,7 @@ WebviewRCHandler::GetStream(const wxString &url) {
   }
   std::pair<wxMemoryInputStream *, wxString> ret;
 
-  auto it = m_fileMap.find(path);
-  if (it != m_fileMap.end()) {
+  if (auto it = m_fileMap.find(path); it != m_fileMap.end()) {
     // 创建内存流
     ret.first = new wxMemoryInputStream(it->second.data(), it->second.size());
   }

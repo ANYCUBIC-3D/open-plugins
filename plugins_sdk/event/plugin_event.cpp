@@ -7,8 +7,7 @@ namespace Anycubic::Plugins::SDK {
 class wxPluginEventPrivate {
 public:
   wxPluginEventPrivate() = default;
-  wxPluginEventPrivate(const wxPluginEventPrivate &other)
-      : m_keyValueMap(other.m_keyValueMap) {}
+  wxPluginEventPrivate(const wxPluginEventPrivate &other) = default;
   wxString GetValue(const wxString &key) const {
     if (auto itr = m_keyValueMap.find(key); itr == m_keyValueMap.end()) {
       return wxString();
