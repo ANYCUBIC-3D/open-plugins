@@ -1,6 +1,7 @@
 ﻿#pragma once
-#include <stdint.h>
+#include <boost/preprocessor/cat.hpp>
 
+#include <stdint.h>
 namespace Anycubic::Plugins {
 struct Plugin;
 struct PluginHost;
@@ -8,10 +9,10 @@ struct PluginHost;
 
 #define PLUGIN_API_VERSION 1
 #define PLUGIN_EXPORT_GETINFO(export, plugin_name)                             \
-  PluginInfo *export plugin_name##_getInfo()
+  PluginInfo *export BOOST_PP_CAT(plugin_name, _getInfo)()
 #define PLUGIN_EXPORT_SETUP(export, plugin_name)                               \
-  struct Anycubic::Plugins::Plugin *export plugin_name##_setup(                \
-      struct Anycubic::Plugins::PluginHost *host)
+  struct Anycubic::Plugins::Plugin *export BOOST_PP_CAT(plugin_name, _setup)(  \
+      struct Anycubic::Plugins::PluginHost * host)
 
 extern "C" {
 struct PluginInfo {
