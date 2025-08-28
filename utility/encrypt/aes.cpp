@@ -21,9 +21,9 @@ static bool generate_salt(unsigned char *salt) {
 static bool derive_key(const std::string_view &password,
                        const unsigned char *salt, unsigned char *key,
                        int key_size) {
-  return ::PKCS5_PBKDF2_HMAC_SHA1(password.data(), password.size(), salt,
-                                  SALT_SIZE, PBKDF2_ITERATIONS, key_size,
-                                  key) == 1;
+  return ::PKCS5_PBKDF2_HMAC_SHA1(
+             password.data(), static_cast<int>(password.size()), salt,
+             SALT_SIZE, PBKDF2_ITERATIONS, key_size, key) == 1;
 }
 
 std::string aesEncrypt(const std::string_view &plaintext,
@@ -79,8 +79,8 @@ std::string aesEncrypt(const std::string_view &plaintext,
   return std::move(ciphertext);
 }
 
-std::string aesDecrypt(const std::string &ciphertext,
-                       const std::string &password) {
+std::string aesDecrypt(const std::string_view &ciphertext,
+                       const std::string_view &password) {
   EVP_CIPHER_CTX *ctx = ::EVP_CIPHER_CTX_new();
   SCOPE_FREE(ctx, ::EVP_CIPHER_CTX_free);
   std::string plaintext;

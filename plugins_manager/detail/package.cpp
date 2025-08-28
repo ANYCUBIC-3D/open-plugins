@@ -46,8 +46,8 @@ bool LoadSignture(const char *plugins, std::vector<char> &buffer) {
 }
 
 bool Decode(std::vector<char> &buffer) {
-  auto str =
-      ::aesDecrypt(std::string(buffer.data(), buffer.size()), AES_PASSWORD);
+  auto str = ::aesDecrypt(std::string_view(buffer.data(), buffer.size()),
+                          AES_PASSWORD);
   if (str.empty())
     return false;
   buffer.assign(str.begin(), str.end());
@@ -55,8 +55,8 @@ bool Decode(std::vector<char> &buffer) {
 }
 
 bool Eecode(std::vector<char> &buffer) {
-  auto str =
-      ::aesEncrypt(std::string(buffer.data(), buffer.size()), AES_PASSWORD);
+  auto str = ::aesEncrypt(std::string_view(buffer.data(), buffer.size()),
+                          AES_PASSWORD);
   if (str.empty())
     return false;
   buffer.assign(str.begin(), str.end());
