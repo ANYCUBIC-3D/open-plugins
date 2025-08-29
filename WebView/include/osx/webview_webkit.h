@@ -67,6 +67,7 @@ public:
     virtual bool IsAccessToDevToolsEnabled() const override;
     virtual void EnableAccessToDevTools(bool enable = true) override;
     virtual bool SetUserAgent(const wxString& userAgent) override;
+    virtual bool ShowDevTools() override;
 
     //History functions
     virtual void ClearHistory() override;

@@ -581,6 +581,38 @@ bool wxWebViewWebKit::SetUserAgent(const wxString& userAgent)
     else
         return false;
 }
+bool wxWebViewWebKit::ShowDevTools() {
+    if (WX_IS_MACOS_AVAILABLE(10, 15)) {
+        if(m_webView && IsAccessToDevToolsEnabled())
+        {
+            @try {
+                // First try the modern private API (macOS 10.15+)
+                if ([m_webView respondsToSelector:@selector(_inspector)])
+                {
+                    id inspector = [m_webView performSelector:@selector(_inspector)];
+                    if ([inspector respondsToSelector:@selector(show)])
+                    {
+                        [inspector performSelector:@selector(show)];
+                        return true;
+                    }
+                }
+                
+                // Fallback to older private API (macOS 10.12-10.14)
+                if ([m_webView respondsToSelector:@selector(_showInspector)])
+                {
+                    [m_webView performSelector:@selector(_showInspector)];
+                    return true;
+                }
+                return true;
+            }
+            @catch (NSException* exception) {
+                wxLogDebug("Failed to show Web Inspector: %s", 
+                          wxCFStringRef::AsString(exception.reason).c_str());
+            }
+        }
+    }
+    return false;
+}
 
 bool wxWebViewWebKit::ClearBrowsingData(int types, wxDateTime since)
 {
