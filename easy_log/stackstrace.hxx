@@ -13,6 +13,10 @@ template <typename T> auto ac_to_string(T &&t);
 #include <sstream>
 #include <string>
 
+extern "C" {
+LOG_API int get_stack_depth(bool entry);
+}
+
 namespace anycubic::tracer {
 
 template <bool entry, typename... Args>
@@ -21,10 +25,12 @@ std::string strace_format(Args &&...args) {
   constexpr int STACKTRACE_SYMBOL_MIN_LENGTH = 9; // 最小符号长度
   std::stringstream ss;
 
+  int stack_depth = get_stack_depth(entry);
+
   if constexpr (entry) {
-    ss << ">>>>>>>";
+    ss << "ENTRY>> " << stack_depth << " ";
   } else {
-    ss << "<<<<<<<<";
+    ss << "LEAVE<< " << stack_depth << " ";
   }
   if constexpr (sizeof...(args) > 0) {
     ss << " " << logger::ac_format(std::forward<Args>(args)...);
