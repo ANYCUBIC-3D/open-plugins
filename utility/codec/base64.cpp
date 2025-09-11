@@ -10,7 +10,7 @@ extern "C" {
 
 #include <math.h>
 
-std::string base64Encode(const std::string_view &src) {
+std::string base64Encode(const std::string &src) {
   assert(!src.empty());
   auto bufferLength = src.size();
   // base64 会把数据变长1/3,搞不了精确就大概就好了
