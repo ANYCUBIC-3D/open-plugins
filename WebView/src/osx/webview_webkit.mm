@@ -974,6 +974,7 @@ void wxWebViewWebKit::RegisterHandler(wxSharedPtr<wxWebViewHandler> handler)
     }
     return self;
 }
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_11_03
 // WKDownloadDelegate 协议方法
 - (void)downloadDidFinish:(WKDownload *)download
 {
@@ -1017,7 +1018,7 @@ completionHandler:(void (^)(NSURL *)) completionHandler
     event.SetInt(static_cast<int>(error.code));
     webKitWindow->ProcessWindowEvent(event);
 }
-
+#endif 
 
 @end
 
