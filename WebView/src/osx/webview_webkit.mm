@@ -1056,6 +1056,7 @@ completionHandler:(void (^)(NSURL *)) completionHandler
     else
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_11_03
 /*
  @abstract Called after using WKNavigationActionPolicyDownload.
  @param webView The web view that created the download.
@@ -1082,7 +1083,7 @@ completionHandler:(void (^)(NSURL *)) completionHandler
         download.delegate = downloadDelegate;
     }
 }
-
+#endif 
 /*
  @abstract Called after using WKNavigationResponsePolicyDownload.
  @param webView The web view that created the download.
@@ -1276,8 +1277,10 @@ wxString nsErrorToWxHtmlError(NSError* error, wxWebViewNavigationError* out)
     if (webKitWindow && webKitWindow->GetEventHandler())
         webKitWindow->GetEventHandler()->ProcessEvent(event);
     WKNavigationActionPolicy policy = event.IsAllowed()? WKNavigationActionPolicyAllow : WKNavigationActionPolicyCancel;
-    if(navFlags == wxWEBVIEW_NAV_ACTION_USER)
-        policy = WKNavigationActionPolicyDownload;
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_11_03
+        if(navFlags == wxWEBVIEW_NAV_ACTION_USER)
+            policy = WKNavigationActionPolicyDownload;
+#endif
 
     decisionHandler(policy);
 }
