@@ -74,5 +74,9 @@ set(CMAKE_DEBUG_POSTFIX d)
 generate_build_header(${CMAKE_BINARY_DIR}/build_info.h)
 
 find_package(wxWidgets 3.1 REQUIRED COMPONENTS core base)
-add_subdirs(3rdparty easy_log utility WebView resources plugins_base plugins_sdk plugins plugins_manager)
+option(ENABLE_WEBVIEW "Enable WebView WebKit" ON)
+if(ENABLE_WEBVIEW)
+    add_subdirs(WebView)
+endif()
+add_subdirs(3rdparty easy_log utility resources plugins_base plugins_sdk plugins plugins_manager)
 
