@@ -16,12 +16,13 @@ create_library_t *GetCreateLibraryArray();
 PluginsManagerImpl::PluginsManagerImpl(const char *plugins, const char *tmp_dir,
                                        CreateWebView_t CreateWebView)
     : plugins_(plugins), tmp_dir_(tmp_dir), config_(nullptr),
-      create_webview_(CreateWebView) {
+      create_webview_(CreateWebView), is_inited_(0) {
   static bool init = false;
   if (init == false) {
     init = true;
     REGISTER_LOGGER(false);
   }
+  router_ = std::make_shared<EventRouter>();
   if (!wxFileName::Exists(wxString::FromUTF8(plugins))) {
     throw std::invalid_argument("plugins not exists");
   }
@@ -273,11 +274,15 @@ void PluginsManagerImpl::EmitEvent(EventType event) {
     // empty
     break;
   case EventType::kEventFinishedByGUI:
-    CreateInstances();
+    if (is_inited_ == 0) {
+      is_inited_ = 1;
+      CreateInstances();
+    }
     break;
   case EventType::kEventExitByGUI:
     instances_.clear();
     widgets_.clear();
+    is_inited_ = 0;
     break;
   case EventType::kEventExitByApp:
     libraries_.clear();
