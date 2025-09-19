@@ -68,4 +68,5 @@ private:
   wxMemoryFSHandler fs_handler_;                 ///< 内存文件系统处理器
   CreateWebView_t create_webview_;               ///< 创建webview的函数指针
   std::vector<create_library_t> static_plugins_; ///< 动态增加的静态插件列表
+  std::vector<wxString> plugin_packages_;        ///< 插件包列表
 };

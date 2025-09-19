@@ -77,10 +77,10 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
   // 搜索输出目录找到所有插件
   std::vector<wxString> plugins;
 #ifndef NDEBUG
-
   if (auto env = std::getenv("PLUGINS_DEBUG_DIR"); env == nullptr) {
 #endif // NDEBUG
-    if (!::Unzip(plugins_, tmp_dir_)) {
+    // 搜索plugins_下所有文件，如果是zip文件，解压到tmp_dir_
+    if (!::UnzipAll(plugin_packages_, tmp_dir_)) {
       FUNC_LEAVE2("Unzip plugins failed");
       return 0;
     }
@@ -114,9 +114,10 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
     }
   }
 #endif
-  std::ranges::for_each(static_plugins_, [this](create_library_t create) {
-    libraries_.push_back(create());
-  });
+  for (auto create_library_array : static_plugins_) {
+    libraries_.push_back(create_library_array());
+  }
+
   std::ranges::transform(
       plugins, std::back_inserter(libraries_),
       [](const wxString &fname) -> std::shared_ptr<LibraryBase> {
@@ -127,16 +128,19 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
         LOG_ERROR("Load library {} failed", fname.utf8_string());
         return nullptr;
       });
-  std::erase_if(libraries_, [](const auto &lib) {
-    if (lib == nullptr) {
-      return true;
-    }
-    auto info = lib->GetPluginInfo();
-    // NOTE: 这里决定插件会不会被加载
-    // 必需有info,且api版本为1
-    return info == nullptr || info->plugin_api != 1;
-  });
-
+  decltype(libraries_) tmp_libs;
+  std::swap(tmp_libs, libraries_);
+  libraries_.reserve(tmp_libs.size());
+  std::ranges::copy_if(tmp_libs, std::back_inserter(libraries_),
+                       [](const auto &lib) {
+                         if (lib == nullptr) {
+                           return false;
+                         }
+                         auto info = lib->GetPluginInfo();
+                         // NOTE: 这里决定插件会不会被加载
+                         // 必需有info,且api版本为1
+                         return info != nullptr && info->plugin_api == 1;
+                       });
   return libraries_.size();
 }
 
@@ -180,13 +184,19 @@ bool PluginsManagerImpl::CreateInstances(void) {
   std::vector<std::shared_ptr<LibraryBase>> libraries;
   std::swap(libraries_, libraries);
   do {
-    previous_size = std::erase_if(libraries, [this](auto &lib) {
+    previous_size = 0;
+    for (auto itr = libraries.begin(); itr != libraries.end();) {
+      auto lib = *itr;
       if (InitPlugin(lib)) {
         libraries_.push_back(lib);
-        return true; // 删除已初始化的元素
+        // 删除已初始化的元素
+        itr = libraries.erase(itr);
+        previous_size += 1; // 标记有插件能被初始化
+      } else {
+        ++itr;
       }
-      return false;
-    });
+    }
+
   } while (previous_size > 0 && !libraries.empty());
 
   LOG_ERROR_IF(!libraries.empty(), "未解决的循环依赖，剩余库: {}",
@@ -287,7 +297,7 @@ void PluginsManagerImpl::EmitEvent(EventType event) {
   FUNC_LEAVE
 }
 
-bool PluginsManagerImpl::CheckPackage() {
+static bool CheckPackage_(const std::string &plugins_) {
   FUNC_ENTRY
   std::vector<char> buffer;
   if (!::LoadSignture(plugins_.c_str(), buffer)) {
@@ -329,4 +339,33 @@ bool PluginsManagerImpl::CheckPackage() {
   }
   FUNC_LEAVE
   return true;
+}
+
+bool PluginsManagerImpl::CheckPackage() {
+  FUNC_ENTRY
+#ifndef NDEBUG
+  FUNC_LEAVE2("check package skipped in debug mode");
+  return true;
+#endif // NDEBUG
+  // 遍历plugins目录下的所有文件
+  wxDir pluginsDir(wxString::FromUTF8(plugins_));
+  if (!pluginsDir.IsOpened()) {
+    FUNC_LEAVE2("plugins dir not opened:{}", plugins_);
+    return false;
+  }
+
+  wxString filename;
+  for (bool cont = pluginsDir.GetFirst(&filename, wxT("*.zip"), wxDIR_FILES);
+       cont; cont = pluginsDir.GetNext(&filename)) {
+    // 构造完整路径
+    wxFileName zipFile(wxString::FromUTF8(plugins_), filename);
+    if (!CheckPackage_(zipFile.GetFullPath().utf8_string())) {
+      FUNC_LEAVE2("check package failed:{}", filename.utf8_string());
+      return false;
+    }
+    plugin_packages_.push_back(filename);
+  }
+  FUNC_LEAVE2("check package finished, package size:{}",
+              plugin_packages_.size());
+  return plugin_packages_.size() > 0;
 }

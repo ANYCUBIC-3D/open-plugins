@@ -213,12 +213,15 @@ wxString GetPluginName(const wxString &filename) {
   return name;
 }
 
-bool Unzip(const std::string &in_zip, const std::string &out_dir) {
+bool Unzip(const std::string &in_zip, const std::string &out_dir,
+           bool remove_first) {
   auto dir = wxFileName::DirName(wxString::FromUTF8(out_dir));
-  if (dir.DirExists()) {
+
+  if (remove_first && dir.DirExists()) {
     dir.Rmdir(wxPATH_RMDIR_RECURSIVE); // 添加递归删除确保清空目录
   }
-  dir.Mkdir(wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL); // 使用完整路径创建模式
+  if (!dir.DirExists())
+    dir.Mkdir(wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL); // 使用完整路径创建模式
 
   wxFileInputStream in(wxString::FromUTF8(in_zip));
   if (!in.IsOk())
@@ -329,4 +332,24 @@ bool Zip(const std::string &dir, const std::string &zip_path) {
 
   zip.Close();
   return !hasError;
+}
+
+bool UnzipAll(const std::vector<wxString> &plugins_packages,
+              const std::string &tmp_dir) {
+  // 创建临时目录
+  auto dir = wxFileName::DirName(wxString::FromUTF8(tmp_dir));
+  if (dir.DirExists()) {
+    dir.Rmdir(wxPATH_RMDIR_RECURSIVE);
+  }
+  dir.Mkdir(wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+
+  for (auto package : plugins_packages) {
+    // 解压单个zip文件
+    if (!Unzip(package.utf8_string(), tmp_dir, false)) {
+      // 解压失败，返回false
+      return false;
+    }
+  }
+  // 所有文件解压成功，返回true
+  return true;
 }
