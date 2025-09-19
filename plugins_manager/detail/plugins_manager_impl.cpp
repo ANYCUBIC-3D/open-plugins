@@ -76,19 +76,10 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
 
   // 搜索输出目录找到所有插件
   std::vector<wxString> plugins;
-#ifndef NDEBUG
-  if (auto env = std::getenv("PLUGINS_DEBUG_DIR"); env == nullptr) {
-#endif // NDEBUG
-    // 搜索plugins_下所有文件，如果是zip文件，解压到tmp_dir_
-    if (!::UnzipAll(plugin_packages_, tmp_dir_)) {
-      FUNC_LEAVE2("Unzip plugins failed");
-      return 0;
-    }
-#ifndef NDEBUG
-  } else {
-    tmp_dir_ = env;
+  if (!::UnzipAll(plugin_packages_, tmp_dir_)) {
+    FUNC_LEAVE2("Unzip plugins failed");
+    return 0;
   }
-#endif // NDEBUG
 
   wxDir dir(wxString::FromUTF8(tmp_dir_));
   if (!dir.IsOpened()) {
