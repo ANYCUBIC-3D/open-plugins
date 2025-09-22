@@ -22,7 +22,7 @@ function(create_static_target prefix suffix)
         )
     elseif(CMAKE_HOST_WIN32)
         set_target_properties(${projectname} PROPERTIES
-            IMPORTED_IMPLIB_RELEASE "${ROOT_DIR}lib/${suffix}.lib"
+            IMPORTED_IMPLIB_RELEASE "${ROOT_DIR}lib/${suffix}_s.lib"
             IMPORTED_IMPLIB_DEBUG "${ROOT_DIR}lib/${suffix}_s${POSTFIX}.lib"
         )
     elseif(CMAKE_HOST_LINUX)
