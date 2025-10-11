@@ -49,7 +49,7 @@ bool PluginsManagerImpl::AddWidget(const wxString &position, wxWindow *widget) {
     FUNC_LEAVE2("{} widgets exists", position.utf8_string());
     return false;
   }
-  widgets_.emplace_back(widget, position);
+  widgets_.emplace_back(WidgetsNode{widget, position});
   FUNC_LEAVE
   return true;
 }
