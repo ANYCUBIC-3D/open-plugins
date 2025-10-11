@@ -66,7 +66,9 @@ enum {
    DEVICESAVE,         /* 设备信息保存*/                                       \
    ENGINEVERSION,      /* 获取引擎版本*/                                       \
    UPDATEVERSION,      /*获取更新版本信息*/                                    \
-   PRESIGN, GETSLICERCONFIG, SETSLICERCONFIG, FORCE_LOGOUT)
+   PRESIGN, GETSLICERCONFIG, SETSLICERCONFIG, FORCE_LOGOUT,                    \
+   BATCHTASKLIST, /*农场批量任务列表*/                                         \
+   SLICERINFO /*农场切片信息*/)
 
 #define CLOUD_DECLARE_EXPAND(r, prefix, elem)                                  \
   wxDECLARE_EXPORTED_EVENT(EVENT_API, BOOST_PP_CAT(prefix, elem),              \
