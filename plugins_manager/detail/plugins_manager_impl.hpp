@@ -53,6 +53,11 @@ private:
   bool InitPlugin(std::shared_ptr<LibraryBase> lib);
 
 private:
+  // 递归遍历目录获取插件
+  void TraverseDirectory(const wxString &dirPath,
+                         std::vector<wxString> &plugins);
+
+private:
   std::string plugins_; ///< 插件压缩包
   std::string tmp_dir_; ///< 插件解压目录
   PMConfig *config_;    ///< 插件配置

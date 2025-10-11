@@ -200,16 +200,21 @@ bool LoadMD5(const char *plugins, map_type &md5s) {
 }
 
 bool IsPlugins(const wxString &filename) {
-  return (filename.StartsWith(wxASCII_STR("plugin")) &&
-          filename.Lower().EndsWith(PLUGIN_EXT));
+  auto fname = wxFileName::FileName(filename).GetFullName();
+  return (fname.StartsWith(PLUGIN_PREFIX) &&
+          fname.Lower().EndsWith(PLUGIN_EXT));
 }
 
 wxString GetPluginName(const wxString &filename) {
   if (!::IsPlugins(filename)) {
     return wxString();
   }
-  auto name = filename.BeforeFirst(wxT('.'));
-  name.Replace(wxASCII_STR("plugin"), wxASCII_STR(""));
+  auto name = wxFileName::FileName(filename).GetName();
+  name.Replace(PLUGIN_PREFIX, wxASCII_STR(""));
+#ifndef NDEBUG
+  // 移除d的标记
+  name = name.RemoveLast(1);
+#endif
   return name;
 }
 
@@ -338,11 +343,12 @@ bool UnzipAll(const std::vector<wxString> &plugins_packages,
               const std::string &tmp_dir) {
   // 创建临时目录
   auto dir = wxFileName::DirName(wxString::FromUTF8(tmp_dir));
+#ifdef NDEBUG
   if (dir.DirExists()) {
     dir.Rmdir(wxPATH_RMDIR_RECURSIVE);
   }
   dir.Mkdir(wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
-
+#endif
   for (auto package : plugins_packages) {
     // 解压单个zip文件
     if (!Unzip(package.utf8_string(), tmp_dir, false)) {

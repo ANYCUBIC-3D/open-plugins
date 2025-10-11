@@ -24,7 +24,7 @@ LibraryShared::LibraryShared() {
 }
 LibraryShared::~LibraryShared() { UnloadLibrary(); }
 
-bool LibraryShared::LoadLibrary(wxString libName) {
+bool LibraryShared::LoadLibrary(const wxString &libName) {
   if (Loaded())
     return true;
   auto pluginName = GetPluginName(libName);
@@ -57,6 +57,6 @@ LibraryStatic::LibraryStatic(plugin_getInfo_t getInfo, plugin_setup_t setup) {
 }
 LibraryStatic::~LibraryStatic() {}
 
-bool LibraryStatic::LoadLibrary(wxString libName) { return true; }
+bool LibraryStatic::LoadLibrary(const wxString &libName) { return true; }
 
 void LibraryStatic::UnloadLibrary() {}

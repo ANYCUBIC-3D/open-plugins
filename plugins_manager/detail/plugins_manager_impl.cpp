@@ -76,7 +76,7 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
   FUNC_ENTRY
 
   // 搜索输出目录找到所有插件
-  std::vector<wxString> plugins;
+
   if (!::UnzipAll(plugin_packages_, tmp_dir_)) {
     FUNC_LEAVE2("Unzip plugins failed");
     return 0;
@@ -87,15 +87,9 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
     FUNC_LEAVE2("Open dir failed");
     return 0;
   }
-  wxString filename;
-  for (bool cont = dir.GetFirst(&filename, wxT("*"), wxDIR_FILES); cont;
-       cont = dir.GetNext(&filename)) {
-    if (!::IsPlugins(filename)) {
-      LOG_INFO("{} is not plugins", filename.utf8_string());
-      continue;
-    }
-    plugins.push_back(filename);
-  }
+  // 递归获取所有子目录的插件
+  std::vector<wxString> plugins;
+  TraverseDirectory(wxString::FromUTF8(tmp_dir_), plugins);
   libraries_.reserve(plugins.size() + PLUGINS_LIST_SIZE +
                      static_plugins_.size());
 #if PLUGINS_LIST_SIZE > 0
@@ -364,4 +358,34 @@ bool PluginsManagerImpl::CheckPackage() {
   FUNC_LEAVE2("check package finished, package size:{}",
               plugin_packages_.size());
   return plugin_packages_.size() > 0;
+}
+
+// 在文件末尾添加成员函数实现
+void PluginsManagerImpl::TraverseDirectory(const wxString &dirPath,
+                                           std::vector<wxString> &plugins) {
+  wxDir dir(dirPath);
+  if (!dir.IsOpened())
+    return;
+
+  wxString filename;
+  // 遍历当前目录的文件和子目录
+  for (bool cont = dir.GetFirst(&filename, wxT("*"), wxDIR_FILES | wxDIR_DIRS);
+       cont; cont = dir.GetNext(&filename)) {
+    wxFileName fullPath(filename);
+    fullPath.MakeAbsolute(dirPath);
+
+    if (wxDir::Exists(fullPath.GetFullPath())) {
+      // 如果是目录且不是"."或".."，递归遍历
+      if (filename != wxT(".") && filename != wxT("..")) {
+        TraverseDirectory(fullPath.GetFullPath(), plugins);
+      }
+    } else {
+      // 如果是文件且是插件，添加到列表
+      if (::IsPlugins(filename)) {
+        plugins.push_back(fullPath.GetFullPath());
+      } else {
+        LOG_INFO("{} is not plugins", filename.utf8_string());
+      }
+    }
+  }
 }
