@@ -45,8 +45,13 @@ private:
   bool AddFS(const wxString &name, const wxString &xrc) override;
   bool DelFS(const wxString &name) override;
   bool AddFS(const wxString &name, void *data, size_t length) override;
-  bool SaveConfig(const char *name, const char *value) override;
-  bool LoadConfig(const char *name, const char **value) override;
+  bool GetValue(const class wxString &key, class wxString &value) override;
+  bool SetValue(const class wxString &key, const class wxString &value,
+                bool persistent = true) override;
+  bool GetEncryptValue(const class wxString &key,
+                       class wxString &value) override;
+  bool SetEncryptValue(const class wxString &key, const class wxString &value,
+                       bool persistent = true) override;
   void Free(const char *value) override;
 
 private:

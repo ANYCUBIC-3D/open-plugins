@@ -175,24 +175,32 @@ struct PluginHost {
   virtual bool AddFS(const wxString &name, void *data, size_t length) = 0;
 
   /**
-   * @brief 保存配置项
-   *
-   * @param name 配置项名称
-   * @param value 配置项值
-   * @return true 保存成功
-   * @return false 保存失败
+   * @brief 获取配置项
+   * @param key 配置键值，支持两级结构如 "section/key"
+   * @param value [输出] 配置值
    */
-  virtual bool SaveConfig(const char *name, const char *value) = 0;
+  virtual bool GetValue(const class wxString &, class wxString &value) = 0;
 
   /**
-   * @brief 加载配置项
-   *
-   * @param name 配置项名称
-   * @param value 配置项值指针
-   * @return true 加载成功
-   * @return false 加载失败
+   * @brief 设置配置项
+   * @param persistent 是否持久化存储，默认true
    */
-  virtual bool LoadConfig(const char *name, const char **value) = 0;
+  virtual bool SetValue(const class wxString &, const class wxString &value,
+                        bool persistent = true) = 0;
+
+  /**
+   * @brief 获取加密配置项
+   * @note 实现类应负责加解密逻辑
+   */
+  virtual bool GetEncryptValue(const class wxString &,
+                               class wxString &value) = 0;
+
+  /**
+   * @brief 设置加密配置项
+   */
+  virtual bool SetEncryptValue(const class wxString &,
+                               const class wxString &value,
+                               bool persistent = true) = 0;
 
   /**
    * @brief 释放配置项值内存

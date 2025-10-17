@@ -238,19 +238,23 @@ bool PluginsManagerImpl::AddFS(const wxString &name, void *data,
   return true;
 }
 
-bool PluginsManagerImpl::SaveConfig(const char *name, const char *value) {
-  assert(config_ != nullptr);
-  return config_->SetValue(wxString::FromUTF8(name), wxString::FromUTF8(value));
+bool PluginsManagerImpl::GetValue(const wxString &key, wxString &value) {
+  return config_->GetValue(key, value);
 }
 
-bool PluginsManagerImpl::LoadConfig(const char *name, const char **value) {
-  assert(config_ != nullptr && value != nullptr);
+bool PluginsManagerImpl::SetValue(const wxString &key, const wxString &value,
+                                  bool persistent) {
+  return config_->SetValue(key, value, persistent);
+}
 
-  if (wxString value_; config_->GetValue(wxString::FromUTF8(name), value_)) {
-    *value = ::strdup(value_.utf8_str());
-    return true;
-  }
-  return false;
+bool PluginsManagerImpl::GetEncryptValue(const wxString &key, wxString &value) {
+  return config_->GetEncryptValue(key, value);
+}
+
+bool PluginsManagerImpl::SetEncryptValue(const wxString &key,
+                                         const wxString &value,
+                                         bool persistent) {
+  return config_->SetEncryptValue(key, value, persistent);
 }
 
 void PluginsManagerImpl::Free(const char *value) {
