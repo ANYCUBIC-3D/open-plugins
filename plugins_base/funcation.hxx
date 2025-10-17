@@ -68,5 +68,12 @@ ret_type dispatch_call(PluginRouter *router, const char *plugin,
     return ret;
   }
 }
-
+template <typename ret_type, typename... Args>
+ret_type dispatch_call(PluginHost *host, const char *plugin, const char *fname,
+                       Args &&...args) {
+  auto router = host->Router();
+  assert(router != nullptr);
+  return dispatch_call<ret_type>(router, plugin, fname,
+                                 std::forward<Args>(args)...);
+}
 } // namespace Anycubic::Plugins
