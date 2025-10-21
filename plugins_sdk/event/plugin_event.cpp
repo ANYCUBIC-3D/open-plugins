@@ -23,9 +23,11 @@ public:
       m_keyValueMap[key] = value;
     }
   }
+  std::shared_ptr<void> &SharedData() { return m_sharedData; }
 
 private:
   std::map<wxString, wxString> m_keyValueMap;
+  std::shared_ptr<void> m_sharedData;
 };
 
 wxPluginEvent::wxPluginEvent() : wxNotifyEvent(), m_private(nullptr) {}
@@ -44,6 +46,14 @@ wxString wxPluginEvent::GetValue(const wxString &key) const {
 }
 void wxPluginEvent::SetValue(const wxString &key, const wxString &value) {
   m_private->SetValue(key, value);
+}
+
+void wxPluginEvent::SetSharedData(void *data, void (*dtor)(void *)) {
+  m_private->SharedData() = std::shared_ptr<void>(data, dtor);
+}
+
+void *wxPluginEvent::GetSharedData(void) const {
+  return m_private->SharedData().get();
 }
 
 constexpr int SUCCESS_MASK = 0x40000000;
