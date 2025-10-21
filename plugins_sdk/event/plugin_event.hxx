@@ -33,7 +33,7 @@ using wxPluginEventFunction = void (wxEvtHandler::*)(wxPluginEvent &);
 } // namespace Anycubic::Plugins::SDK
 // 静态事件表支持
 #define wxPluginEventHandler(func)                                             \
-  wxEVENT_HANDLER_CAST(wxPluginEventFunction, func)
+  wxEVENT_HANDLER_CAST(::Anycubic::Plugins::SDK::wxPluginEventFunction, func)
 
 #define EVT_PLUGIN_EVT(evt, id, fn)                                            \
   wx__DECLARE_EVT1(evt, id, wxPluginEventHandler(fn))
