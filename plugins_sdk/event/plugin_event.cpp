@@ -48,8 +48,10 @@ void wxPluginEvent::SetValue(const wxString &key, const wxString &value) {
   m_private->SetValue(key, value);
 }
 
-void wxPluginEvent::SetSharedData(void *data, void (*dtor)(void *)) {
-  m_private->SharedData() = std::shared_ptr<void>(data, dtor);
+void wxPluginEvent::SetSharedData(void *data, void *ctx,
+                                  void (*dtor)(void *, void *)) {
+  m_private->SharedData() =
+      std::shared_ptr<void>(data, [ctx, dtor](void *data) { dtor(data, ctx); });
 }
 
 void *wxPluginEvent::GetSharedData(void) const {

@@ -18,7 +18,7 @@ public:
 
   wxString GetValue(const wxString &key) const;
   void SetValue(const wxString &key, const wxString &value);
-  void SetSharedData(void *data, void (*dtor)(void *));
+  void SetSharedData(void *data, void *ctx, void (*dtor)(void *, void *));
   void *GetSharedData(void) const;
 
   bool IsSuccess(void) const;

@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <type_traits>
 
-namespace ac::json {
+namespace Anycubic::utility::json {
 
 template <typename T> struct ArrayWrapper : public std::true_type {
   typedef T value_type;
@@ -66,4 +66,4 @@ template <typename T> struct ArrayWrapper<T *> : public std::false_type {
   pointer data_ = nullptr;
   uintptr_t size_ = 0;
 };
-} // namespace ac::json
+} // namespace Anycubic::utility::json
