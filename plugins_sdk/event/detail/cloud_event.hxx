@@ -67,5 +67,5 @@ enum {
    SLICERINFO,    /*农场切片信息*/                                             \
    SENDFILSTOPRINTER /* 发送文件到打印机*/)
 
-EVENT_HELPER_DECLARE(impl_wxDECLARE_EVENT, WXEVT_CLOUD_MQTT_,
+EVENT_HELPER_DECLARE(impl_wxDECLARE_EVENT, EVT_CLOUD_CLIENT_,
                      CLOUD_CLIENT_EVENT_LIST)

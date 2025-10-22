@@ -40,11 +40,11 @@ template <typename _Ty> static void dep_copy(_Ty &&dst) {
       if constexpr (std::is_array_v<typename type_v::value_type>) {
         for (auto idx : range(array_size(old_data[i]))) {
           dst.data_[i][idx] = old_data[i][idx]; // 对数组元素执行拷贝
-          DepCopy_(dst.data_[i][idx]);          // 对数组元素递归执行拷贝
+          dep_copy(dst.data_[i][idx]);          // 对数组元素递归执行拷贝
         }
       } else {
         dst.data_[i] = old_data[i]; // 对数组元素执行拷贝
-        DepCopy_(dst.data_[i]);     // 对数组元素递归执行拷贝
+        dep_copy(dst.data_[i]);     // 对数组元素递归执行拷贝
       }
     }
   } else if constexpr (std::is_aggregate_v<type_v>) {
@@ -82,14 +82,14 @@ static type_v *copy_array(type_v *src, size_t src_size) {
   auto dst = new type_v[src_size];
   for (auto i : range(src_size)) {
     dst[i] = src[i];  // 对数组元素执行拷贝
-    DepCopy_(dst[i]); // 对数组元素递归执行拷贝
+    dep_copy(dst[i]); // 对数组元素递归执行拷贝
   }
   return make_shared(dst, src_size);
 }
 template <typename type_v> static type_v *copy_object(type_v *src) {
   auto dst = new type_v;
   *dst = *src;    // 对对象元素执行拷贝
-  DepCopy_(*dst); // 对对象元素递归执行拷贝
+  dep_copy(*dst); // 对对象元素递归执行拷贝
   return dst;
 }
 
@@ -109,7 +109,7 @@ public:
     auto this_ = reinterpret_cast<deleter_array<type_v> *>(pthis);
     // 深度释放
     free_array(ptr, this_->size_);
-    delete this;
+    delete this_;
   }
 
 public:
@@ -127,5 +127,6 @@ public:
     dep_free(*ptr);
     delete ptr;
   }
+};
 
 } // namespace Anycubic::Plugins::SDK
