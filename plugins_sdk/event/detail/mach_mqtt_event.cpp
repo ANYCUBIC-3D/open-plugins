@@ -1,3 +1,5 @@
 ﻿#include "mach_mqtt_event.hxx"
 
 EVENT_HELPER_DEFINE(impl_wxDEFINE_EVENT, WXEVT_MACH_MQTT_, MACH_MQTT_EVT_LIST)
+EVENT_HELPER_DECLARE(impl_wxDEFINE_EVENT, WXEVT_MACH_MQTT_,
+                     MACH_MQTT_EVT_LIST_2)
