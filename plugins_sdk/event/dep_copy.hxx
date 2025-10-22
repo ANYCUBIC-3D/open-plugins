@@ -77,16 +77,18 @@ template <typename _Ty> static void dep_free(_Ty &&dst) {
 }
 
 template <typename type_v>
-static type_v *copy_array(type_v *src, size_t src_size) {
+static std::remove_const_t<type_v> *copy_array(const type_v *src,
+                                               size_t src_size) {
   using range = utility::utils::range;
   auto dst = new type_v[src_size];
   for (auto i : range(src_size)) {
     dst[i] = src[i];  // 对数组元素执行拷贝
     dep_copy(dst[i]); // 对数组元素递归执行拷贝
   }
-  return make_shared(dst, src_size);
+  return dst;
 }
-template <typename type_v> static type_v *copy_object(type_v *src) {
+template <typename type_v>
+static std::remove_const_t<type_v> *copy_object(const type_v *src) {
   auto dst = new type_v;
   *dst = *src;    // 对对象元素执行拷贝
   dep_copy(*dst); // 对对象元素递归执行拷贝
