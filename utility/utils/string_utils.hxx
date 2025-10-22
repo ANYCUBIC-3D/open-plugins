@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <iterator>
 #include <string>
-namespace Anycubic::utility {
+namespace Anycubic::utility::utils {
 template <typename ContainerType>
 std::string Join(const ContainerType &items, const std::string &delimiter) {
   if (std::empty(items))
@@ -16,4 +16,4 @@ std::string Join(const ContainerType &items, const std::string &delimiter) {
   }
   return result;
 }
-} // namespace Anycubic::utility
+} // namespace Anycubic::utility::utils

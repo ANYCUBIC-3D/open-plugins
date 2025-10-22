@@ -35,7 +35,7 @@ std::string make_query(const query_type &query) {
                                         escape(kv.second));
                    return std::move(v);
                  });
-  return Anycubic::utility::Join(out, "&");
+  return Anycubic::utility::utils::Join(out, "&");
 }
 
 query_type parse_query(const std::string &query) {

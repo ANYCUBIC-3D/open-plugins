@@ -216,7 +216,7 @@ private:
     return ss.str();
   }
   template <typename _Ty> static wxString create_response(const _Ty &val) {
-    ac::json::reader writer;
+    Anycubic::utility::json::reader writer;
     writer["code"] = 200;
     writer["msg"] = "OK";
 
@@ -226,8 +226,9 @@ private:
     } else if constexpr (std::is_same_v<data_type, std::string> ||
                          std::is_arithmetic_v<data_type>) {
       writer["data"] = val;
-    } else if constexpr (ac::json::is_reflection_v<data_type>) {
-      writer["data"] = ac::json::reader::parse(object_to_json(val));
+    } else if constexpr (Anycubic::utility::json::is_reflection_v<data_type>) {
+      writer["data"] =
+          Anycubic::utility::json::reader::parse(object_to_json(val));
     } else {
       assert(false);
     }
@@ -252,8 +253,9 @@ private:
     }
   }
   template <typename _Ty>
-  static void transform_json(_Ty &ret,
-                             const ac::json::reader::value_type &val) {
+  static void
+  transform_json(_Ty &ret,
+                 const Anycubic::utility::json::reader::value_type &val) {
     using ret_type = std::decay_t<_Ty>;
     if constexpr (std::is_same_v<bool, ret_type>) {
       ret = val;
@@ -290,7 +292,7 @@ private:
   template <int32_t I = 0, typename... Args>
   static void assign_json(std::tuple<Args...> &tuple,
                           const std::vector<wxString> &names,
-                          ac::json::reader &read) {
+                          Anycubic::utility::json::reader &read) {
     if constexpr (I < sizeof...(Args)) {
       assert(sizeof...(Args) <= names.size());
       using arg_type = decltype(std::get<I>(tuple));
@@ -316,8 +318,9 @@ private:
     if constexpr (query) {
       auto args = ::parse_query(jsonstr);
       assign_query(val, names, args);
-    } else if (ac::json::reader reader;
-               ac::json::parse_json(reader, jsonstr.data(), jsonstr.size())) {
+    } else if (Anycubic::utility::json::reader reader;
+               Anycubic::utility::json::parse_json(reader, jsonstr.data(),
+                                                   jsonstr.size())) {
       assign_json(val, names, reader);
     }
   }
