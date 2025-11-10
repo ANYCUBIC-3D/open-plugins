@@ -8,6 +8,7 @@ LIBRARIES ACWebView easy_log iguana nlohmann_json
 ) 
 target_compile_definitions(webview_sdk PRIVATE wxDEBUG_LEVEL=0 MODULE_NAME="" ENABLE_STRACE=1)
 set_target_properties(webview_sdk PROPERTIES FOLDER "PluginsSDK")
+target_include_directories(webview_sdk PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 
 # foreach(DIR ${HDRS})
 #     string(REPLACE "${CMAKE_CURRENT_LIST_DIR}" "" sub ${DIR})

@@ -1,49 +1,45 @@
 ﻿#include "webview_api_handler.hxx"
-#include "detail/router.hxx"
+#include "detail/router.hpp"
 
 #include <wx/log.h>
 namespace Anycubic::Plugins::SDK {
-WebviewApiHandler::WebviewApiHandler(const wxString &scheme,
-                                     ExecuteBase *executer)
-    : wxWebViewHandler(scheme), router_(new Router()), executer_(executer) {
-  assert(executer_ != nullptr);
-#if defined(__WXMSW__)
+void WebviewApiHandler::AddInstances(
+    const std::initializer_list<InstanceBase *> &list) {
+  std::ranges::for_each(list, std::bind(&WebviewApiHandler::AddInstance, this,
+                                        std::placeholders::_1));
+}
+
+void WebviewApiHandler::AddInstance(InstanceBase *instance) {
+  assert(instance != nullptr && m_router != nullptr);
+  instance->Init(*m_router);
+  m_instances.push_back(instance);
+}
+
+WebviewApiHandler::WebviewApiHandler(const wxString &scheme)
+    : wxWebViewHandler(scheme), m_router(Router::Create()) {
   SetVirtualHost("ac.localhost");
-#endif
 }
 
-WebviewApiHandler::~WebviewApiHandler() {
-  for (auto &instance : instances_) {
-    delete instance;
-  }
-  instances_.clear();
-
-  delete router_;
-  router_ = nullptr;
-  executer_ = nullptr;
-}
-
-void WebviewApiHandler::Reload(void) {
-  for (auto &instance : instances_) {
-    instance->Reload();
-    instance->RegisterApi(router_, executer_);
-  }
-}
+WebviewApiHandler::~WebviewApiHandler() { Shutdown(); }
 
 void WebviewApiHandler::StartRequest(
     wxWebViewHandlerRequest &request,
     wxSharedPtr<wxWebViewHandlerResponse> response) {
-  // 尝试使用 Router 处理请求
-  if (router_->dispatch(request, response)) {
-    return;
+  if (m_router) {
+    m_router->Execute(request, response);
   }
+}
+void WebviewApiHandler::Shutdown(void) {
+  for (auto ptr : m_instances) {
+    ptr->Release();
+  }
+  m_instances.clear();
+  m_router.reset();
+}
 
-  // 如果 Router 无法处理，则返回 404 错误
-  response->SetStatus(404);
-  response->SetContentType("application/json;charset=UTF-8");
-  response->SetHeader("X-Content-Type-Options", "nosniff");
-  wxString resBody = R"({"code":404,"msg":"NotFound"})";
-  response->Finish(wxSharedPtr<wxWebViewHandlerResponseData>(
-      new handlerStringResponseData(resBody)));
+void WebviewApiHandler::Reload(void) {
+  for (auto ptr : m_instances) {
+    ptr->Reload();
+  }
 }
 } // namespace Anycubic::Plugins::SDK

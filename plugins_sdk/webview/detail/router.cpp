@@ -1,9 +1,14 @@
-#include "router.hxx"
+#include "router.hpp"
+#include <object_base.hxx>
 
 #include <wx/regex.h>
+#include <wx/uri.h>
+
 namespace Anycubic::Plugins::SDK {
-bool Router::dispatch(wxWebViewHandlerRequest &request,
-                      wxSharedPtr<wxWebViewHandlerResponse> response) {
+
+bool Router::Execute(const wxWebViewHandlerRequest &request,
+                     wxSharedPtr<wxWebViewHandlerResponse> response) const {
+
   response->SetHeader("Access-Control-Allow-Origin", "*");
   response->SetHeader("Access-Control-Allow-Methods",
                       "GET, POST, PUT, DELETE, OPTIONS");
@@ -12,21 +17,21 @@ bool Router::dispatch(wxWebViewHandlerRequest &request,
   response->SetHeader("Access-Control-Max-Age", "3600000"); // 预检请求缓存时间
   response->SetHeader("X-Content-Type-Options", "nosniff");
   auto method = request.GetMethod();
-  METHOD m;
+  METHOD_TYPE m;
   if (method == "GET") {
-    m = METHOD::MethodGET;
+    m = METHOD_TYPE::MethodGET;
   } else if (method == "POST") {
-    m = METHOD::MethodPOST;
+    m = METHOD_TYPE::MethodPOST;
   } else if (method == "PUT") {
-    m = METHOD::MethodPUT;
+    m = METHOD_TYPE::MethodPUT;
   } else if (method == "DELETE") {
-    m = METHOD::MethodDELETE;
+    m = METHOD_TYPE::MethodDELETE;
   } else if (method == "OPTIONS") {
     response->SetContentType("application/json;charset=UTF-8");
     response->SetStatus(OK_200);
     wxString resBody = R"({"code":200,"msg":"Ok"})";
     response->Finish(wxSharedPtr<wxWebViewHandlerResponseData>(
-        new handlerStringResponseData(resBody)));
+        new StringResponseData(resBody)));
     return true;
   } else {
     return false;
@@ -35,8 +40,8 @@ bool Router::dispatch(wxWebViewHandlerRequest &request,
   auto &hs = get_handler(m);
   wxURI uri(request.GetRawURI());
   for (auto &h : hs) {
-    if (h.matcher_->match(uri.GetPath())) {
-      return h.handler_(request, response);
+    if (h.matcher_->Match(uri.GetPath())) {
+      return h.handler_->Execute(request, response);
     }
   }
   response->SetStatus(NotFound_404);
@@ -44,55 +49,68 @@ bool Router::dispatch(wxWebViewHandlerRequest &request,
   response->SetHeader("X-Content-Type-Options", "nosniff");
   wxString resBody = R"({"code":404,"msg":"NotFound"})";
   response->Finish(wxSharedPtr<wxWebViewHandlerResponseData>(
-      new handlerStringResponseData(resBody)));
+      new StringResponseData(resBody)));
   return false;
 }
 
 Router::Router(void) {}
 Router::~Router(void) {
-  for (auto m : {METHOD::MethodGET, METHOD::MethodPOST, METHOD::MethodDELETE,
-                 METHOD::MethodPUT}) {
-    auto hs = get_handler(m);
+  for (auto m : {METHOD_TYPE::MethodGET, METHOD_TYPE::MethodPOST,
+                 METHOD_TYPE::MethodDELETE, METHOD_TYPE::MethodPUT}) {
+    auto &hs = get_handler(m);
     for (auto &n : hs) {
       delete n.matcher_;
+      n.handler_->Release();
     }
     hs.clear();
   }
 }
 
-bool Router::add_handler(METHOD method, const wxString &pattern,
-                         Handler &&handler) {
+bool Router::RegisterHandler(METHOD_TYPE method, const wxString &pattern,
+                             HandlerBase *handler) {
   auto matcher = make_matcher(pattern);
   auto &handlers = get_handler(method);
   handlers.emplace_back(Node{matcher, std::move(handler)});
   return true;
 }
+void Router::Release(void) { delete this; }
+Router *Router::Create(void) { return new Router(); }
 MatcherBase *Router::make_matcher(const wxString &pattern) {
   return new RegexMatcher(pattern);
 }
-
-std::vector<Router::Node> &Router::get_handler(METHOD method) {
-  switch (method) {
-  case METHOD::MethodGET:
-    return m_get_handlers;
-  case METHOD::MethodPOST:
-    return m_post_handlers;
-  case METHOD::MethodDELETE:
-    return m_delete_handlers;
-  case METHOD::MethodPUT:
-    return m_put_handlers;
-  default: {
-    assert(false);
-    static std::vector<Node> tmp;
-    return tmp;
-  }
-  }
+std::vector<Router::Node> &Router::get_handler(METHOD_TYPE method) const {
+  return get_handler(method);
 }
-bool RegexMatcher::match(const wxString &path) const {
+std::vector<Router::Node> &Router::get_handler(METHOD_TYPE method) {
+#define SWITCH_HANDLER(m, obj)                                                 \
+  case METHOD_TYPE::m:                                                         \
+    return obj;
+#define BEGIN_SWITCH(m) switch (m) {
+#define END_SWITCH()                                                           \
+  default:                                                                     \
+    assert(false);                                                             \
+    }
+  BEGIN_SWITCH(method)
+  SWITCH_HANDLER(MethodGET, m_get_handlers)
+  SWITCH_HANDLER(MethodPOST, m_post_handlers)
+  SWITCH_HANDLER(MethodDELETE, m_delete_handlers)
+  SWITCH_HANDLER(MethodPUT, m_put_handlers)
+  END_SWITCH()
+#undef SWITCH_HANDLER
+#undef BEGIN_SWITCH
+#undef END_SWITCH
+
+  static std::vector<Node> tmp;
+  tmp.clear();
+  return tmp;
+}
+
+bool RegexMatcher::Match(const wxString &path) const {
   return path == regex_ || wxRegEx(regex_).Matches(path);
 }
 
-handlerStringResponseData::handlerStringResponseData(wxString &data)
-    : m_stream(data) {}
-wxInputStream *handlerStringResponseData::GetStream() { return &m_stream; }
+void RegexMatcher::Reload(void) {}
+
+void RegexMatcher::Release(void) { delete this; }
+
 } // namespace Anycubic::Plugins::SDK
