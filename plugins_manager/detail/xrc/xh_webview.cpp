@@ -17,6 +17,18 @@ WebviewHandler::WebviewHandler(
 
 wxObject *WebviewHandler::DoCreateResource() {
   wxString url = GetParamValue(wxASCII_STR("url"));
+  if (url.IsEmpty()) {
+#if __WXMSW__
+    url = GetParamValue(wxASCII_STR("win_url"));
+#elif __WXOSX__
+    url = GetParamValue(wxASCII_STR("osx_url"));
+#elif __WXGTK__
+    url = GetParamValue(wxASCII_STR("gtk_url"));
+#else
+#error "Unsupported platform"
+#endif
+  }
+  assert(!url.IsEmpty());
   wxString plugins_name = GetParamValue(wxASCII_STR("name"));
   bool clear = GetBool(wxASCII_STR("clear"), false);
   Anycubic::Plugins::Plugin *plugin;
