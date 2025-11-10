@@ -18,6 +18,8 @@ WebviewHandler::WebviewHandler(
 wxObject *WebviewHandler::DoCreateResource() {
   wxString url = GetParamValue(wxASCII_STR("url"));
   if (url.IsEmpty()) {
+    // 在windows下，使用虚拟服务来实施拦截处理
+    // 其他平台是scheme处理，逻辑不同
 #if __WXMSW__
     url = GetParamValue(wxASCII_STR("win_url"));
 #elif __WXOSX__
@@ -29,8 +31,9 @@ wxObject *WebviewHandler::DoCreateResource() {
 #endif
   }
   assert(!url.IsEmpty());
-  wxString plugins_name = GetParamValue(wxASCII_STR("name"));
-  bool clear = GetBool(wxASCII_STR("clear"), false);
+  // 获取回调插件名
+  wxString plugins_name = GetParamValue(wxASCII_STR("plugin_name"));
+  bool clear = GetBool(wxASCII_STR("clear_before"), false);
   Anycubic::Plugins::Plugin *plugin;
   if (getPlugin_ == nullptr) {
     plugin = getPlugin_(plugins_name);
