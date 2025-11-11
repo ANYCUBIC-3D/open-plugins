@@ -167,6 +167,7 @@ public:
     wxWebViewHandler(const wxString& scheme)
         : m_scheme(scheme), m_securityURL() {}
     virtual ~wxWebViewHandler() = default;
+    virtual void SetName(const wxString& scheme) { m_scheme = scheme; }
     virtual wxString GetName() const { return m_scheme; }
     virtual wxFSFile* GetFile(const wxString &uri);
     virtual void SetSecurityURL(const wxString& url) { m_securityURL = url; }
