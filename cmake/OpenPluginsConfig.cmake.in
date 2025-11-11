@@ -71,6 +71,7 @@ if(TARGET ${project_name}::ACWebView)
             INTERFACE_COMPILE_DEFINITIONS "USE_WEBVIEW=1;wxDEBUG_LEVEL=0"
         )
     endif()
+    target_include_directories(${project_name}::ACWebView INTERFACE "${ROOT_DIR}include/webview")
 endif()
 list(LENGTH PM_DEPS PM_DEPS_LENGTH)
 if(TARGET ${project_name}::plugins_manager AND PM_DEPS_LENGTH GREATER 0)

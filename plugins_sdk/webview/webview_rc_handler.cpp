@@ -10,6 +10,7 @@
 #include <wx/mimetype.h>
 #include <wx/mstream.h>
 #include <wx/uri.h>
+#include <wx/wfstream.h>
 #include <wx/zipstrm.h>
 
 #ifdef __WXMSW__
@@ -17,7 +18,7 @@
 #else
 
 #endif //
-
+namespace Anycubic::Plugins::SDK {
 class WebViewHandlerResponseDataMemory : public wxWebViewHandlerResponseData {
 public:
   explicit WebViewHandlerResponseDataMemory(
@@ -35,9 +36,9 @@ private:
   std::unique_ptr<wxMemoryInputStream> m_stream;
 };
 
-WebviewRCHandler::WebviewRCHandler(const wxString &scheme,
-                                   const wxString &dllPath)
-    : wxWebViewHandler(scheme), m_dllPath(dllPath) {
+WebviewRCHandler::WebviewRCHandler(const wxString &scheme, const wxString &zip,
+                                   const wxString &password)
+    : wxWebViewHandler(scheme), m_zipPath(zip) {
   // 构造函数实现
 #if defined(__WXMSW__)
   SetVirtualHost("localhost");
@@ -50,46 +51,11 @@ WebviewRCHandler::WebviewRCHandler(const wxString &scheme,
 WebviewRCHandler::~WebviewRCHandler() { m_fileMap.clear(); }
 
 bool WebviewRCHandler::LoadPackageData() {
-  wxDynamicLibrary dll;
-  // 加载动态库
-  if (!dll.Load(m_dllPath, wxDL_VERBATIM | wxDL_NOW)) {
-    LOG_ERROR("Failed to load DLL: {},errno:{}", m_dllPath.utf8_string(),
-              errno);
-    return false;
-  }
-
-  // 获取getPackageInfo函数
-  using GetPackageInfoFunc = PackageInfo *(*)(void);
-  auto getPackageInfo =
-      reinterpret_cast<GetPackageInfoFunc>(dll.GetSymbol("getPackageInfo"));
-
-  if (!getPackageInfo) {
-    LOG_ERROR("Failed to get getPackageInfo symbol from DLL");
-    return false;
-  }
-
-  // 调用getPackageInfo获取包信息
-  auto packageInfo = getPackageInfo();
-
-  if (!packageInfo || !packageInfo->data || packageInfo->size == 0) {
-    LOG_ERROR("Invalid package info");
-    return false;
-  }
-  // 计算md5 保数据完整性
-  char calMd5[MD5LEN] = {0};
-  ::md5Sum(reinterpret_cast<const char *>(packageInfo->data), packageInfo->size,
-           calMd5);
-  char orgMD5[MD5LEN] = {0};
-  ::hex2bin(const_cast<char *>(packageInfo->md5), orgMD5, 2 * MD5LEN);
-  if (::memcmp(calMd5, orgMD5, MD5LEN) != 0) {
-    LOG_ERROR("md5 check failed");
-    return false;
-  }
 
   // 解析zip数据并建立文件映射
-  wxMemoryInputStream memStream(static_cast<const void *>(packageInfo->data),
-                                packageInfo->size);
-  wxZipInputStream zipStream(memStream);
+  // 这里不支持解密
+  wxFFileInputStream in(m_zipPath);
+  wxZipInputStream zipStream(in);
 
   wxZipEntry *entry;
   while ((entry = zipStream.GetNextEntry()) != nullptr) {
@@ -187,3 +153,4 @@ WebviewRCHandler::GetStream(const wxString &url) {
   }
   return ret;
 }
+} // namespace Anycubic::Plugins::SDK
