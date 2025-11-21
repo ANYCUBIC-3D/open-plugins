@@ -5,7 +5,7 @@
 #include <iostream>
 
 void TestRange() {
-  for (int i : Anycubic::utility::utils::range(10)) {
+  for (int i : Anycubic::utility::range(10)) {
     std::cout << i << std::endl;
   }
 }

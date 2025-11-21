@@ -1,5 +1,5 @@
 ﻿#include "query.hxx"
-#include "string_utils.hxx"
+#include "string.hxx"
 
 #include <iterator>
 #include <vector>
@@ -7,7 +7,7 @@
 #include <curl/curl.h>
 
 #include <fmt/format.h>
-
+namespace Anycubic::utility {
 void append(query_type &) {}
 
 static std::string escape(const std::string &src) {
@@ -35,7 +35,7 @@ std::string make_query(const query_type &query) {
                                         escape(kv.second));
                    return std::move(v);
                  });
-  return Anycubic::utility::utils::Join(out, "&");
+  return Anycubic::utility::Join(out, "&");
 }
 
 query_type parse_query(const std::string &query) {
@@ -64,3 +64,4 @@ query_type parse_query(const std::string &query) {
   q.emplace(unescape(key), unescape(value));
   return q;
 }
+} // namespace Anycubic::utility

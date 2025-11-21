@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////
 /*                    实现url请求参数生成处理                               */
 ////////////////////////////////////////////////////////////////////////////
-
+namespace Anycubic::utility {
 /**
  * @brief query参数同名多个参数！！
  */
@@ -79,3 +79,4 @@ make_query(Args &&...args) {
  * @return query_type
  */
 query_type parse_query(const std::string &query);
+} // namespace Anycubic::utility

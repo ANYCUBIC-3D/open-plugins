@@ -16,7 +16,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-
+namespace Anycubic::utility {
 namespace detail {
 
 struct Converter {
@@ -102,3 +102,4 @@ typename std::enable_if_t<std::is_same_v<To, From>, To>
 lexical_cast(const From &from) {
   return from;
 }
+} // namespace Anycubic::utility

@@ -2,7 +2,7 @@
 
 #include <iterator>
 
-namespace Anycubic::utility::utils {
+namespace Anycubic::utility {
 
 class range {
 private:
@@ -95,4 +95,4 @@ inline range make_range(int start, int stop, int step) {
   return range(start, stop, step);
 }
 
-} // namespace Anycubic::utility::utils
+} // namespace Anycubic::utility
