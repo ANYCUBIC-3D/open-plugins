@@ -8,6 +8,7 @@ macro(add_subdirTEST subname)
             ${CMAKE_CURRENT_SOURCE_DIR}/${subname}
             )
 
+
         file(GLOB_RECURSE HDRS_G "${CMAKE_CURRENT_SOURCE_DIR}/${subname}/*.h*" )
         file(GLOB_RECURSE SRCS_G "${CMAKE_CURRENT_SOURCE_DIR}/${subname}/*_Test.cpp" )
         file(GLOB_RECURSE OtherSRC_G "${CMAKE_CURRENT_SOURCE_DIR}/${subname}/*cpp" )
@@ -16,11 +17,15 @@ macro(add_subdirTEST subname)
         endforeach(item)
 
         foreach(FILE ${SRCS_G})
-            STRING(REGEX REPLACE ".+/(.+)\\..*" "\\1" SUB_NAME ${FILE})
+            cmake_path(GET FILE STEM SUB_NAME)
             add_executable(${SUB_NAME} ${FILE} ${OtherSRC_G})
-            target_link_libraries(${SUB_NAME} ${ARGN})
+            target_link_libraries(${SUB_NAME} PRIVATE ${ARGN})
             set_target_properties(${SUB_NAME} PROPERTIES FOLDER "Test")
         endforeach(FILE)
+        file(GLOB_RECURSE CMAKE_G "${CMAKE_CURRENT_SOURCE_DIR}/${subname}/*.cmake" )
+        foreach(item ${CMAKE_G})
+            include(${item})
+        endforeach(item)
     endif()
 endmacro()
 

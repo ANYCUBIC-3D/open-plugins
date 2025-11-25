@@ -84,5 +84,7 @@ if(wxWidgets_FOUND)
     add_subdirs(plugins_base plugins_sdk plugins plugins_manager)
 endif()
 
+add_subdirGTEST(Test)
+
 
 
