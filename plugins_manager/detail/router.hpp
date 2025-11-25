@@ -18,6 +18,9 @@ public:
                        struct Anycubic::Plugins::IStream *data,
                        struct Anycubic::Plugins::OStream *result) override;
 
+public:
+  virtual ~EventRouter();
+
 private:
   wxString KeyName(const wxString &plugin, const wxString &fname) const;
 

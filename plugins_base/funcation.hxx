@@ -16,6 +16,7 @@ using FuncationType = std::function<void(IStream *data, OStream *result)>;
 class FuncationWrapper : public RequestHandler {
 public:
   FuncationWrapper(const FuncationType &func) : func_(func) {}
+  virtual ~FuncationWrapper() {}
   void Execute(IStream *data, OStream *result) override { func_(data, result); }
   void Destroy() override { delete this; }
 
@@ -28,9 +29,11 @@ RequestHandler *make_call(const Function &func, Self *self) {
   using func_traits = function_traits<Function>;
   auto h = [func, self](IStream *data, OStream *result) {
     using ret_type = std::decay_t<typename func_traits::return_type>;
-    typename func_traits::bare_tuple_type args;
-    if constexpr (std::tuple_size_v<typename func_traits::bare_tuple_type> >
-                  0) {
+    using arg_types = typename func_traits::bare_tuple_type;
+
+    arg_types args;
+    constexpr size_t arg_count = std::tuple_size_v<arg_types>;
+    if constexpr (arg_count > 0) {
       unpack_args(args, data);
     }
 

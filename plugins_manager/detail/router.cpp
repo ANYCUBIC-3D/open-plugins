@@ -2,6 +2,10 @@
 
 #include <assert.h>
 
+void global_destroy(Anycubic::Plugins::RequestHandler *p) {
+  assert(p != nullptr);
+  p->Destroy();
+}
 void EventRouter::SetPluginName(const wxString &name) { plugin_name_ = name; }
 
 bool EventRouter::AddFunction(const char *fname,
@@ -11,21 +15,26 @@ bool EventRouter::AddFunction(const char *fname,
   if (funcs_.contains(key)) {
     return false;
   }
-  funcs_[key] = std::shared_ptr<Anycubic::Plugins::RequestHandler>(
-      handler, [](Anycubic::Plugins::RequestHandler *p) { p->Destroy(); });
-  return true;
+  auto result =
+      funcs_.emplace(key, std::shared_ptr<Anycubic::Plugins::RequestHandler>(
+                              handler, global_destroy));
+  assert(result.second);
+  return result.second;
 }
 
 bool EventRouter::ExecuteFunction(const char *plugin, const char *fname,
                                   Anycubic::Plugins::IStream *data,
                                   Anycubic::Plugins::OStream *result) {
   auto key = KeyName(wxASCII_STR(plugin), wxASCII_STR(fname));
-  if (funcs_.contains(key)) {
-    return false;
+  if (auto itr = funcs_.find(key); itr != funcs_.end()) {
+    itr->second->Execute(data, result);
+    return true;
   }
-  funcs_[key]->Execute(data, result);
-  return true;
+
+  return false;
 }
+
+EventRouter::~EventRouter() {}
 
 wxString EventRouter::KeyName(const wxString &plugin,
                               const wxString &fname) const {

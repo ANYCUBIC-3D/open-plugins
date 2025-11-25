@@ -33,7 +33,7 @@ template <typename _Ty> static void dep_copy(_Ty &&dst) {
       dst = nullptr;
     }
   } else if constexpr (is_array_wrapper_v<type_v>) {
-    using range = utility::utils::range;
+    using range = utility::range;
     auto old_data = dst.data_;
     dst.data_ = new typename type_v::value_type[dst.size()];
     for (auto i : range(dst.size())) {
@@ -60,7 +60,7 @@ template <typename _Ty> static void dep_free(_Ty &&dst) {
       dst = nullptr;
     }
   } else if constexpr (is_array_wrapper_v<type_v>) {
-    using range = utility::utils::range;
+    using range = utility::range;
     for (auto i : range(dst.size())) {
       if constexpr (std::is_array_v<typename type_v::value_type>) {
         for (auto idx : range(array_size(dst.data_[i]))) {
@@ -79,7 +79,7 @@ template <typename _Ty> static void dep_free(_Ty &&dst) {
 template <typename type_v>
 static std::remove_const_t<type_v> *copy_array(const type_v *src,
                                                size_t src_size) {
-  using range = utility::utils::range;
+  using range = utility::range;
   auto dst = new type_v[src_size];
   for (auto i : range(src_size)) {
     dst[i] = src[i];  // 对数组元素执行拷贝
@@ -97,7 +97,7 @@ static std::remove_const_t<type_v> *copy_object(const type_v *src) {
 
 template <typename type_v>
 static void free_array(type_v *dst, size_t src_size) {
-  using range = utility::utils::range;
+  using range = utility::range;
   for (auto i : range(src_size)) {
     dep_free(dst[i]); // 对数组元素递归执行释放
   }
