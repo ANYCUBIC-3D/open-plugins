@@ -30,7 +30,7 @@ public:
 
   static RequestHandler *Create(FuncationType &&func) {
     FUNC_ENTRY;
-    auto v = new FuncationWrapper(func);
+    auto v = new FuncationWrapper(std::move(func));
     FUNC_LEAVE2("object pointer:{}", (intptr_t)v);
     return v;
   }

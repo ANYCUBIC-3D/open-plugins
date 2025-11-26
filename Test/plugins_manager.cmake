@@ -1,0 +1,6 @@
+﻿if(TARGET plugins_manager_Test)
+    find_package(wxWidgets 3.1 COMPONENTS core base adv xrc)
+    find_package(Boost CONFIG REQUIRED COMPONENTS json)
+    find_package(OpenSSL 1.1 REQUIRED)
+    target_link_libraries(plugins_manager_Test PRIVATE ${wxWidgets_LIBRARIES} plugins_base plugins_manager utility app_plugin tabbook_plugin utility_plugin ${Boost_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto)
+endif()

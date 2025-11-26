@@ -1,4 +1,5 @@
 ﻿if(TARGET stream_Test)
     find_package(wxWidgets 3.1 COMPONENTS core base adv)
     target_link_libraries(stream_Test PRIVATE ${wxWidgets_LIBRARIES} plugins_base plugins_manager)
+    target_compile_definitions(stream_Test PRIVATE MODULE_NAME="stream_Test" PLUGINS=1 ENABLE_STRACE=1 wxDEBUG_LEVEL=0)
 endif()

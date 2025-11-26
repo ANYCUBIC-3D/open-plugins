@@ -1,8 +1,8 @@
-﻿option(ENALBE_TEST "打开Test目录编译" OFF)
+﻿option(ENABLE_TEST "打开Test目录编译" OFF)
 option(ENABLE_GTEST "打开GTest目录编译" OFF)
 
 macro(add_subdirTEST subname)
-    if(ENALBE_TEST)
+    if(ENABLE_TEST)
         include_directories(
             ${CMAKE_CURRENT_BINARY_DIR}/${subname}
             ${CMAKE_CURRENT_SOURCE_DIR}/${subname}
@@ -111,21 +111,23 @@ find_package(wxWidgets 3.1 COMPONENTS core base adv)
 if(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
     function(add_static_plugin plugin_name)
-        add_static(${plugin_name} ${plugin_name}_EXPORT ${ARGN})
+        set(project_name "${plugin_name}_plugin")
+        add_static(${project_name} ${plugin_name}_EXPORT ${ARGN})
         # 设置分组
-        set_target_properties(${plugin_name} PROPERTIES FOLDER "Plugins_Static")
-        target_compile_definitions(${plugin_name} PRIVATE prefix=${plugin_name}  wxDEBUG_LEVEL=0 MODULE_NAME="${plugin_name}" ENABLE_STRACE=1)
-        target_link_libraries(${plugin_name} PRIVATE plugins_base ${wxWidgets_LIBRARIES})
+        set_target_properties(${project_name} PROPERTIES FOLDER "Plugins_Static")
+        target_compile_definitions(${project_name} PRIVATE prefix=${plugin_name}  wxDEBUG_LEVEL=0 MODULE_NAME="${plugin_name}" ENABLE_STRACE=1)
+        target_link_libraries(${project_name} PRIVATE plugins_base ${wxWidgets_LIBRARIES})
         list(APPEND PM_DEPS ${plugin_name})
         set(PM_DEPS "${PM_DEPS}" PARENT_SCOPE)
     endfunction()
 
     function(add_shared_plugin plugin_name)
-        add_shared(${plugin_name} ${plugin_name}_EXPORT ${ARGN})
+        set(project_name "${plugin_name}_plugin")
+        add_shared(${project_name} ${plugin_name}_EXPORT ${ARGN})
         # 设置分组
-        set_target_properties(${plugin_name} PROPERTIES FOLDER "Plugins_Shared")
-        target_compile_definitions(${plugin_name} PRIVATE prefix=${plugin_name}  wxDEBUG_LEVEL=0 MODULE_NAME="${plugin_name}" ENABLE_STRACE=1)
-        target_link_libraries(${plugin_name} PRIVATE plugins_base ${wxWidgets_LIBRARIES})
+        set_target_properties(${project_name} PROPERTIES FOLDER "Plugins_Shared")
+        target_compile_definitions(${project_name} PRIVATE prefix=${plugin_name}  wxDEBUG_LEVEL=0 MODULE_NAME=${plugin_name} ENABLE_STRACE=1)
+        target_link_libraries(${project_name} PRIVATE plugins_base ${wxWidgets_LIBRARIES})
         list(APPEND PM_DEPS ${plugin_name})
         set(PM_DEPS "${PM_DEPS}" PARENT_SCOPE)
         # 设置输出文件名
