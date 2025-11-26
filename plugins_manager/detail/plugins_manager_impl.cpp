@@ -13,7 +13,8 @@
 #if PLUGINS_LIST_SIZE > 0
 create_library_t *GetCreateLibraryArray();
 #endif
-PluginsManagerImpl::PluginsManagerImpl(const char *plugins, const char *tmp_dir,
+PluginsManagerImpl::PluginsManagerImpl(const char *plugins,
+                                       const std::string &tmp_dir,
                                        CreateWebView_t CreateWebView)
     : plugins_(plugins), tmp_dir_(tmp_dir), config_(nullptr),
       create_webview_(CreateWebView), is_inited_(0) {
@@ -59,6 +60,7 @@ bool PluginsManagerImpl::AddStaticPlugins(create_library_t *create,
                  return create_library != nullptr;
                });
   FUNC_LEAVE2("new size: {}", static_plugins_.size());
+  return true;
 }
 
 bool PluginsManagerImpl::SetConfig(PMConfig *config) {
@@ -284,6 +286,7 @@ void PluginsManagerImpl::EmitEvent(EventType event) {
     }
     break;
   case EventType::kEventExitByGUI:
+    router_.reset();
     instances_.clear();
     widgets_.clear();
     is_inited_ = 0;

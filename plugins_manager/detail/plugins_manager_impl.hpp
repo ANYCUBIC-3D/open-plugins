@@ -15,7 +15,7 @@ class LibraryBase;
 class PluginsManagerImpl : public PluginsManager,
                            public Anycubic::Plugins::PluginHost {
 public:
-  PluginsManagerImpl(const char *plugins, const char *tmp_dir,
+  PluginsManagerImpl(const char *plugins, const std::string &tmp_dir,
                      CreateWebView_t CreateWebView);
   ~PluginsManagerImpl() override;
   bool CheckPackage();

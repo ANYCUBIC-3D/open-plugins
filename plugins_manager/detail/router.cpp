@@ -53,7 +53,7 @@ bool EventRouter::ExecuteFunction(const char *plugin, const char *fname,
   return false;
 }
 
-EventRouter::~EventRouter() {}
+EventRouter::~EventRouter() { funcs_.clear(); }
 
 wxString EventRouter::KeyName(const wxString &plugin,
                               const wxString &fname) const {

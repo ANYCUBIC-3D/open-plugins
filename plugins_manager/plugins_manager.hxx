@@ -118,9 +118,12 @@ bool GetPluginsPackageInfo(const char *plugins, PluginsPackageInfo *info);
 
 /**
  * @brief 初始化插件管理器
- * @param tmp_dir 临时解压目录，默认使用系统临时目录
+ * @param  plugins_dir 插件搜索目录
+ * @param CreateWebView 创建webview接口
+ * @param tmp_dir
+ * 临时解压目录，默认使用系统临时目录--当调试时，可直接指向搜索目录
  */
-PluginsManager *SetupPM(const char *plugins, CreateWebView_t CreateWebView,
+PluginsManager *SetupPM(const char *plugins_dir, CreateWebView_t CreateWebView,
                         const char *tmp_dir = nullptr);
 
 /**

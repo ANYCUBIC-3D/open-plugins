@@ -2,7 +2,11 @@
 
 #include <plugins_manager/plugins_manager.hxx>
 
+#include <easy_log/log.hxx>
+
 #include <WebView/include/webview.h>
+
+#include <filesystem>
 
 #ifdef __WXMAC__
 #define ENV_NAME "DYLD_LIBRARY_PATH"
@@ -35,6 +39,19 @@ class VConfig : public PMConfig {
   }
 };
 
+class PMEnv : public testing::Environment {
+  void SetUp() override {
+
+    // 当前工作目录
+    std::string current_dir = std::filesystem::current_path().string();
+    anycubic::logger::setup_log(current_dir.c_str(),
+                                anycubic::logger::level_enum::trace);
+  }
+
+  void TearDown() override {}
+};
+
+static auto env_ = testing::AddGlobalTestEnvironment(new PMEnv);
 class PMBaseTest : public ::testing::Test {
 protected:
   void SetUp() override {
@@ -44,7 +61,8 @@ protected:
     }
     append_env(ENV_NAME, plugins);
 
-    pm_ = ::SetupPM(plugins, CreateWebView);
+    pm_ = ::SetupPM(plugins, CreateWebView, plugins);
+    assert(pm_);
     pm_->SetConfig(&config_);
   }
   void TearDown() override { ::ShutdownPM(pm_); }
@@ -64,8 +82,26 @@ protected:
     return true;
   }
 
-private:
+protected:
   VConfig config_;
   PluginsManager *pm_ = nullptr;
 };
-TEST_F(PMBaseTest, base) {}
+TEST_F(PMBaseTest, base) {
+  for (auto event : {
+           EventType::kEventInitByApp,
+           EventType::kEventInitByGUI,
+           EventType::kEventFinishedByGUI,
+           EventType::kEventExitByGUI,
+           EventType::kEventExitByApp,
+       }) {
+    pm_->EmitEvent(event);
+  }
+}
+
+// enum class EventType : int8_t {
+//    ///< 应用程序初始化时触发
+//    ///< GUI框架初始化时触发
+//    ///< GUI初始化完成时触发
+//    ///< GUI退出时触发
+//    ///< 应用程序退出时触发
+// };

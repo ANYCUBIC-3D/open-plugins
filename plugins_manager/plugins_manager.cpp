@@ -8,6 +8,8 @@
 
 #include <easy_log/stackstrace.hxx>
 
+#include <filesystem>
+
 bool GetPluginsPackageInfo(const char *plugins, PluginsPackageInfo *info) {
   FUNC_ENTRY;
   if (!plugins || !info) {
@@ -49,7 +51,14 @@ PluginsManager *SetupPM(const char *plugins, CreateWebView_t CreateWebView,
   REGISTER_LOGGER(false);
 
   FUNC_ENTRY;
-  auto p = new PluginsManagerImpl(plugins, tmp_dir, CreateWebView);
+  std::string tmp;
+  if (tmp_dir == nullptr) {
+    tmp = std::filesystem::temp_directory_path().string();
+  } else {
+    tmp = tmp_dir;
+  }
+
+  auto p = new PluginsManagerImpl(plugins, tmp, CreateWebView);
   if (!p->CheckPackage()) {
     FUNC_LEAVE2("check package failed");
     delete p;
