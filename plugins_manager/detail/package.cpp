@@ -16,9 +16,11 @@
 #include <boost/scope_exit.hpp>
 
 bool LoadSignture(const char *plugins, std::vector<char> &buffer) {
+  FUNC_ENTRY2("plugins = {}", plugins);
   // 步骤1：打开zip文件
   wxFileInputStream fileStream(wxString::FromUTF8(plugins));
   if (!fileStream.IsOk()) {
+    FUNC_LEAVE;
     return false; // 文件打开失败
   }
 
@@ -34,32 +36,43 @@ bool LoadSignture(const char *plugins, std::vector<char> &buffer) {
       // 步骤4：读取签名数据
       size_t signSize = entry->GetSize();
       if (signSize == 0) {
+        FUNC_LEAVE;
         return false; // 签名文件为空
       }
       // 分配内存存储签名数据（需与PluginsPackageInfo结构匹配）
       buffer.resize(signSize + 1);
       zipStream.Read(buffer.data(), signSize);
+      FUNC_LEAVE;
       return true; // 成功找到并读取签名
     }
   }
+  FUNC_LEAVE;
   return false;
 }
 
 bool Decode(std::vector<char> &buffer) {
+  FUNC_ENTRY;
   auto str = ::aesDecrypt(std::string_view(buffer.data(), buffer.size()),
                           AES_PASSWORD);
-  if (str.empty())
+  if (str.empty()) {
+    FUNC_LEAVE;
     return false;
+  }
   buffer.assign(str.begin(), str.end());
+  FUNC_LEAVE;
   return true;
 }
 
 bool Eecode(std::vector<char> &buffer) {
+  FUNC_ENTRY;
   auto str = ::aesEncrypt(std::string_view(buffer.data(), buffer.size()),
                           AES_PASSWORD);
-  if (str.empty())
+  if (str.empty()) {
+    FUNC_LEAVE;
     return false;
+  }
   buffer.assign(str.begin(), str.end());
+  FUNC_LEAVE;
   return true;
 }
 namespace boost::json {
@@ -121,14 +134,16 @@ void tag_invoke(const value_from_tag &, value &jv, T const &t) {
 } // namespace boost::json
 
 bool ParseInfo(const std::vector<char> &buffer, Package *info) {
-
+  FUNC_ENTRY;
   boost::json::value json =
       boost::json::parse(std::string(buffer.begin(), buffer.end()));
   if (!json.is_object()) {
+    FUNC_LEAVE;
     return false;
   }
   try {
     *info = boost::json::value_to<Package>(json);
+    FUNC_LEAVE;
     return true;
   } catch (const boost::json::system_error &e) {
     FUNC_LEAVE2("failed,errno={1}, msg={0}", e.what());
@@ -137,6 +152,7 @@ bool ParseInfo(const std::vector<char> &buffer, Package *info) {
 }
 
 bool SaveInfo(const Package &info, std::vector<char> &buffer) {
+  FUNC_ENTRY;
   try {
     // 将结构体序列化为JSON
     boost::json::value json = boost::json::value_from(info);
@@ -147,11 +163,13 @@ bool SaveInfo(const Package &info, std::vector<char> &buffer) {
     // 加密数据
     auto encrypted = ::aesEncrypt(json_str, AES_PASSWORD);
     if (encrypted.empty()) {
+      FUNC_LEAVE;
       return false;
     }
 
     // 写入buffer
     buffer.assign(encrypted.begin(), encrypted.end());
+    FUNC_LEAVE;
     return true;
   } catch (const boost::json::system_error &e) {
     FUNC_LEAVE2("SaveInfo failed: {}", e.what());
@@ -160,9 +178,11 @@ bool SaveInfo(const Package &info, std::vector<char> &buffer) {
 }
 
 bool LoadMD5(const char *plugins, map_type &md5s) {
+  FUNC_ENTRY;
   // 步骤1：打开zip文件
   wxFileInputStream fileStream(wxString::FromUTF8(plugins));
   if (!fileStream.IsOk()) {
+    FUNC_LEAVE;
     return false; // 文件打开失败
   }
 
@@ -196,6 +216,7 @@ bool LoadMD5(const char *plugins, map_type &md5s) {
       md5s.try_emplace(filename.utf8_string(), buffer);
     }
   }
+  FUNC_LEAVE;
   return !md5s.empty();
 }
 
@@ -206,7 +227,9 @@ bool IsPlugins(const wxString &filename) {
 }
 
 wxString GetPluginName(const wxString &filename) {
+  FUNC_ENTRY2("filename = {}", filename.utf8_string());
   if (!::IsPlugins(filename)) {
+    FUNC_LEAVE;
     return wxString();
   }
   auto name = wxFileName::FileName(filename).GetName();
@@ -215,11 +238,13 @@ wxString GetPluginName(const wxString &filename) {
   // 移除d的标记
   name = name.RemoveLast(1);
 #endif
+  FUNC_LEAVE;
   return name;
 }
 
 bool Unzip(const std::string &in_zip, const std::string &out_dir,
            bool remove_first) {
+  FUNC_ENTRY2("in_zip = {}, out_dir = {}", in_zip, out_dir);
   auto dir = wxFileName::DirName(wxString::FromUTF8(out_dir));
 
   if (remove_first && dir.DirExists()) {
@@ -229,12 +254,16 @@ bool Unzip(const std::string &in_zip, const std::string &out_dir,
     dir.Mkdir(wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL); // 使用完整路径创建模式
 
   wxFileInputStream in(wxString::FromUTF8(in_zip));
-  if (!in.IsOk())
+  if (!in.IsOk()) {
+    FUNC_LEAVE;
     return false; // 添加输入流检查
+  }
 
   wxZipInputStream zip(in);
-  if (!zip.IsOk())
+  if (!zip.IsOk()) {
+    FUNC_LEAVE;
     return false; // 添加zip流检查
+  }
 
   wxZipEntry *entry;
   bool hasError = false;
@@ -281,21 +310,29 @@ bool Unzip(const std::string &in_zip, const std::string &out_dir,
       break;
     }
   }
+  FUNC_LEAVE;
   return !hasError; // 返回实际解压状态
 }
 
 bool Zip(const std::string &dir, const std::string &zip_path) {
+  FUNC_ENTRY2("dir = {}, zip_path = {}", dir, zip_path);
   wxFileOutputStream out(wxString::FromUTF8(zip_path));
-  if (!out.IsOk())
-    return false;
+  if (!out.IsOk()) {
+    FUNC_LEAVE;
+    return false; // 添加输出流检查
+  }
 
   wxZipOutputStream zip(out);
-  if (!zip.IsOk())
-    return false;
+  if (!zip.IsOk()) {
+    FUNC_LEAVE;
+    return false; // 添加zip流检查
+  }
 
   wxDir traverser;
-  if (!traverser.Open(wxString::FromUTF8(dir)))
-    return false;
+  if (!traverser.Open(wxString::FromUTF8(dir))) {
+    FUNC_LEAVE;
+    return false; // 添加目录遍历检查
+  }
 
   wxString filename;
   bool hasError = false;
@@ -336,11 +373,14 @@ bool Zip(const std::string &dir, const std::string &zip_path) {
   }
 
   zip.Close();
+  FUNC_LEAVE;
   return !hasError;
 }
 
 bool UnzipAll(const std::vector<wxString> &plugins_packages,
               const std::string &tmp_dir) {
+  FUNC_ENTRY2("plugins_packages = {}, tmp_dir = {}", plugins_packages.size(),
+              tmp_dir);
   // 创建临时目录
   auto dir = wxFileName::DirName(wxString::FromUTF8(tmp_dir));
 #ifdef NDEBUG
@@ -353,9 +393,11 @@ bool UnzipAll(const std::vector<wxString> &plugins_packages,
     // 解压单个zip文件
     if (!Unzip(package.utf8_string(), tmp_dir, false)) {
       // 解压失败，返回false
+      FUNC_LEAVE;
       return false;
     }
   }
   // 所有文件解压成功，返回true
+  FUNC_LEAVE;
   return true;
 }

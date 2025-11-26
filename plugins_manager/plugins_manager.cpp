@@ -6,23 +6,32 @@
 #include <utility/codec/bin2ascii.hxx>
 #include <utility/codec/md5.hxx>
 
+#include <easy_log/stackstrace.hxx>
+
 bool GetPluginsPackageInfo(const char *plugins, PluginsPackageInfo *info) {
-  if (!plugins || !info)
+  FUNC_ENTRY;
+  if (!plugins || !info) {
+    FUNC_LEAVE;
     return false;
+  }
   std::vector<char> buffer;
   if (!LoadSignture(plugins, buffer)) {
+    FUNC_LEAVE2("load signture failed");
     return false;
   }
 
   if (!Decode(buffer)) {
+    FUNC_LEAVE2("decode failed");
     return false;
   }
   Package p;
   if (!ParseInfo(buffer, &p)) {
+    FUNC_LEAVE2("parse info failed");
     return false;
   }
   char md5[MD5LEN] = {0};
   if (!md5File(plugins, md5)) {
+    FUNC_LEAVE2("md5 file failed");
     return false;
   }
 
@@ -30,19 +39,25 @@ bool GetPluginsPackageInfo(const char *plugins, PluginsPackageInfo *info) {
 
   info->version = p.version;
   info->build_time = p.build_time;
-
+  FUNC_LEAVE;
   return true;
 }
 
 PluginsManager *SetupPM(const char *plugins, CreateWebView_t CreateWebView,
                         const char *tmp_dir) {
   assert(wxIsMainThread());
+  FUNC_ENTRY;
+  REGISTER_LOGGER(false);
   auto p = new PluginsManagerImpl(plugins, tmp_dir, CreateWebView);
-  if (p->CheckPackage())
-    return p;
-  delete p;
-  return nullptr;
+  if (!p->CheckPackage()) {
+    FUNC_LEAVE2("check package failed");
+    delete p;
+    return nullptr;
+  }
+  FUNC_LEAVE;
+  return p;
 }
 void ShutdownPM(PluginsManager *pm) {
   dynamic_cast<PluginsManagerImpl *>(pm)->~PluginsManagerImpl();
+  UNREGISTER_LOGGER();
 }

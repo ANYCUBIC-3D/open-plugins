@@ -17,6 +17,7 @@ PluginsManagerImpl::PluginsManagerImpl(const char *plugins, const char *tmp_dir,
                                        CreateWebView_t CreateWebView)
     : plugins_(plugins), tmp_dir_(tmp_dir), config_(nullptr),
       create_webview_(CreateWebView), is_inited_(0) {
+  FUNC_ENTRY;
   static bool init = false;
   if (init == false) {
     init = true;
@@ -32,6 +33,7 @@ PluginsManagerImpl::PluginsManagerImpl(const char *plugins, const char *tmp_dir,
       new WebviewHandler(create_webview_, [this](const wxString &name) {
         return GetPlugin(name.utf8_str());
       }));
+  FUNC_LEAVE;
 }
 
 PluginsManagerImpl::~PluginsManagerImpl() {
@@ -40,13 +42,13 @@ PluginsManagerImpl::~PluginsManagerImpl() {
 }
 
 bool PluginsManagerImpl::AddWidget(const wxString &position, wxWindow *widget) {
-  FUNC_ENTRY
+  FUNC_ENTRY2("position = {}", position.utf8_string());
   if (auto itr = std::ranges::find_if(widgets_,
                                       [&position](const WidgetsNode &node) {
                                         return node.position == position;
                                       });
       itr != widgets_.end()) {
-    FUNC_LEAVE2("{} widgets exists", position.utf8_string());
+    FUNC_LEAVE;
     return false;
   }
   widgets_.emplace_back(WidgetsNode{widget, position});
@@ -56,21 +58,26 @@ bool PluginsManagerImpl::AddWidget(const wxString &position, wxWindow *widget) {
 
 bool PluginsManagerImpl::AddStaticPlugins(create_library_t *create,
                                           size_t count) {
-  for (size_t idx = 0; idx < count; idx++) {
-    if (create[idx] == nullptr) {
-      continue;
-    }
-    static_plugins_.push_back(create[idx]);
-  }
-  return true;
+  FUNC_ENTRY2("count = {},current size: {}", count, static_plugins_.size());
+  std::copy_if(create, create + count, std::back_inserter(static_plugins_),
+               [](create_library_t create_library) {
+                 return create_library != nullptr;
+               });
+  FUNC_LEAVE2("new size: {}", static_plugins_.size());
 }
 
 bool PluginsManagerImpl::SetConfig(PMConfig *config) {
+  assert(config != nullptr);
   config_ = config;
   return true;
 }
 
-size_t PluginsManagerImpl::Plugins(void) const { return libraries_.size(); }
+size_t PluginsManagerImpl::Plugins(void) const {
+  FUNC_ENTRY;
+  auto size = libraries_.size();
+  FUNC_LEAVE2("size: {}", size);
+  return size;
+}
 
 size_t PluginsManagerImpl::LoadPlugins(void) {
   FUNC_ENTRY
@@ -107,11 +114,14 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
   std::ranges::transform(
       plugins, std::back_inserter(libraries_),
       [](const wxString &fname) -> std::shared_ptr<LibraryBase> {
+        FUNC_ENTRY2("fname = {}", fname.utf8_string());
         if (auto lib = std::make_shared<LibraryShared>();
             lib->LoadLibrary(fname)) {
+          FUNC_LEAVE;
           return lib;
         }
         LOG_ERROR("Load library {} failed", fname.utf8_string());
+        FUNC_LEAVE;
         return nullptr;
       });
   decltype(libraries_) tmp_libs;
@@ -127,6 +137,7 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
                          // 必需有info,且api版本为1
                          return info != nullptr && info->plugin_api == 1;
                        });
+  FUNC_LEAVE2("load plugins: {}", libraries_.size());
   return libraries_.size();
 }
 

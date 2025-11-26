@@ -1,13 +1,20 @@
 #include "LibraryBase.hxx"
 #include "package.hxx"
 
+#include <easy_log/stackstrace.hxx>
+
 #include <assert.h>
 
 PluginInfo *LibraryBase::GetPluginInfo() const {
+  FUNC_ENTRY;
   assert(Loaded());
-  if (getInfo_ == nullptr)
+  if (getInfo_ == nullptr) {
+    FUNC_LEAVE;
     return nullptr;
-  return getInfo_();
+  }
+  auto info = getInfo_();
+  FUNC_LEAVE;
+  return info;
 }
 
 Anycubic::Plugins::Plugin *
