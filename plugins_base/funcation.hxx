@@ -3,6 +3,8 @@
 #include "pack.hxx"
 #include "plugins.hxx"
 
+#include <easy_log/stackstrace.hxx>
+
 #include <functional>
 
 #include <boost/preprocessor/stringize.hpp>
@@ -15,10 +17,33 @@ namespace Anycubic::Plugins {
 using FuncationType = std::function<void(IStream *data, OStream *result)>;
 class FuncationWrapper : public RequestHandler {
 public:
-  FuncationWrapper(const FuncationType &func) : func_(func) {}
-  virtual ~FuncationWrapper() {}
-  void Execute(IStream *data, OStream *result) override { func_(data, result); }
-  void Destroy() override { delete this; }
+  void Execute(IStream *data, OStream *result) override {
+    FUNC_ENTRY;
+    func_(data, result);
+    FUNC_LEAVE;
+  }
+  void Destroy(void) override {
+    FUNC_ENTRY2("object pointer:{}", (intptr_t)this);
+    delete this;
+    FUNC_LEAVE;
+  }
+
+  static RequestHandler *Create(FuncationType &&func) {
+    FUNC_ENTRY;
+    auto v = new FuncationWrapper(func);
+    FUNC_LEAVE2("object pointer:{}", (intptr_t)v);
+    return v;
+  }
+
+private:
+  FuncationWrapper(FuncationType &&func) : func_(func) {
+    FUNC_ENTRY;
+    FUNC_LEAVE;
+  }
+  virtual ~FuncationWrapper() {
+    FUNC_ENTRY;
+    FUNC_LEAVE;
+  }
 
 private:
   FuncationType func_;
@@ -30,7 +55,7 @@ RequestHandler *make_call(const Function &func, Self *self) {
   auto h = [func, self](IStream *data, OStream *result) {
     using ret_type = std::decay_t<typename func_traits::return_type>;
     using arg_types = typename func_traits::bare_tuple_type;
-
+    FUNC_ENTRY;
     arg_types args;
     constexpr size_t arg_count = std::tuple_size_v<arg_types>;
     if constexpr (arg_count > 0) {
@@ -39,20 +64,22 @@ RequestHandler *make_call(const Function &func, Self *self) {
 
     if constexpr (std::is_void_v<ret_type>) {
       std::apply(func, std::tuple_cat(std::make_tuple(self), args));
+      FUNC_LEAVE;
     } else {
       ret_type ret =
           std::apply(func, std::tuple_cat(std::make_tuple(self), args));
       pack_result(result, ret);
+      FUNC_LEAVE;
     }
   };
-  return new FuncationWrapper(std::move(h));
+  return FuncationWrapper::Create(std::move(h));
 }
 
 template <typename ret_type, typename... Args>
 ret_type dispatch_call(PluginRouter *router, const char *plugin,
                        const char *fname, Args &&...args) {
+  FUNC_ENTRY;
   std::vector<char> argsData;
-
   if constexpr (sizeof...(Args) > 0) {
     auto bytes = get_bytes(args...);
     argsData.resize(bytes);
@@ -68,15 +95,21 @@ ret_type dispatch_call(PluginRouter *router, const char *plugin,
     IStream rs(os.Data(), os.Size());
     ret_type ret;
     unpack_args_read(&rs, ret);
+    FUNC_LEAVE;
     return ret;
+  } else {
+    FUNC_LEAVE;
   }
 }
 template <typename ret_type, typename... Args>
 ret_type dispatch_call(PluginHost *host, const char *plugin, const char *fname,
                        Args &&...args) {
+  FUNC_ENTRY;
   auto router = host->Router();
   assert(router != nullptr);
-  return dispatch_call<ret_type>(router, plugin, fname,
-                                 std::forward<Args>(args)...);
+  auto result = dispatch_call<ret_type>(router, plugin, fname,
+                                        std::forward<Args>(args)...);
+  FUNC_LEAVE;
+  return result;
 }
 } // namespace Anycubic::Plugins

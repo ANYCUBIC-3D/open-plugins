@@ -103,7 +103,7 @@ bool unregister_logger(const char *mname) {
 
 bool set_level(const char *mname, level_enum level) {
   try {
-      if (mname == nullptr) {
+    if (mname == nullptr) {
       spdlog::apply_all([level](std::shared_ptr<spdlog::logger> logger) {
         logger->set_level(static_cast<spdlog::level::level_enum>(level));
         if (level <= level_enum::debug) {
@@ -163,6 +163,9 @@ bool log_(const char *mname, const source_loc &loc, level_enum level,
     if (logger) {
       logger->log(spdlog::source_loc{loc.filename, loc.line, loc.funcname},
                   static_cast<spdlog::level::level_enum>(level), msg);
+#ifndef NDEBUG
+      logger->flush();
+#endif
       return true;
     }
   } catch (const spdlog::spdlog_ex &) {

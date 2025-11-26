@@ -6,7 +6,7 @@ add_static(webview_sdk WEBVIEW_EXPORT ${SRC})
 setTartetBasic(webview_sdk 
 LIBRARIES ACWebView easy_log iguana nlohmann_json
 ) 
-target_compile_definitions(webview_sdk PRIVATE wxDEBUG_LEVEL=0 MODULE_NAME="" ENABLE_STRACE=1)
+target_compile_definitions(webview_sdk PRIVATE wxDEBUG_LEVEL=0 MODULE_NAME="" ENABLE_STRACE=1 BUILD_WEBVIEW_API=1)
 set_target_properties(webview_sdk PROPERTIES FOLDER "PluginsSDK")
 target_include_directories(webview_sdk PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 

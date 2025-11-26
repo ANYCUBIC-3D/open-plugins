@@ -1,5 +1,7 @@
 ﻿#include "plugins_stream.hxx"
 
+#include <easy_log/stackstrace.hxx>
+
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -52,11 +54,14 @@ OStream::~OStream(void) {
 }
 
 size_t OStream::Write(const void *data, size_t size) {
+  FUNC_ENTRY;
   if (pos_ + size > size_) {
+    FUNC_LEAVE;
     return 0;
   }
   memcpy(static_cast<char *>(data_) + pos_, data, size);
   pos_ += size;
+  FUNC_LEAVE;
   return size;
 }
 size_t OStream::Size() const { return size_; }
@@ -64,12 +69,15 @@ void *OStream::Data(void) { return data_; }
 size_t OStream::Tellp(void) const { return pos_; }
 size_t OStream::Seekp(size_t pos) { return pos_ = pos; }
 size_t OStream::Resize(size_t size) {
+  FUNC_ENTRY;
   if (size <= size_) {
+    FUNC_LEAVE;
     return size_;
   }
 
   void *new_data = malloc(size);
   if (new_data == nullptr) {
+    FUNC_LEAVE;
     return size_; // 分配失败返回原大小
   }
 
@@ -83,6 +91,7 @@ size_t OStream::Resize(size_t size) {
   data_ = new_data;
   size_ = size;
   is_owner_ = true; // 确保所有权一致
+  FUNC_LEAVE;
   return size;
 }
 } // namespace Anycubic::Plugins

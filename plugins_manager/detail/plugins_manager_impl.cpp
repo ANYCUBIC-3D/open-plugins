@@ -18,11 +18,6 @@ PluginsManagerImpl::PluginsManagerImpl(const char *plugins, const char *tmp_dir,
     : plugins_(plugins), tmp_dir_(tmp_dir), config_(nullptr),
       create_webview_(CreateWebView), is_inited_(0) {
   FUNC_ENTRY;
-  static bool init = false;
-  if (init == false) {
-    init = true;
-    REGISTER_LOGGER(false);
-  }
   router_ = std::make_shared<EventRouter>();
   if (!wxFileName::Exists(wxString::FromUTF8(plugins))) {
     throw std::invalid_argument("plugins not exists");

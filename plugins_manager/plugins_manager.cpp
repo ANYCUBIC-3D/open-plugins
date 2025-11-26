@@ -46,8 +46,9 @@ bool GetPluginsPackageInfo(const char *plugins, PluginsPackageInfo *info) {
 PluginsManager *SetupPM(const char *plugins, CreateWebView_t CreateWebView,
                         const char *tmp_dir) {
   assert(wxIsMainThread());
-  FUNC_ENTRY;
   REGISTER_LOGGER(false);
+
+  FUNC_ENTRY;
   auto p = new PluginsManagerImpl(plugins, tmp_dir, CreateWebView);
   if (!p->CheckPackage()) {
     FUNC_LEAVE2("check package failed");

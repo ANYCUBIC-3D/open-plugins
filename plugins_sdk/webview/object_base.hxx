@@ -1,7 +1,9 @@
 ﻿#pragma once
-
+#ifdef BUILD_WEBVIEW_API
+#include <WebView/include/webview.h>
+#else
 #include <webview/webview.h>
-
+#endif // BUILD_WEBVIEW_API
 namespace Anycubic::Plugins::SDK {
 
 enum StatusCode {
