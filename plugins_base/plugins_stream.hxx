@@ -22,7 +22,9 @@ template <typename T>
 constexpr bool is_std_string_v = std::is_same_v<std::decay_t<T>, std::string>;
 
 template <typename T>
-constexpr bool is_c_string_v = std::is_same_v<std::decay_t<T>, char *>;
+constexpr bool is_c_string_v =
+    std::is_pointer_v<T> && (std::is_same_v<std::decay_t<T>, char *> ||
+                             std::is_same_v<std::decay_t<T>, const char *>);
 
 template <typename T>
 constexpr bool is_pointer_v = std::is_pointer_v<T> && !is_c_string_v<T>;

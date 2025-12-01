@@ -10,10 +10,9 @@ namespace Anycubic::Plugins {
 
 template <typename _Ty> size_t get_type_size(_Ty &v) {
   using value_t = std::decay_t<_Ty>;
-  if constexpr (std::is_same_v<value_t, wxString>) {
+  if constexpr (std::is_same_v<value_t, wxString> ||
+                std::is_same_v<value_t, std::string>) {
     return v.length() + sizeof(uint16_t);
-  } else if constexpr (std::is_same_v<value_t, std::string>) {
-    return v.size() + sizeof(uint16_t);
   } else if constexpr (is_c_string_v<value_t>) {
     return strlen(v) + sizeof(uint16_t);
   } else if constexpr (std::is_arithmetic_v<value_t> ||
@@ -51,16 +50,14 @@ void pack_result(struct OStream *stream, Args &&...args) {
   auto result = (stream->Write(args) && ...);
   assert(result);
 }
-template <typename T> inline void free_impl(T &&v) {
-  using value_t = std::decay_t<T>;
-  if constexpr (is_c_string_v<value_t>) {
-    free(const_cast<void *>(v));
-  }
-}
 
-template <typename... Args> inline void pack_free(std::tuple<Args...> &&args) {
-  tuple_for_each(
-      args, [](auto &&elem) { free_impl(std::forward<decltype(elem)>(elem)); });
+template <typename Tuple> inline void pack_free(Tuple &&tuple) {
+  tuple_for_each(tuple, [](auto &&elem) {
+    using value_t = std::decay_t<decltype(elem)>;
+    if constexpr (is_c_string_v<value_t>) {
+      free(const_cast<char *>(elem));
+    }
+  });
 }
 
 } // namespace Anycubic::Plugins

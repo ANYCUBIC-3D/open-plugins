@@ -51,7 +51,7 @@ bool PluginsManagerImpl::AddWidget(const wxString &position, wxWindow *widget) {
   FUNC_LEAVE
   return true;
 }
-wxString RandomString(int length) {
+static wxString RandomString(int length) {
   wxString str;
   for (int i = 0; i < length; ++i) {
     str += (wxChar)('a' + rand() % 26);

@@ -16,7 +16,7 @@ TabBookPlugin::TabBookPlugin(Anycubic::Plugins::PluginHost *host)
   router->REGISTER_FUNCATION(TabBookPlugin, GetTabTitle);
   router->REGISTER_FUNCATION(TabBookPlugin, GetTabCount);
 }
-wxString RandomString(int length) {
+static wxString RandomString(int length) {
   wxString str;
   for (int i = 0; i < length; ++i) {
     str += (wxChar)('a' + rand() % 26);
