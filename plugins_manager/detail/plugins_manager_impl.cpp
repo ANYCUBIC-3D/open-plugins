@@ -1,5 +1,6 @@
 ﻿#include "plugins_manager_impl.hpp"
 #include "LibraryBase.hxx"
+#include "fshandler.hpp"
 #include "package.hxx"
 #include "xrc/xh_webview.hpp"
 
@@ -23,7 +24,8 @@ PluginsManagerImpl::PluginsManagerImpl(const char *plugins,
   if (!wxFileName::Exists(wxString::FromUTF8(plugins))) {
     throw std::invalid_argument("plugins not exists");
   }
-  wxFileSystem::AddHandler(&fs_handler_);
+  fs_handler_ = std::make_shared<MemoryFSHandler>();
+  wxFileSystem::AddHandler(fs_handler_.get());
   wxXmlResource::Get()->InitAllHandlers();
   wxXmlResource::Get()->AddHandler(
       new WebviewHandler(create_webview_, [this](const wxString &name) {
@@ -33,7 +35,8 @@ PluginsManagerImpl::PluginsManagerImpl(const char *plugins,
 }
 
 PluginsManagerImpl::~PluginsManagerImpl() {
-  wxFileSystem::RemoveHandler(&fs_handler_);
+  wxFileSystem::RemoveHandler(fs_handler_.get());
+  fs_handler_.reset();
   wxXmlResource::Get()->ClearHandlers();
 }
 
@@ -258,18 +261,19 @@ wxWindow *PluginsManagerImpl::GetWindow(const char *postion) {
 }
 
 bool PluginsManagerImpl::AddFS(const wxString &name, const wxString &xrc) {
-  wxMemoryFSHandler::AddFile(name, xrc);
+  fs_handler_->AddFS(name, xrc);
   return true;
 }
 
 bool PluginsManagerImpl::DelFS(const wxString &name) {
-  wxMemoryFSHandler::RemoveFile(name);
+  fs_handler_->DelFS(name);
   return true;
 }
 
 bool PluginsManagerImpl::AddFS(const wxString &name, void *data,
                                size_t length) {
-  wxMemoryFSHandler::AddFile(name, data, length);
+  wxMemoryFSHandler::AddFile(
+      name, wxString::From8BitData((const char *)data, length));
   return true;
 }
 
