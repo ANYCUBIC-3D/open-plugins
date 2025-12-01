@@ -8,6 +8,7 @@ class wxWindow;
 class wxWebView;
 class wxBitmap;
 class wxString;
+class wxPanel;
 
 namespace Anycubic::Plugins {
 struct IStream;
@@ -145,6 +146,18 @@ struct PluginHost {
    * @return wxWindow* 窗口指针
    */
   virtual wxWindow *GetWindow(const char *postion = nullptr) = 0;
+
+  /**
+   * @brief Create a Panel object
+   *
+   * @param position 父容器位置标识符，用于定位添加位置
+   * @param xrcName 插件提供的XRC资源名称，用于加载面板窗口
+   * @param xrc 插件提供的XRC资源字符串，用于创建面板窗口
+   * @return wxWindow*  创建的面板窗口指针
+   */
+  virtual wxPanel *CreatePanel(const class wxString &position,
+                               const class wxString &xrcName,
+                               const class wxString &xrc) = 0;
 
   /**
    * @brief  添加虚拟文件系统

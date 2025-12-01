@@ -1,22 +1,24 @@
 #pragma once
 #include "plugins_stream.hxx"
+#include "tuple_foreach.hxx"
 
 #include <wx/string.h>
 
+#include <string.h>
+
 namespace Anycubic::Plugins {
 
-template <typename _Ty> size_t get_type_size(const _Ty &v) {
+template <typename _Ty> size_t get_type_size(_Ty &v) {
   using value_t = std::decay_t<_Ty>;
-
-  if constexpr (std::is_arithmetic_v<value_t> || std::is_pointer_v<value_t> ||
-                std::is_pod_v<value_t>) {
-    return sizeof(value_t);
-  } else if constexpr (std::is_same_v<value_t, wxString> ||
-                       std::is_same_v<value_t, const wxString &>) {
+  if constexpr (std::is_same_v<value_t, wxString>) {
     return v.length() + sizeof(uint16_t);
-  } else if constexpr (std::is_same_v<value_t, std::string> ||
-                       std::is_same_v<value_t, const std::string &>) {
+  } else if constexpr (std::is_same_v<value_t, std::string>) {
     return v.size() + sizeof(uint16_t);
+  } else if constexpr (is_c_string_v<value_t>) {
+    return strlen(v) + sizeof(uint16_t);
+  } else if constexpr (std::is_arithmetic_v<value_t> ||
+                       std::is_pointer_v<value_t> || std::is_pod_v<value_t>) {
+    return sizeof(value_t);
   }
 }
 
@@ -26,7 +28,8 @@ template <typename... Args> size_t get_bytes(Args... args) {
 
 template <typename... Args>
 void unpack_args_read(struct IStream *stream, Args &...args) {
-  (stream->Read(args), ...);
+  auto result = (stream->Read(args) && ...);
+  assert(result);
 }
 
 template <typename... Args>
@@ -36,6 +39,7 @@ bool unpack_args(std::tuple<Args...> &args, struct IStream *stream) {
         return (stream->Read(tuple_args) && ...);
       },
       args);
+  assert(result);
   return result;
 }
 
@@ -44,7 +48,19 @@ template <typename... Args>
 void pack_result(struct OStream *stream, Args &&...args) {
   auto bytes = get_bytes(std::forward<Args>(args)...);
   stream->Resize(bytes);
-  (stream->Write(args), ...);
+  auto result = (stream->Write(args) && ...);
+  assert(result);
+}
+template <typename T> inline void free_impl(T &&v) {
+  using value_t = std::decay_t<T>;
+  if constexpr (is_c_string_v<value_t>) {
+    free(const_cast<void *>(v));
+  }
+}
+
+template <typename... Args> inline void pack_free(std::tuple<Args...> &&args) {
+  tuple_for_each(
+      args, [](auto &&elem) { free_impl(std::forward<decltype(elem)>(elem)); });
 }
 
 } // namespace Anycubic::Plugins

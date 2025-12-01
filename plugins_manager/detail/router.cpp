@@ -46,7 +46,7 @@ bool EventRouter::ExecuteFunction(const char *plugin, const char *fname,
       FUNC_LEAVE2("function {} execute failed: {}", fname, e.what());
       return false;
     }
-    FUNC_LEAVE2("function {} executed: {}", fname, true);
+    FUNC_LEAVE;
     return true;
   }
   FUNC_LEAVE2("function {} not found", fname);

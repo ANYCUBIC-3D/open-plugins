@@ -8,6 +8,8 @@
 #include <string>
 #include <type_traits>
 
+#include <wx/string.h>
+
 namespace Anycubic::Plugins {
 
 template <typename T>
@@ -15,12 +17,15 @@ constexpr bool is_trivial_v =
     std::is_arithmetic_v<T> ||
     (std::is_class_v<T> && std::is_standard_layout_v<T> &&
      std::is_trivial_v<T>);
+
 template <typename T>
 constexpr bool is_std_string_v = std::is_same_v<std::decay_t<T>, std::string>;
 
 template <typename T>
-constexpr bool is_pointer_v =
-    std::is_pointer_v<T> || std::is_same_v<T, const char *>;
+constexpr bool is_c_string_v = std::is_same_v<std::decay_t<T>, char *>;
+
+template <typename T>
+constexpr bool is_pointer_v = std::is_pointer_v<T> && !is_c_string_v<T>;
 
 struct PLGINS_EXPORT IStream {
   IStream(const void *data, size_t size);
@@ -33,10 +38,24 @@ struct PLGINS_EXPORT IStream {
   size_t Seekg(size_t pos);
   const void *Data(void) const;
 
-  template <typename T> std::enable_if_t<is_trivial_v<T>, bool> Read(T &data) {
+  template <typename T>
+  std::enable_if_t<is_trivial_v<T> && !std::is_const_v<T>, bool> Read(T &data) {
     return sizeof(T) == Read(&data, sizeof(T));
   }
+  bool Read(const char *&data) {
+    uint16_t length = 0;
+    if (!Read(length)) {
+      return false;
+    }
+    auto buffer = (char *)malloc(length + 1);
+    data = buffer;
+    if (buffer == nullptr) {
+      return false;
+    }
+    memset(buffer, 0, length + 1);
 
+    return Read(buffer, length) == length;
+  }
   bool Read(std::string &data) {
     uint16_t length = 0;
     if (!Read(length)) {
@@ -45,8 +64,17 @@ struct PLGINS_EXPORT IStream {
     data.resize(length);
     return Read(data.data(), data.size()) == length;
   }
+  bool Read(wxString &data) {
+    std::string buffer;
+    if (Read(buffer)) {
+      data = wxString::FromUTF8(buffer);
+      return true;
+    }
+    return false;
+  }
 
-  template <typename T> std::enable_if_t<is_pointer_v<T>, bool> Read(T &data) {
+  template <typename T>
+  std::enable_if_t<std::is_pointer_v<T>, bool> Read(T &data) {
     intptr_t ptr = 0;
     if (!Read(ptr)) {
       return false;
@@ -84,9 +112,14 @@ struct PLGINS_EXPORT OStream {
     uint16_t length = static_cast<uint16_t>(data.size());
     return Write(length) && Write(data.data(), length);
   }
-
+  bool Write(const wxString &data) { return Write(data.utf8_string()); }
+  bool Write(const char *data) {
+    assert(data != nullptr);
+    uint16_t length = static_cast<uint16_t>(strlen(data));
+    return Write(length) && Write(data, length);
+  }
   template <typename T>
-  std::enable_if_t<is_pointer_v<T>, bool> Write(const T &data) {
+  std::enable_if_t<std::is_pointer_v<T>, bool> Write(T data) {
     if (data == nullptr) {
       return false;
     }

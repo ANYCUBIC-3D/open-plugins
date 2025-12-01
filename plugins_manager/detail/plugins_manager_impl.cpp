@@ -51,6 +51,33 @@ bool PluginsManagerImpl::AddWidget(const wxString &position, wxWindow *widget) {
   FUNC_LEAVE
   return true;
 }
+wxString RandomString(int length) {
+  wxString str;
+  for (int i = 0; i < length; ++i) {
+    str += (wxChar)('a' + rand() % 26);
+  }
+  return str;
+}
+
+class wxPanel *PluginsManagerImpl::CreatePanel(const wxString &position,
+                                               const wxString &xrcName,
+                                               const wxString &xrc) {
+  auto *parent = this->GetWindow(position.utf8_string().c_str());
+  if (parent == nullptr) {
+    return nullptr;
+  }
+
+  wxString name = RandomString(16) + wxASCII_STR(".xrc");
+  this->AddFS(name, xrc);
+  auto pXRC = wxXmlResource::Get();
+  auto result = pXRC->Load(wxASCII_STR("memory:") + name);
+  this->DelFS(name);
+  if (!result) {
+    return nullptr;
+  }
+  wxPanel *p = pXRC->LoadPanel(parent, wxString::FromUTF8(xrcName));
+  return p;
+}
 
 bool PluginsManagerImpl::AddStaticPlugins(create_library_t *create,
                                           size_t count) {
@@ -290,6 +317,7 @@ void PluginsManagerImpl::EmitEvent(EventType event) {
     instances_.clear();
     widgets_.clear();
     is_inited_ = 0;
+    assert(router_ == nullptr && instances_.empty() && widgets_.empty());
     break;
   case EventType::kEventExitByApp:
     libraries_.clear();

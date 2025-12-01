@@ -71,6 +71,7 @@ RequestHandler *make_call(const Function &func, Self *self) {
       pack_result(result, ret);
       FUNC_LEAVE;
     }
+    pack_free(args);
   };
   return FuncationWrapper::Create(std::move(h));
 }
@@ -80,7 +81,8 @@ ret_type dispatch_call(PluginRouter *router, const char *plugin,
                        const char *fname, Args &&...args) {
   FUNC_ENTRY;
   std::vector<char> argsData;
-  if constexpr (sizeof...(Args) > 0) {
+  constexpr auto args_size = sizeof...(Args);
+  if constexpr (args_size > 0) {
     auto bytes = get_bytes(args...);
     argsData.resize(bytes);
     OStream os(argsData.data(), bytes);

@@ -3,6 +3,7 @@
 #include "router.hpp"
 
 #include <wx/fs_mem.h>
+#include <wx/panel.h>
 #include <wx/string.h>
 #include <wx/window.h>
 
@@ -21,9 +22,7 @@ public:
   bool CheckPackage();
   // PluginsManager
 private:
-  bool AddWidget(const class wxString &position,
-                 class wxWindow *widget) override;
-
+  bool AddWidget(const class wxString &position, wxWindow *widget) override;
   bool AddStaticPlugins(create_library_t *create, size_t count) override;
 
   bool SetConfig(class PMConfig *config) override;
@@ -42,6 +41,9 @@ private:
   bool HasPlugin(const char *name) override;
   Anycubic::Plugins::Plugin *GetPlugin(const char *name) override;
   class wxWindow *GetWindow(const char *postion = nullptr) override;
+  class wxPanel *CreatePanel(const class wxString &position,
+                             const class wxString &xrcName,
+                             const class wxString &xrc) override;
   bool AddFS(const wxString &name, const wxString &xrc) override;
   bool DelFS(const wxString &name) override;
   bool AddFS(const wxString &name, void *data, size_t length) override;
