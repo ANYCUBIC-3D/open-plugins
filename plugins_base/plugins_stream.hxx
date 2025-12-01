@@ -49,6 +49,10 @@ struct PLGINS_EXPORT IStream {
     if (!Read(length)) {
       return false;
     }
+    if (length == 0) {
+      data = nullptr;
+      return true;
+    }
     auto buffer = (char *)malloc(length + 1);
     data = buffer;
     if (buffer == nullptr) {
@@ -62,6 +66,9 @@ struct PLGINS_EXPORT IStream {
     uint16_t length = 0;
     if (!Read(length)) {
       return false;
+    }
+    if (length == 0) {
+      return true;
     }
     data.resize(length);
     return Read(data.data(), data.size()) == length;
@@ -112,13 +119,21 @@ struct PLGINS_EXPORT OStream {
   bool Write(const std::string &data) {
     assert(data.size() <= std::numeric_limits<uint16_t>::max());
     uint16_t length = static_cast<uint16_t>(data.size());
-    return Write(length) && Write(data.data(), length);
+    if (length == 0) {
+      return Write(length);
+    } else {
+      return Write(length) && Write(data.data(), length);
+    }
   }
   bool Write(const wxString &data) { return Write(data.utf8_string()); }
   bool Write(const char *data) {
     assert(data != nullptr);
     uint16_t length = static_cast<uint16_t>(strlen(data));
-    return Write(length) && Write(data, length);
+    if (length == 0) {
+      return Write(length);
+    } else {
+      return Write(length) && Write(data, length);
+    }
   }
   template <typename T>
   std::enable_if_t<std::is_pointer_v<T>, bool> Write(T data) {

@@ -55,7 +55,7 @@ OStream::~OStream(void) {
 
 size_t OStream::Write(const void *data, size_t size) {
   FUNC_ENTRY;
-  if (pos_ + size > size_) {
+  if (((pos_ + size) > size_)) {
     FUNC_LEAVE;
     return 0;
   }

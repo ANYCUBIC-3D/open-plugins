@@ -14,12 +14,14 @@ class TestPlugin {
 public:
   void RegisterFuncation(EventRouter &router) {
     router.REGISTER_FUNCATION(TestPlugin, onTestFuncation);
+    router.REGISTER_FUNCATION(TestPlugin, OnEmpty);
   }
   std::string onTestFuncation(const std::string &v, int *data, const char *name,
                               const StructTestSuccess &t) {
     *data = kTestFuncationData;
     return v;
   }
+  std::string OnEmpty() { return ""; }
 };
 
 TEST(StreamTest, StreamTest) {
@@ -35,4 +37,7 @@ TEST(StreamTest, StreamTest) {
       &router, kTestPluginName, "onTestFuncation", v, &data, "testchar*", t);
   EXPECT_EQ(data, kTestFuncationData);
   EXPECT_EQ(v, result);
+
+  result = dispatch_call<std::string>(&router, kTestPluginName, "OnEmpty");
+  EXPECT_TRUE(result.empty());
 }
