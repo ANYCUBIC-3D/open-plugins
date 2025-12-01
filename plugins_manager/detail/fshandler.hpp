@@ -24,4 +24,5 @@ public:
 private:
   using node_type = std::pair<wxString, wxString>;
   std::vector<node_type> m_fs_nodes;
+  static wxDateTime m_last_modified;
 };

@@ -34,8 +34,8 @@ wxObject *WebviewHandler::DoCreateResource() {
   // 获取回调插件名
   wxString plugins_name = GetParamValue(wxASCII_STR("plugin_name"));
   bool clear = GetBool(wxASCII_STR("clear_before"), false);
-  Anycubic::Plugins::Plugin *plugin;
-  if (getPlugin_ == nullptr) {
+  Anycubic::Plugins::Plugin *plugin=nullptr;
+  if (getPlugin_ != nullptr) {
     plugin = getPlugin_(plugins_name);
   }
   wxWebViewConfiguration confg =
@@ -44,12 +44,13 @@ wxObject *WebviewHandler::DoCreateResource() {
     confg.ClearCookies();
   }
   wxWebView *webview =
-      CreateWebView_(nullptr, url, &confg, [plugin](wxWebView *view) {
-        if (plugin == nullptr) {
-          return;
-        }
-        plugin->CreateWebview(view);
-      });
+      CreateWebView_(dynamic_cast<wxWindow *>(GetParent()), url, &confg,
+                     [plugin](wxWebView *view) {
+                       if (plugin == nullptr) {
+                         return;
+                       }
+                       plugin->CreateWebview(view);
+                     });
   webview->SetId(GetID());
   webview->SetName(GetName());
   return webview;

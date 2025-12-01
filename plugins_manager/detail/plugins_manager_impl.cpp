@@ -71,9 +71,12 @@ class wxPanel *PluginsManagerImpl::CreatePanel(const wxString &position,
   }
 
   wxString name = RandomString(16) + wxASCII_STR(".xrc");
-  this->AddFS(name, xrc);
+  auto result = this->AddFS(name, xrc);
+  if (!result) {
+    return nullptr;
+  }
   auto pXRC = wxXmlResource::Get();
-  auto result = pXRC->Load(wxASCII_STR("memory:") + name);
+  result = pXRC->Load(wxASCII_STR("acmemory:") + name);
   this->DelFS(name);
   if (!result) {
     return nullptr;
@@ -261,20 +264,17 @@ wxWindow *PluginsManagerImpl::GetWindow(const char *postion) {
 }
 
 bool PluginsManagerImpl::AddFS(const wxString &name, const wxString &xrc) {
-  fs_handler_->AddFS(name, xrc);
-  return true;
+  return fs_handler_->AddFS(name, xrc);
 }
 
 bool PluginsManagerImpl::DelFS(const wxString &name) {
-  fs_handler_->DelFS(name);
-  return true;
+  return fs_handler_->DelFS(name);
 }
 
 bool PluginsManagerImpl::AddFS(const wxString &name, void *data,
                                size_t length) {
-  wxMemoryFSHandler::AddFile(
-      name, wxString::From8BitData((const char *)data, length));
-  return true;
+  assert(data != nullptr && length > 0);
+  return AddFS(name, wxString::From8BitData((const char *)data, length));
 }
 
 bool PluginsManagerImpl::GetValue(const wxString &key, wxString &value) {

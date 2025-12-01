@@ -2,7 +2,7 @@
 
 #include <wx/filesys.h>
 #include <wx/sstream.h>
-
+wxDateTime MemoryFSHandler::m_last_modified = wxDateTime::Now();
 bool MemoryFSHandler::AddFS(const wxString &name, const wxString &xrc) {
   if (auto itr = std::ranges::find_if(
           m_fs_nodes,
@@ -35,5 +35,5 @@ wxFSFile *MemoryFSHandler::OpenFile(wxFileSystem &fs,
     return nullptr;
   auto stream = new wxStringInputStream(i->second);
   return new wxFSFile(stream, location, wxEmptyString, GetAnchor(location),
-                      wxDateTime::Now());
+                      m_last_modified);
 }
