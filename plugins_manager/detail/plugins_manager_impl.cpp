@@ -2,6 +2,7 @@
 #include "LibraryBase.hxx"
 #include "fshandler.hpp"
 #include "package.hxx"
+#include "tranclations.hpp"
 #include "xrc/xh_webview.hpp"
 
 #include <plugins_base/plugins_base.hxx>
@@ -16,9 +17,14 @@ create_library_t *GetCreateLibraryArray();
 #endif
 PluginsManagerImpl::PluginsManagerImpl(const char *plugins,
                                        const std::string &tmp_dir,
-                                       CreateWebView_t CreateWebView)
-    : plugins_(plugins), tmp_dir_(tmp_dir), config_(nullptr),
+                                       CreateWebView_t CreateWebView,
+                                       const char *domain)
+    : plugins_(plugins), tmp_dir_(tmp_dir), domain_(domain), config_(nullptr),
       create_webview_(CreateWebView), is_inited_(0) {
+  // NOTE:
+  // 由于wxTranslations会默认删除translations_loader_，
+  // 后续不会删除translations_loader_
+  translations_loader_ = new acTranslationsLoader;
   FUNC_ENTRY;
   router_ = std::make_shared<EventRouter>();
   if (!wxFileName::Exists(wxString::FromUTF8(plugins))) {
@@ -83,6 +89,28 @@ class wxPanel *PluginsManagerImpl::CreatePanel(const wxString &position,
   }
   wxPanel *p = pXRC->LoadPanel(parent, wxString::FromUTF8(xrcName));
   return p;
+}
+
+wxString PluginsManagerImpl::Language(void) {
+  auto lang = wxTranslations::Get()->GetBestTranslation(domain_.c_str());
+  return lang;
+}
+
+bool PluginsManagerImpl::LoadTranslationFromData(const wxString &domain,
+                                                 void *data, size_t bytes) {
+  assert(translations_loader_ != nullptr);
+  wxString domainTmp = domain.IsEmpty() ? wxString::FromUTF8(domain_) : domain;
+  translations_loader_->RegisterCatalog(domainTmp,
+                                        wxString((char *)data, bytes));
+  return wxTranslations::Get()->AddCatalog(domainTmp);
+}
+
+bool PluginsManagerImpl::LoadTranslationFromFile(const wxString &domain,
+                                                 const wxString &path) {
+  assert(translations_loader_ != nullptr);
+  wxString domainTmp = domain.IsEmpty() ? wxString::FromUTF8(domain_) : domain;
+  translations_loader_->RegisterCatalog(domainTmp, path);
+  return wxTranslations::Get()->AddCatalog(domainTmp);
 }
 
 bool PluginsManagerImpl::AddStaticPlugins(create_library_t *create,
@@ -306,6 +334,9 @@ void PluginsManagerImpl::EmitEvent(EventType event) {
   switch (event) {
   case EventType::kEventInitByApp:
     LoadPlugins();
+    // NOTE: 初始化语言加载处理
+    assert(translations_loader_ != nullptr);
+    wxTranslations::Get()->SetLoader(translations_loader_);
     break;
   case EventType::kEventInitByGUI:
     // empty
@@ -324,6 +355,7 @@ void PluginsManagerImpl::EmitEvent(EventType event) {
     assert(router_ == nullptr && instances_.empty() && widgets_.empty());
     break;
   case EventType::kEventExitByApp:
+    translations_loader_ = nullptr;
     libraries_.clear();
     break;
   default:

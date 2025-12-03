@@ -158,6 +158,39 @@ struct PluginHost {
   virtual wxPanel *CreatePanel(const class wxString &position,
                                const class wxString &xrcName,
                                const class wxString &xrc) = 0;
+  /**
+   * @brief 获取当前语言
+   *
+   * @return wxString 当前语言名称, 例如 "zh_CN"
+   */
+  virtual wxString Language(void) = 0;
+
+  /**
+   * @brief 加载翻译文件
+   *
+   * @param domain
+   * 翻译有效域，这个只是为了兼容wxWidgets的翻译机制，并不实际使用, eg:
+   * "zh_CN",如果不确认定用wxEmptyString
+   * @param data 翻译文件数据指针
+   * @param bytes 数据长度
+   * @return true 加载成功
+   * @return false 加载失败
+   */
+  virtual bool LoadTranslationFromData(const wxString &domain, void *data,
+                                       size_t bytes) = 0;
+
+  /**
+   * @brief 从文件加载翻译
+   *
+   * @param domain 翻译域, 这个只是为了兼容wxWidgets的翻译机制，并不实际使用,
+   * eg: "zh_CN",如果不确认定用wxEmptyString
+   * @param path 翻译文件路径, eg:
+   * "/usr/share/locale/zh_CN/LC_MESSAGES/anycubic.mo"
+   * @return true 加载成功
+   * @return false 加载失败
+   */
+  virtual bool LoadTranslationFromFile(const wxString &domain,
+                                       const wxString &path) = 0;
 
   /**
    * @brief  添加虚拟文件系统

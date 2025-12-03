@@ -14,11 +14,12 @@
 
 class LibraryBase;
 class MemoryFSHandler;
+class acTranslationsLoader;
 class PluginsManagerImpl : public PluginsManager,
                            public Anycubic::Plugins::PluginHost {
 public:
   PluginsManagerImpl(const char *plugins, const std::string &tmp_dir,
-                     CreateWebView_t CreateWebView);
+                     CreateWebView_t CreateWebView, const char *domain);
   ~PluginsManagerImpl() override;
   bool CheckPackage();
   // PluginsManager
@@ -45,6 +46,11 @@ private:
   class wxPanel *CreatePanel(const class wxString &position,
                              const class wxString &xrcName,
                              const class wxString &xrc) override;
+  wxString Language(void) override;
+  bool LoadTranslationFromData(const wxString &domain, void *data,
+                               size_t bytes) override;
+  bool LoadTranslationFromFile(const wxString &domain,
+                               const wxString &path) override;
   bool AddFS(const wxString &name, const wxString &xrc) override;
   bool DelFS(const wxString &name) override;
   bool AddFS(const wxString &name, void *data, size_t length) override;
@@ -66,9 +72,11 @@ private:
                          std::vector<wxString> &plugins);
 
 private:
-  std::string plugins_; ///< 插件压缩包
-  std::string tmp_dir_; ///< 插件解压目录
-  PMConfig *config_;    ///< 插件配置
+  std::string plugins_;                       ///< 插件压缩包
+  std::string tmp_dir_;                       ///< 插件解压目录
+  std::string domain_;                        ///< 主程序翻译名
+  acTranslationsLoader *translations_loader_; ///< 翻译加载器
+  PMConfig *config_;                          ///< 插件配置
   struct WidgetsNode {
     wxWindow *widget;  ///< 主程序窗口
     wxString position; ///< 位置标记
