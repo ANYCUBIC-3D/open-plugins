@@ -14,6 +14,12 @@ template <typename T> auto ac_to_string(T &&t);
 #include <string>
 
 extern "C" {
+/**
+ * @brief Get the stack depth
+ *
+ * @param entry 是否是入口
+ * @return LOG_API 栈深度
+ */
 LOG_API int get_stack_depth(bool entry);
 }
 

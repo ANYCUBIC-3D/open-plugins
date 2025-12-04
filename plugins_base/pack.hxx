@@ -1,3 +1,11 @@
+/**
+ * @file pack.hxx
+ * @brief 这里代码是给funcation.hxx中使用，其他地方使用要慎重
+ *
+ * @copyright Copyright (c) 2025
+ *
+ */
+
 #pragma once
 #include "plugins_stream.hxx"
 #include "tuple_foreach.hxx"

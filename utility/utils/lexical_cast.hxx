@@ -87,6 +87,14 @@ struct Converter {
 
 } // namespace detail
 
+/**
+ * @brief 类型转换
+ *
+ * @tparam To 目标类型
+ * @tparam From 源类型
+ * @param from 源对象
+ * @return To 目标对象
+ */
 template <typename To, typename From>
 typename std::enable_if_t<!std::is_same_v<To, From>, To>
 lexical_cast(const From &from) {
@@ -97,6 +105,14 @@ lexical_cast(const From &from) {
   throw std::invalid_argument("argument is invalid");
 }
 
+/**
+ * @brief 类型转换（相同类型）
+ *
+ * @tparam To 目标类型
+ * @tparam From 源类型
+ * @param from 源对象
+ * @return To 目标对象
+ */
 template <typename To, typename From>
 typename std::enable_if_t<std::is_same_v<To, From>, To>
 lexical_cast(const From &from) {

@@ -84,7 +84,27 @@ bool LOG_API set_level(const char *mname, level_enum level);
  * ***********************************************************************/
 bool LOG_API set_pattern(const char *mname, const char *pattern=DEFAULT_PATTERN);
 // clang-format on
+
+/**
+ * @brief 判断是否需要输出日志
+ *
+ * @param mname 日志模块名
+ * @param level 日志级别
+ * @return true 需要输出
+ * @return false 不需要输出
+ */
 bool LOG_API should_log(const char *mname, level_enum level);
+
+/**
+ * @brief 输出日志
+ *
+ * @param mname 日志模块名
+ * @param loc 日志位置
+ * @param level 日志级别
+ * @param msg 日志消息
+ * @return true 输出成功
+ * @return false 输出失败
+ */
 bool LOG_API log_(const char *mname, const source_loc &loc, level_enum level,
                   const char *msg);
 

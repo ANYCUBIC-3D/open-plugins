@@ -13,6 +13,11 @@ class wxPanel;
 namespace Anycubic::Plugins {
 struct IStream;
 struct OStream;
+
+/**
+ * @brief 请求处理器接口
+ *
+ */
 struct RequestHandler {
   virtual ~RequestHandler() = default;
   /**
@@ -28,6 +33,11 @@ struct RequestHandler {
   virtual void Destroy() = 0;
 };
 
+/**
+ * @brief 插件路由接口
+ * @note 插件路由接口，用于管理插件函数的注册和执行
+ *
+ */
 struct PluginRouter {
   virtual ~PluginRouter() = default;
   /**
@@ -55,6 +65,11 @@ struct PluginRouter {
                                struct OStream *result) = 0;
 };
 
+/**
+ * @brief 插件接口
+ * @note 插件接口，定义了插件的基本功能和生命周期管理
+ *
+ */
 struct Plugin {
   virtual ~Plugin() = default;
   /**
@@ -114,6 +129,11 @@ struct Plugin {
   virtual void Destroy(void) = 0;
 };
 
+/**
+ * @brief 插件主机接口
+ * @note 插件主机接口，定义了插件与主机环境的交互接口
+ *
+ */
 struct PluginHost {
   virtual ~PluginHost() = default;
   /**

@@ -87,10 +87,32 @@ public:
 };
 
 // 便捷函数，用于创建range对象
+
+/**
+ * @brief 创建一个范围对象
+ *
+ * @param stop 范围结束值（不包含在范围内）
+ * @return range 范围对象
+ */
 inline range make_range(int stop) { return range(stop); }
 
+/**
+ * @brief 创建一个范围对象
+ *
+ * @param start 范围开始值（包含在范围内）
+ * @param stop 范围结束值（不包含在范围内）
+ * @return range 范围对象
+ */
 inline range make_range(int start, int stop) { return range(start, stop); }
 
+/**
+ * @brief 创建一个范围对象
+ *
+ * @param start 范围开始值（包含在范围内）
+ * @param stop 范围结束值（不包含在范围内）
+ * @param step 范围步长
+ * @return range 范围对象
+ */
 inline range make_range(int start, int stop, int step) {
   return range(start, stop, step);
 }

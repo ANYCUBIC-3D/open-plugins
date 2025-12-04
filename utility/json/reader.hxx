@@ -277,6 +277,15 @@ static bool parse_json(reader &rd, const char *buf, size_t len) {
     return false;
   }
 }
+
+/**
+ * @brief 从JSON对象加载元组
+ *
+ * @tparam T 元组类型
+ * @param t 元组对象
+ * @param rd JSON读取器对象
+ * @return bool 是否加载成功
+ */
 template <typename T>
 inline std::enable_if_t<is_tuple<std::decay_t<T>>::value, bool>
 load_from_json(T &&t, reader &rd) {
@@ -285,6 +294,14 @@ load_from_json(T &&t, reader &rd) {
   return true;
 }
 
+/**
+ * @brief 从JSON对象加载序列容器
+ *
+ * @tparam T 序列容器类型
+ * @param v 序列容器对象
+ * @param rd JSON读取器对象
+ * @return bool 是否加载成功
+ */
 template <typename T>
 inline std::enable_if_t<is_sequence_container<std::decay_t<T>>::value, bool>
 load_from_json(T &v, reader &rd) {
@@ -299,6 +316,14 @@ load_from_json(T &v, reader &rd) {
   return true;
 }
 
+/**
+ * @brief 从JSON对象加载反射对象
+ *
+ * @tparam T 反射对象类型
+ * @param t 反射对象对象
+ * @param rd JSON读取器对象
+ * @return bool 是否加载成功
+ */
 template <typename T>
 inline std::enable_if_t<is_reflection_v<T>, bool> load_from_json(T &&t,
                                                                  reader &rd) {
@@ -310,6 +335,15 @@ inline std::enable_if_t<is_reflection_v<T>, bool> load_from_json(T &&t,
   return true;
 }
 
+/**
+ * @brief 从JSON字符串加载反射对象
+ *
+ * @tparam T 反射对象类型
+ * @param t 反射对象对象
+ * @param buf JSON字符串指针
+ * @param len JSON字符串大小
+ * @return bool 是否加载成功
+ */
 template <typename T>
 inline bool load_from_json(T &&t, const char *buf, size_t len = -1) {
   reader rd;
@@ -319,6 +353,13 @@ inline bool load_from_json(T &&t, const char *buf, size_t len = -1) {
   return load_from_json(std::forward<T>(t), rd);
 }
 
+/**
+ * @brief 释放反射对象内存
+ *
+ * @tparam T 反射对象类型
+ * @param t 反射对象对象
+ * @return bool 是否释放成功
+ */
 template <typename T>
 inline std::enable_if_t<is_reflection_v<T>, bool> free_memory(T &&t) {
   try {

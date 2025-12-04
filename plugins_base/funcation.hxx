@@ -15,6 +15,12 @@
 
 namespace Anycubic::Plugins {
 using FuncationType = std::function<void(IStream *data, OStream *result)>;
+
+/**
+ * @brief 函数包装器类
+ * @note 用于将函数包装为请求处理器
+ *
+ */
 class FuncationWrapper : public RequestHandler {
 public:
   void Execute(IStream *data, OStream *result) override {
@@ -49,6 +55,13 @@ private:
   FuncationType func_;
 };
 
+/**
+ * @brief 创建函数包装器
+ *
+ * @param func 函数指针
+ * @param self 类实例指针
+ * @return RequestHandler* 函数包装器实例
+ */
 template <typename Function, typename Self>
 RequestHandler *make_call(const Function &func, Self *self) {
   using func_traits = function_traits<Function>;
@@ -76,6 +89,15 @@ RequestHandler *make_call(const Function &func, Self *self) {
   return FuncationWrapper::Create(std::move(h));
 }
 
+/**
+ * @brief 调用插件函数
+ *
+ * @param router 插件路由器
+ * @param plugin 插件名称
+ * @param fname 函数名称
+ * @param args 函数参数
+ * @return ret_type 函数返回值
+ */
 template <typename ret_type, typename... Args>
 ret_type dispatch_call(PluginRouter *router, const char *plugin,
                        const char *fname, Args &&...args) {
@@ -103,6 +125,16 @@ ret_type dispatch_call(PluginRouter *router, const char *plugin,
     FUNC_LEAVE;
   }
 }
+
+/**
+ * @brief 调用插件函数
+ *
+ * @param host 插件宿主
+ * @param plugin 插件名称
+ * @param fname 函数名称
+ * @param args 函数参数
+ * @return ret_type 函数返回值
+ */
 template <typename ret_type, typename... Args>
 ret_type dispatch_call(PluginHost *host, const char *plugin, const char *fname,
                        Args &&...args) {
