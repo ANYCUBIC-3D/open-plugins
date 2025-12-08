@@ -12,9 +12,10 @@ bool LoadSignture(const char *plagin, std::vector<char> &buffer);
 bool Decode(std::vector<char> &buffer);
 bool Eecode(std::vector<char> &buffer);
 struct Package {
-  int64_t version;
-  int64_t build_time;
-  map_type files;
+  int64_t version;    ///< 插件包版本号
+  int64_t build_time; ///< 编译时间
+  std::string name;   ///< 插件包名
+  map_type files;     ///< 插件包文件列表
 };
 
 bool ParseInfo(const std::vector<char> &buffer, Package *info);

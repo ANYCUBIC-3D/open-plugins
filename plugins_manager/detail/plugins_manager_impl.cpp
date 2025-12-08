@@ -427,13 +427,16 @@ bool PluginsManagerImpl::CheckPackage() {
     wxFileName zipFile(wxString::FromUTF8(plugins_), filename);
     if (!CheckPackage_(zipFile.GetFullPath().utf8_string())) {
       FUNC_LEAVE2("check package failed:{}", filename.utf8_string());
-      return false;
+      // 检查失败也仅仅是跳过
+      continue;
     }
     plugin_packages_.push_back(filename);
   }
   FUNC_LEAVE2("check package finished, package size:{}",
               plugin_packages_.size());
-  return plugin_packages_.size() > 0;
+  // 检查插件目录下是否有插件
+  // 没有插件也需要运行起来的
+  return true;
 }
 
 // 在文件末尾添加成员函数实现

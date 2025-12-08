@@ -96,6 +96,8 @@ static T tag_invoke(const value_to_tag<T> &, const value &jv) {
       }
       if constexpr (std::is_same_v<value_type, int64_t>) {
         field = itr->value().as_int64();
+      } else if constexpr (std::is_same_v<value_type, std::string>) {
+        field = itr->value().as_string();
       } else {
         auto v = itr->value().as_object();
         for (auto &[k, val] : v) {
@@ -119,6 +121,8 @@ void tag_invoke(const value_from_tag &, value &jv, T const &t) {
     using value_type = std::decay_t<decltype(field)>;
 
     if constexpr (std::is_same_v<value_type, int64_t>) {
+      obj[names[index]] = field;
+    } else if constexpr (std::is_same_v<value_type, std::string>) {
       obj[names[index]] = field;
     } else {
       object nested;

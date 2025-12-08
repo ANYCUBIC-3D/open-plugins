@@ -41,8 +41,15 @@ bool GetPluginsPackageInfo(const char *plugins, PluginsPackageInfo *info) {
 
   info->version = p.version;
   info->build_time = p.build_time;
+  info->name = strdup(p.name.c_str());
   FUNC_LEAVE;
   return true;
+}
+
+void FreePluginsPackageInfo(PluginsPackageInfo *info) {
+  if (info->name) {
+    free(info->name);
+  }
 }
 
 PluginsManager *SetupPM(const char *plugins, CreateWebView_t CreateWebView,

@@ -33,6 +33,15 @@ private:
 
   void EmitEvent(EventType event) override;
 
+  size_t Package(void) const override { return plugin_packages_.size(); }
+  bool PackagePath(size_t index, wxString &path) override {
+    if (index >= plugin_packages_.size()) {
+      return false;
+    }
+    path = plugin_packages_[index];
+    return true;
+  }
+
 private:
   size_t LoadPlugins(void);
   bool CreateInstances(void);

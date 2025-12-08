@@ -92,6 +92,20 @@ struct PluginsManager {
    * @brief 获取已加载插件数量
    */
   virtual size_t Plugins(void) const = 0;
+
+  /**
+   * @brief 获取已加载插件包数量
+   *
+   * @return size_t
+   */
+  virtual size_t Package(void) const = 0;
+  /**
+   * @brief 获取已加载插件包路径
+   *
+   * @param index 插件包索引
+   * @return const char* 插件包路径
+   */
+  virtual bool PackagePath(size_t index, wxString &path) = 0;
 };
 class wxWebView;
 class wxWebViewConfiguration;
@@ -103,18 +117,25 @@ typedef wxWebView *(*CreateWebView_t)(
  * @brief 插件包元信息结构体
  */
 struct PluginsPackageInfo {
-
   int64_t version;   ///< 插件包版本号(时间戳格式)
   time_t build_time; ///< 构建时间戳
+  char *name;        ///< 插件包名
   char md5[32];      ///< 插件包校验码
 };
 
 /**
- * @brief 获取插件包信息
+ * @brief 获取单个插件包信息
  * @param plugins 插件包路径
  * @param info [输出] 插件包信息
  */
 bool GetPluginsPackageInfo(const char *plugins, PluginsPackageInfo *info);
+
+/**
+ * @brief 释放插件包信息结构体
+ *
+ * @param info 插件包信息结构体指针
+ */
+void FreePluginsPackageInfo(PluginsPackageInfo *info);
 
 /**
  * @brief 初始化插件管理器
