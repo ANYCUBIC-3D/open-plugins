@@ -358,6 +358,18 @@ public:
     {
         if (!m_webViewEnvironment)
         {
+            bool shouldSetNoProxy = true;
+            LPWSTR params = nullptr;
+            if(auto result = m_webViewEnvironmentOptions->get_AdditionalBrowserArguments(&params); SUCCEEDED(result)){
+                if(params != nullptr && wxString(params).Find("--proxy-server") != wxNOT_FOUND){
+                    shouldSetNoProxy = false;
+                }
+                CoTaskMemFree(params);
+            }
+            
+            if(shouldSetNoProxy){
+                m_webViewEnvironmentOptions->put_AdditionalBrowserArguments(L"--no-proxy-server");
+            }
             m_webViewsWaitingForEnvironment.push_back(impl);
             HRESULT hr = wxCreateCoreWebView2EnvironmentWithOptions(
                 ms_browserExecutableDir.wc_str(),
@@ -518,6 +530,10 @@ wxWebViewEdgeImpl::~wxWebViewEdgeImpl()
         wxCOMPtr<ICoreWebView2_4> webView2_4;
         if(auto hr = m_webView->QueryInterface(IID_PPV_ARGS(&webView2_4));SUCCEEDED(hr)){
             webView2_4->remove_DownloadStarting(m_downloadStartingToken);
+        }
+        wxCOMPtr<ICoreWebView2_26> webView2_26;
+        if(auto hr = m_webView->QueryInterface(IID_PPV_ARGS(&webView2_26));SUCCEEDED(hr)){
+            webView2_26->remove_SaveFileSecurityCheckStarting(m_saveFileSecurityCheckStartingToken);
         }
     }
 }
@@ -1035,6 +1051,18 @@ HRESULT wxWebViewEdgeImpl::OnWebViewCreated(HRESULT result, ICoreWebView2Control
                     return S_OK;
                 }).Get(),
             &m_serverCertificateErrorToken);
+    }
+    wxCOMPtr<ICoreWebView2_26> webView2_26;
+    if (hr = m_webView->QueryInterface(IID_PPV_ARGS(&webView2_26));SUCCEEDED(hr) && webView2_26) {
+        webView2_26->add_SaveFileSecurityCheckStarting(
+            Callback<ICoreWebView2SaveFileSecurityCheckStartingEventHandler>(
+                [](ICoreWebView2* sender, ICoreWebView2SaveFileSecurityCheckStartingEventArgs* args) -> HRESULT
+                {
+                    // 忽略所有保存文件安全检查
+                    args->put_CancelSave(TRUE);
+                    return S_OK;
+                }).Get(),
+            &m_saveFileSecurityCheckStartingToken);
     }
 
     m_webViewController = webViewController;

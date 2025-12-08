@@ -1165,7 +1165,32 @@ wxgtk_webview_webkit_load_failed_with_tls_errors(WebKitWebView*,
     
     return TRUE; // 表示已处理错误
 }
+bool setNoProxy(WebKitWebContext* context){
+    
+#if WEBKIT_CHECK_VERSION(2, 16, 0)
+    if (wx_check_webkit_version(2, 16, 0))
+    {
+        wxCHECK_MSG( context, false, "no context?" );
+        const auto data_manager = webkit_web_context_get_website_data_manager(context);
+        wxCHECK_MSG( data_manager, false, "no data manager?" );
+        webkit_website_data_manager_set_network_proxy_settings(
+            data_manager,
+            WEBKIT_NETWORK_PROXY_MODE_NO_PROXY,
+            nullptr
+        );
+        return true;
+    }
 
+    wxLogError(_("Setting proxy is not supported by WebKit, at least version 2.16 is required."));
+
+    return false;
+#else // WebKit < 2.16 doesn't support setting proxy
+
+    wxLogError(_("This program was compiled without support for setting WebKit proxy."));
+
+    return false;
+#endif // WebKit 2.16+
+}
 bool wxWebViewWebKit::Create(wxWindow *parent,
                       wxWindowID id,
                       const wxString &url,
@@ -1198,6 +1223,8 @@ bool wxWebViewWebKit::Create(wxWindow *parent,
                      "initialize-web-extensions",
                      G_CALLBACK(wxgtk_initialize_web_extensions),
                      m_dbusServer);
+
+    setNoProxy(WEBKIT_WEB_CONTEXT(m_config.GetNativeConfiguration()));
 
     if (!isChildWebView)
 #ifdef wxHAVE_WEBKIT_WEBSITE_DATA_MANAGER
