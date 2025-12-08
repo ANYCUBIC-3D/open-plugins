@@ -172,7 +172,7 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
   std::ranges::transform(
       plugins, std::back_inserter(libraries_),
       [](const wxString &fname) -> std::shared_ptr<LibraryBase> {
-        FUNC_ENTRY2("fname = {}", fname.utf8_string());
+        FUNC_ENTRY2("plugin name = {}", fname.utf8_string());
         if (auto lib = std::make_shared<LibraryShared>();
             lib->LoadLibrary(fname)) {
           FUNC_LEAVE;
@@ -334,12 +334,11 @@ void PluginsManagerImpl::EmitEvent(EventType event) {
   switch (event) {
   case EventType::kEventInitByApp:
     LoadPlugins();
+    break;
+  case EventType::kEventInitByGUI:
     // NOTE: 初始化语言加载处理
     assert(translations_loader_ != nullptr);
     wxTranslations::Get()->SetLoader(translations_loader_);
-    break;
-  case EventType::kEventInitByGUI:
-    // empty
     break;
   case EventType::kEventFinishedByGUI:
     if (is_inited_ == 0) {

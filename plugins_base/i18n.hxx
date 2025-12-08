@@ -2,7 +2,7 @@
 
 #ifndef _
 #define _(s) Anycubic::Plugins::I18n::translate((s))
-#define _L(s) Slic3r::GUI::I18N::translate((s))
+#define _L(s) Anycubic::Plugins::I18n::translate((s))
 #define _devL(s) wxString((s))
 #define _omitL(s) ("")
 #define _utf8(s) Anycubic::Plugins::I18n::translate_utf8((s))
