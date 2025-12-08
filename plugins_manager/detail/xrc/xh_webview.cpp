@@ -20,11 +20,11 @@ wxObject *WebviewHandler::DoCreateResource() {
   if (url.IsEmpty()) {
     // 在windows下，使用虚拟服务来实施拦截处理
     // 其他平台是scheme处理，逻辑不同
-#if __WXMSW__
+#if defined(__WXMSW__)
     url = GetParamValue(wxASCII_STR("win_url"));
-#elif __WXOSX__
+#elif defined(__WXOSX__)
     url = GetParamValue(wxASCII_STR("osx_url"));
-#elif __WXGTK__
+#elif defined(__WXGTK__)
     url = GetParamValue(wxASCII_STR("gtk_url"));
 #else
 #error "Unsupported platform"
@@ -34,7 +34,7 @@ wxObject *WebviewHandler::DoCreateResource() {
   // 获取回调插件名
   wxString plugins_name = GetParamValue(wxASCII_STR("plugin_name"));
   bool clear = GetBool(wxASCII_STR("clear_before"), false);
-  Anycubic::Plugins::Plugin *plugin=nullptr;
+  Anycubic::Plugins::Plugin *plugin = nullptr;
   if (getPlugin_ != nullptr) {
     plugin = getPlugin_(plugins_name);
   }
@@ -43,14 +43,13 @@ wxObject *WebviewHandler::DoCreateResource() {
   if (clear) {
     confg.ClearCookies();
   }
-  wxWebView *webview =
-      CreateWebView_(dynamic_cast<wxWindow *>(GetParent()), url, &confg,
-                     [plugin](wxWebView *view) {
-                       if (plugin == nullptr) {
-                         return;
-                       }
-                       plugin->CreateWebview(view);
-                     });
+  wxWebView *webview = CreateWebView_(dynamic_cast<wxWindow *>(GetParent()),
+                                      url, &confg, [plugin](wxWebView *view) {
+                                        if (plugin == nullptr) {
+                                          return;
+                                        }
+                                        plugin->CreateWebview(view);
+                                      });
   webview->SetId(GetID());
   webview->SetName(GetName());
   return webview;
