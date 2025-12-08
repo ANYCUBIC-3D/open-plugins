@@ -73,7 +73,7 @@ include(generate)
 set(CMAKE_DEBUG_POSTFIX d)
 generate_build_header(${CMAKE_BINARY_DIR}/build_info.h)
 
-
+include_directories(${CMAKE_SOURCE_DIR}/3rdparty)
 option(ENABLE_WEBVIEW "Enable WebView WebKit" ON)
 if(ENABLE_WEBVIEW)
     add_subdirs(WebView)
