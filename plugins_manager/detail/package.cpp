@@ -385,6 +385,7 @@ bool UnzipAll(const std::vector<wxString> &plugins_packages,
   auto dir = wxFileName::DirName(wxString::FromUTF8(tmp_dir));
 #ifdef NDEBUG
   if (dir.DirExists()) {
+    LOG_INFO("tmp_dir:{} already exists, remove it", tmp_dir);
     dir.Rmdir(wxPATH_RMDIR_RECURSIVE);
   }
   dir.Mkdir(wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);

@@ -458,6 +458,7 @@ void PluginsManagerImpl::TraverseDirectory(const wxString &dirPath,
     } else {
       // 如果是文件且是插件，添加到列表
       if (::IsPlugins(filename)) {
+        LOG_INFO("found plugins:{}", filename.utf8_string());
         plugins.push_back(fullPath.GetFullPath());
       } else {
         LOG_INFO("{} is not plugins", filename.utf8_string());
