@@ -27,9 +27,7 @@ PluginsManagerImpl::PluginsManagerImpl(const char *plugins,
   translations_loader_ = new acTranslationsLoader;
   FUNC_ENTRY;
   router_ = std::make_shared<EventRouter>();
-  if (!wxFileName::Exists(wxString::FromUTF8(plugins))) {
-    throw std::invalid_argument("plugins not exists");
-  }
+
   fs_handler_ = std::make_shared<MemoryFSHandler>();
   wxFileSystem::AddHandler(fs_handler_.get());
   wxXmlResource::Get()->InitAllHandlers();
@@ -409,10 +407,11 @@ static bool CheckPackage_(const std::string &plugins_) {
 
 bool PluginsManagerImpl::CheckPackage() {
   FUNC_ENTRY
-#ifndef NDEBUG
-  FUNC_LEAVE2("check package skipped in debug mode");
-  return true;
-#endif // NDEBUG
+  if (!wxFileName::Exists(wxString::FromUTF8(plugins_))) {
+    FUNC_LEAVE2("plugins directory not exists:{}", plugins_);
+    return true;
+  }
+
   // 遍历plugins目录下的所有文件
   wxDir pluginsDir(wxString::FromUTF8(plugins_));
   if (!pluginsDir.IsOpened()) {
@@ -426,7 +425,7 @@ bool PluginsManagerImpl::CheckPackage() {
     // 构造完整路径
     wxFileName zipFile(wxString::FromUTF8(plugins_), filename);
     if (!CheckPackage_(zipFile.GetFullPath().utf8_string())) {
-      FUNC_LEAVE2("check package failed:{}", filename.utf8_string());
+      LOG_WARN("check package failed:{}", filename.utf8_string());
       // 检查失败也仅仅是跳过
       continue;
     }
