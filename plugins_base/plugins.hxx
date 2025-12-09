@@ -191,6 +191,17 @@ struct PluginHost {
                                const class wxString &xrcName,
                                const class wxString &xrc) = 0;
   /**
+   * @brief Create a Panel object
+   *
+   * @param parent 父容器窗口指针，用于添加面板窗口
+   * @param xrcName 插件提供的XRC资源名称，用于加载面板窗口
+   * @param xrc 插件提供的XRC资源字符串，用于创建面板窗口
+   * @return wxWindow*  创建的面板窗口指针
+   */
+  virtual wxPanel *CreatePanel(class wxWindow *parent,
+                               const class wxString &xrcName,
+                               const class wxString &xrc) = 0;
+  /**
    * @brief 获取当前语言
    *
    * @return wxString 当前语言名称, 例如 "zh_CN"

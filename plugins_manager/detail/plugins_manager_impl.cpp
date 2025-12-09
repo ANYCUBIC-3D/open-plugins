@@ -80,6 +80,15 @@ class wxPanel *PluginsManagerImpl::CreatePanel(const wxString &position,
   if (parent == nullptr) {
     return nullptr;
   }
+  return CreatePanel(parent, xrcName, xrc);
+}
+
+wxPanel *PluginsManagerImpl::CreatePanel(wxWindow *parent,
+                                         const wxString &xrcName,
+                                         const wxString &xrc) {
+  if (parent == nullptr) {
+    return nullptr;
+  }
 
   wxString name = RandomString(16) + wxASCII_STR(".xrc");
   auto result = this->AddFS(name, xrc);

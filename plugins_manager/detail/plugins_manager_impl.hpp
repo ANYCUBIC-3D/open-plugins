@@ -57,6 +57,8 @@ private:
   class wxPanel *CreatePanel(const class wxString &position,
                              const class wxString &xrcName,
                              const class wxString &xrc) override;
+  wxPanel *CreatePanel(class wxWindow *parent, const class wxString &xrcName,
+                       const class wxString &xrc) override;
   wxString Language(void) override;
   bool LoadTranslationFromData(const wxString &domain, void *data,
                                size_t bytes) override;
