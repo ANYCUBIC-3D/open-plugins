@@ -39,8 +39,8 @@ bool TabBookPlugin::AttachEvt(wxEvtHandler *) { return false; }
 
 bool TabBookPlugin::DetachEvt(wxEvtHandler *) { return false; }
 
-bool TabBookPlugin::CreateDialog(wxDialog *dlg, wxWindow *parent,
-                                 wxString *bmp) {
+bool TabBookPlugin::CreatePanel(wxPanel *panel, wxWindow *parent,
+                                wxString *bmp) {
   return false;
 }
 
