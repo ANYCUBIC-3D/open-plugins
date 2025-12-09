@@ -103,6 +103,7 @@ public:
     EventRegistrationToken m_stateChangedToken = {};
     EventRegistrationToken m_serverCertificateErrorToken = {};
     EventRegistrationToken m_saveFileSecurityCheckStartingToken = {};
+    EventRegistrationToken m_permissionRequestedToken = {};
 
     // WebView Event handlers
     HRESULT OnNavigationStarting(ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args);

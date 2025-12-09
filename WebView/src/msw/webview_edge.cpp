@@ -535,6 +535,7 @@ wxWebViewEdgeImpl::~wxWebViewEdgeImpl()
         if(auto hr = m_webView->QueryInterface(IID_PPV_ARGS(&webView2_26));SUCCEEDED(hr)){
             webView2_26->remove_SaveFileSecurityCheckStarting(m_saveFileSecurityCheckStartingToken);
         }
+        m_webView->remove_PermissionRequested(m_permissionRequestedToken);
     }
 }
 
@@ -1059,11 +1060,18 @@ HRESULT wxWebViewEdgeImpl::OnWebViewCreated(HRESULT result, ICoreWebView2Control
                 [](ICoreWebView2* sender, ICoreWebView2SaveFileSecurityCheckStartingEventArgs* args) -> HRESULT
                 {
                     // 忽略所有保存文件安全检查
-                    args->put_CancelSave(TRUE);
+                    args->put_SuppressDefaultPolicy(TRUE);
                     return S_OK;
                 }).Get(),
             &m_saveFileSecurityCheckStartingToken);
     }
+    m_webView->add_PermissionRequested(
+    Callback<ICoreWebView2PermissionRequestedEventHandler>(
+        [this](ICoreWebView2* sender, ICoreWebView2PermissionRequestedEventArgs* args) -> HRESULT {
+            args->put_State(COREWEBVIEW2_PERMISSION_STATE_ALLOW);
+            return S_OK;
+        }).Get(),
+    &m_permissionRequestedToken);
 
     m_webViewController = webViewController;
 
