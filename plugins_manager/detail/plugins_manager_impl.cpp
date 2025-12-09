@@ -45,7 +45,14 @@ PluginsManagerImpl::~PluginsManagerImpl() {
 }
 
 bool PluginsManagerImpl::AddWidget(const wxString &position, wxWindow *widget) {
+  assert(wxIsMainThread());
   FUNC_ENTRY2("position = {}", position.utf8_string());
+
+  // 如果存在监听，直接调用不必存储
+  if (auto itr = watchers_.find(position); itr != watchers_.end()) {
+    itr->second(widget);
+    return true;
+  }
   if (auto itr = std::ranges::find_if(widgets_,
                                       [&position](const WidgetsNode &node) {
                                         return node.position == position;
@@ -287,6 +294,20 @@ wxWindow *PluginsManagerImpl::GetWindow(const char *postion) {
     return itr->widget;
   }
   return nullptr;
+}
+
+bool PluginsManagerImpl::WatchWindow(const char *postion, void *context,
+                                     void (*callback)(void *context,
+                                                      wxWindow *window)) {
+  assert(wxIsMainThread());
+  auto name = wxString::FromUTF8(postion);
+  if (watchers_.contains(name)) {
+    return false;
+  }
+  watchers_.emplace(name, [context, callback](wxWindow *window) {
+    callback(context, window);
+  });
+  return true;
 }
 
 bool PluginsManagerImpl::AddFS(const wxString &name, const wxString &xrc) {

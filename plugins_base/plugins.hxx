@@ -168,6 +168,18 @@ struct PluginHost {
   virtual wxWindow *GetWindow(const char *postion = nullptr) = 0;
 
   /**
+   * @brief 监听窗口创建事件
+   *
+   * @param postion 窗口位置
+   * @param context 上下文指针
+   * @param callback 回调函数指针
+   * @return true 监听成功
+   * @return false 监听失败
+   */
+  virtual bool WatchWindow(const char *postion, void *context,
+                           void (*callback)(void *context,
+                                            wxWindow *window)) = 0;
+  /**
    * @brief Create a Panel object
    *
    * @param position 父容器位置标识符，用于定位添加位置
