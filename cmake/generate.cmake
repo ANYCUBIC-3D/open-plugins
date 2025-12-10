@@ -162,11 +162,11 @@ macro(i18n_generate_embed target search_dir)
     file(WRITE ${template}
         "#include <stdint.h>\n"
         "#include <tuple>\n"
-        "using result_type = std::tuple<uint32_t, const uint8_t *, const char *>;\n"
+        "using result_type = std::tuple<uint32_t, uint8_t *, const char *>;\n"
         "// clang-format off\n"
         "static const char* PACKAGE_MD5 = \"@PACKAGE_MD5@\";\n"
         "static constexpr uint32_t PACKAGE_SIZE = @PACKAGE_SIZE@;\n"
-        "static const uint8_t PACKAGE_DATA[] = {@PACKAGE_DATA@};\n"
+        "static uint8_t PACKAGE_DATA[] = {@PACKAGE_DATA@};\n"
         "result_type @LANG@() {\n"
         "return std::make_tuple(PACKAGE_SIZE, PACKAGE_DATA, PACKAGE_MD5);\n"
         "}\n"
@@ -176,7 +176,7 @@ macro(i18n_generate_embed target search_dir)
     file(WRITE ${header}
         "#include <stdint.h>\n"
         "#include <tuple>\n"
-        "using result_type = std::tuple<uint32_t, const uint8_t *, const char *>;\n"
+        "using result_type = std::tuple<uint32_t, uint8_t *, const char *>;\n"
         "#define LANGUAGE_LIST ("
         )
     file(GLOB_RECURSE mo_files ${search_dir}/*.mo)
