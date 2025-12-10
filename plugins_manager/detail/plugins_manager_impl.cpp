@@ -48,9 +48,9 @@ bool PluginsManagerImpl::AddWidget(const wxString &position, wxWindow *widget) {
   assert(wxIsMainThread());
   FUNC_ENTRY2("position = {}", position.utf8_string());
 
-  // 如果存在监听，直接调用不必存储
-  if (auto itr = watchers_.find(position); itr != watchers_.end()) {
-    itr->second(widget);
+  if (auto itr = watchers_.find(position);
+      itr != watchers_.end() && false == itr->second(widget)) {
+    // 当被监听且返回false时，认为被监听者已处理，不存储
     return true;
   }
   if (auto itr = std::ranges::find_if(widgets_,
@@ -306,7 +306,7 @@ wxWindow *PluginsManagerImpl::GetWindow(const char *postion) {
 }
 
 bool PluginsManagerImpl::WatchWindow(const char *postion, void *context,
-                                     void (*callback)(void *context,
+                                     bool (*callback)(void *context,
                                                       wxWindow *window)) {
   assert(wxIsMainThread());
   auto name = wxString::FromUTF8(postion);
@@ -314,7 +314,7 @@ bool PluginsManagerImpl::WatchWindow(const char *postion, void *context,
     return false;
   }
   watchers_.emplace(name, [context, callback](wxWindow *window) {
-    callback(context, window);
+    return callback(context, window);
   });
   return true;
 }

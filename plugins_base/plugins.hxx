@@ -172,12 +172,13 @@ struct PluginHost {
    *
    * @param postion 窗口位置
    * @param context 上下文指针
-   * @param callback 回调函数指针
+   * @param callback 回调函数指针 --
+   * 当callback返回false时将影响AddWidget的存储行为为不存储
    * @return true 监听成功
    * @return false 监听失败
    */
   virtual bool WatchWindow(const char *postion, void *context,
-                           void (*callback)(void *context,
+                           bool (*callback)(void *context,
                                             wxWindow *window)) = 0;
   /**
    * @brief Create a Panel object

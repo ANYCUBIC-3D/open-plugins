@@ -53,7 +53,7 @@ private:
   Anycubic::Plugins::Plugin *GetPlugin(const char *name) override;
   class wxWindow *GetWindow(const char *postion = nullptr) override;
   bool WatchWindow(const char *postion, void *context,
-                   void (*callback)(void *context, wxWindow *window)) override;
+                   bool (*callback)(void *context, wxWindow *window)) override;
   class wxPanel *CreatePanel(const class wxString &position,
                              const class wxString &xrcName,
                              const class wxString &xrc) override;
@@ -105,6 +105,6 @@ private:
   std::vector<wxString> plugin_packages_;        ///< 插件包列表
   int is_inited_;                                ///< 是否初始化完成
   std::map<wxString,
-           std::function<void(wxWindow *window)>>
+           std::function<bool(wxWindow *window)>>
       watchers_; ///< 窗口监听列表
 };
