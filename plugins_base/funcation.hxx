@@ -98,8 +98,8 @@ RequestHandler *make_call(const Function &func, Self *self) {
  * @param args 函数参数
  * @return ret_type 函数返回值
  */
-template <typename ret_type, typename... Args>
-ret_type dispatch_call(PluginRouter *router, const char *plugin,
+template <typename ret_type, typename router_type, typename... Args>
+ret_type dispatch_call(router_type *router, const char *plugin,
                        const char *fname, Args &&...args) {
   FUNC_ENTRY;
   std::vector<char> argsData;
@@ -113,7 +113,12 @@ ret_type dispatch_call(PluginRouter *router, const char *plugin,
 
   IStream is(argsData.empty() ? nullptr : argsData.data(), argsData.size());
   OStream os;
-  router->ExecuteFunction(plugin, fname, &is, &os);
+  auto result = router->ExecuteFunction(plugin, fname, &is, &os);
+  assert(result); // 未执行的直接标记为失败
+  if (!result) {
+    FUNC_LEAVE2("{}::{} not found or execute failed", plugin, fname);
+    return ret_type();
+  }
 
   if constexpr (!std::is_void_v<ret_type>) {
     IStream rs(os.Data(), os.Size());

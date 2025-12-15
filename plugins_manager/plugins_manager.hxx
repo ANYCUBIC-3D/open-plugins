@@ -6,6 +6,11 @@
 #include <functional>
 #include <memory>
 
+namespace Anycubic::Plugins {
+struct IStream;
+struct OStream;
+} // namespace Anycubic::Plugins
+
 class LibraryBase;
 using create_library_t = std::shared_ptr<LibraryBase> (*)(void);
 /**
@@ -106,6 +111,20 @@ struct PluginsManager {
    * @return const char* 插件包路径
    */
   virtual bool PackagePath(size_t index, wxString &path) = 0;
+
+  /**
+   * @brief 执行插件函数
+   *
+   * @param plugin 插件名称
+   * @param fname 函数名称
+   * @param data 输入数据流
+   * @param result 输出结果流
+   * @return true 执行成功
+   * @return false 执行失败
+   */
+  virtual bool ExecuteFunction(const char *plugin, const char *fname,
+                               Anycubic::Plugins::IStream *data,
+                               Anycubic::Plugins::OStream *result) = 0;
 };
 class wxWebView;
 class wxWebViewConfiguration;

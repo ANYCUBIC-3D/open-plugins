@@ -151,6 +151,12 @@ size_t PluginsManagerImpl::Plugins(void) const {
   return size;
 }
 
+bool PluginsManagerImpl::ExecuteFunction(const char *plugin, const char *fname,
+                                         Anycubic::Plugins::IStream *data,
+                                         Anycubic::Plugins::OStream *result) {
+  return router_->ExecuteFunction(plugin, fname, data, result);
+}
+
 size_t PluginsManagerImpl::LoadPlugins(void) {
   FUNC_ENTRY
 

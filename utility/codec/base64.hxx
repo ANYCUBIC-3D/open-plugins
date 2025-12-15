@@ -8,3 +8,4 @@
  * @return std::string 输出base64编码字符串
  */
 std::string base64Encode(const std::string &src);
+std::string base64Dec

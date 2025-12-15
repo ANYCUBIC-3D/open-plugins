@@ -41,6 +41,9 @@ private:
     path = plugin_packages_[index];
     return true;
   }
+  bool ExecuteFunction(const char *plugin, const char *fname,
+                       Anycubic::Plugins::IStream *data,
+                       Anycubic::Plugins::OStream *result) override;
 
 private:
   size_t LoadPlugins(void);
