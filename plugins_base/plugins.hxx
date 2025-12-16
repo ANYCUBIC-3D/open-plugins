@@ -188,9 +188,9 @@ struct PluginHost {
    * @param xrc 插件提供的XRC资源字符串，用于创建面板窗口
    * @return wxWindow*  创建的面板窗口指针
    */
-  virtual wxPanel *CreatePanel(const class wxString &position,
-                               const class wxString &xrcName,
-                               const class wxString &xrc) = 0;
+  virtual wxPanel *CreatePanel(const wxString &position,
+                               const wxString &xrcName,
+                               const wxString &xrc) = 0;
   /**
    * @brief Create a Panel object
    *
@@ -199,9 +199,8 @@ struct PluginHost {
    * @param xrc 插件提供的XRC资源字符串，用于创建面板窗口
    * @return wxWindow*  创建的面板窗口指针
    */
-  virtual wxPanel *CreatePanel(class wxWindow *parent,
-                               const class wxString &xrcName,
-                               const class wxString &xrc) = 0;
+  virtual wxPanel *CreatePanel(wxWindow *parent, const wxString &xrcName,
+                               const wxString &xrc) = 0;
   /**
    * @brief 获取当前语言
    *
@@ -269,27 +268,25 @@ struct PluginHost {
    * @param key 配置键值，支持两级结构如 "section/key"
    * @param value [输出] 配置值
    */
-  virtual bool GetValue(const class wxString &, class wxString &value) = 0;
+  virtual bool GetValue(const wxString &, wxString &value) = 0;
 
   /**
    * @brief 设置配置项
    * @param persistent 是否持久化存储，默认true
    */
-  virtual bool SetValue(const class wxString &, const class wxString &value,
+  virtual bool SetValue(const wxString &, const wxString &value,
                         bool persistent = true) = 0;
 
   /**
    * @brief 获取加密配置项
    * @note 实现类应负责加解密逻辑
    */
-  virtual bool GetEncryptValue(const class wxString &,
-                               class wxString &value) = 0;
+  virtual bool GetEncryptValue(const wxString &, wxString &value) = 0;
 
   /**
    * @brief 设置加密配置项
    */
-  virtual bool SetEncryptValue(const class wxString &,
-                               const class wxString &value,
+  virtual bool SetEncryptValue(const wxString &, const wxString &value,
                                bool persistent = true) = 0;
 
   /**
