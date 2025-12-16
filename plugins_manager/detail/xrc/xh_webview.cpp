@@ -43,13 +43,13 @@ wxObject *WebviewHandler::DoCreateResource() {
   if (clear) {
     confg.ClearCookies();
   }
-  wxWebView *webview = CreateWebView_(dynamic_cast<wxWindow *>(GetParent()),
-                                      url, &confg, [plugin](wxWebView *view) {
-                                        if (plugin == nullptr) {
-                                          return;
-                                        }
-                                        plugin->CreateWebview(view);
-                                      });
+  wxWebView *webview =
+      CreateWebView_(m_parentAsWindow, url, &confg, [plugin](wxWebView *view) {
+        if (plugin == nullptr) {
+          return;
+        }
+        plugin->CreateWebview(view);
+      });
   webview->SetId(GetID());
   webview->SetName(GetName());
   return webview;
