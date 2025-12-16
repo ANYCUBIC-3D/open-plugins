@@ -102,15 +102,15 @@ struct Plugin {
   virtual bool DetachEvt(wxEvtHandler *evt) = 0;
 
   /**
-   * @brief 创建插件对话框
+   * @brief 绑定事件
    * @param panel 面板对象
    * @param parent 父窗口指针
    * @param bmp 位图资源指针
    * @return true 创建成功
    * @return false 创建失败
    */
-  virtual bool CreatePanel(wxPanel *panel, wxWindow *parent = nullptr,
-                           wxString *bmp = nullptr) = 0;
+  virtual bool BindEvt(wxPanel *panel, wxWindow *parent = nullptr,
+                       wxString *bmp = nullptr) = 0;
   /**
    * @brief 创建插件Webview
    *
