@@ -16,7 +16,7 @@ class wxPluginEventPrivate;
 class EVENT_API wxPluginEvent : public wxNotifyEvent {
 public:
   wxPluginEvent();
-  wxPluginEvent(wxEventType type, int id);
+  wxPluginEvent(wxEventType type, int id = wxID_ANY);
   wxPluginEvent(const wxPluginEvent &event);
   ~wxPluginEvent(void) override;
   wxEvent *Clone() const override;
