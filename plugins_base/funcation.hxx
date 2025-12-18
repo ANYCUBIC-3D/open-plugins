@@ -146,9 +146,15 @@ ret_type dispatch_call(PluginHost *host, const char *plugin, const char *fname,
   FUNC_ENTRY;
   auto router = host->Router();
   assert(router != nullptr);
-  auto result = dispatch_call<ret_type>(router, plugin, fname,
-                                        std::forward<Args>(args)...);
-  FUNC_LEAVE;
-  return result;
+  if constexpr(std::is_void_v<ret_type>) {
+    dispatch_call<void>(router, plugin, fname, std::forward<Args>(args)...);
+    FUNC_LEAVE;
+    return ret_type();
+  }else{
+    auto result = dispatch_call<ret_type>(router, plugin, fname,
+                                          std::forward<Args>(args)...);
+    FUNC_LEAVE;
+    return result;
+  }
 }
 } // namespace Anycubic::Plugins
