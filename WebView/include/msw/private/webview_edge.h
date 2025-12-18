@@ -102,7 +102,6 @@ public:
     EventRegistrationToken m_bytesReceivedChangedToken = {};
     EventRegistrationToken m_stateChangedToken = {};
     EventRegistrationToken m_serverCertificateErrorToken = {};
-    EventRegistrationToken m_saveFileSecurityCheckStartingToken = {};
     EventRegistrationToken m_permissionRequestedToken = {};
 
     // WebView Event handlers

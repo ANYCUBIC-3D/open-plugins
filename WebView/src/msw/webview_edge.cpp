@@ -531,10 +531,6 @@ wxWebViewEdgeImpl::~wxWebViewEdgeImpl()
         if(auto hr = m_webView->QueryInterface(IID_PPV_ARGS(&webView2_4));SUCCEEDED(hr)){
             webView2_4->remove_DownloadStarting(m_downloadStartingToken);
         }
-        wxCOMPtr<ICoreWebView2_26> webView2_26;
-        if(auto hr = m_webView->QueryInterface(IID_PPV_ARGS(&webView2_26));SUCCEEDED(hr)){
-            webView2_26->remove_SaveFileSecurityCheckStarting(m_saveFileSecurityCheckStartingToken);
-        }
         m_webView->remove_PermissionRequested(m_permissionRequestedToken);
     }
 }
@@ -1052,18 +1048,6 @@ HRESULT wxWebViewEdgeImpl::OnWebViewCreated(HRESULT result, ICoreWebView2Control
                     return S_OK;
                 }).Get(),
             &m_serverCertificateErrorToken);
-    }
-    wxCOMPtr<ICoreWebView2_26> webView2_26;
-    if (hr = m_webView->QueryInterface(IID_PPV_ARGS(&webView2_26));SUCCEEDED(hr) && webView2_26) {
-        webView2_26->add_SaveFileSecurityCheckStarting(
-            Callback<ICoreWebView2SaveFileSecurityCheckStartingEventHandler>(
-                [](ICoreWebView2* sender, ICoreWebView2SaveFileSecurityCheckStartingEventArgs* args) -> HRESULT
-                {
-                    // 忽略所有保存文件安全检查
-                    args->put_SuppressDefaultPolicy(TRUE);
-                    return S_OK;
-                }).Get(),
-            &m_saveFileSecurityCheckStartingToken);
     }
     m_webView->add_PermissionRequested(
     Callback<ICoreWebView2PermissionRequestedEventHandler>(
