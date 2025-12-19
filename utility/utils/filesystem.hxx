@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#ifndef NOT_WXWIDGETS
 #include <wx/string.h>
 namespace Anycubic::utility {
 /**
@@ -46,3 +46,4 @@ bool FileExists(const wxString &path);
  */
 bool CreatePaths(const wxString &path);
 } // namespace Anycubic::utility
+#endif // NOT_WXWIDGETS

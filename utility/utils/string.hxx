@@ -1,8 +1,9 @@
 ﻿#pragma once
 #include <iterator>
 #include <string>
-
+#ifndef NOT_WXWIDGETS
 #include <wx/string.h>
+#endif // NOT_WXWIDGETS
 namespace Anycubic::utility {
 /**
  * @brief 连接容器中的字符串
@@ -74,7 +75,7 @@ bool Split(OutputIt output, const std::string &str,
   }
   return true;
 }
-
+#ifndef NOT_WXWIDGETS
 /**
  * @brief 从UTF-8编码的字符串创建wxString
  *
@@ -90,5 +91,5 @@ wxString FromUtf8(const std::string &str);
  * @return std::string UTF-8编码的字符串
  */
 std::string ToUtf8(const wxString &str);
-
+#endif // NOT_WXWIDGETS
 } // namespace Anycubic::utility
