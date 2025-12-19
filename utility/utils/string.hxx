@@ -1,6 +1,8 @@
 ﻿#pragma once
+#include <algorithm>
 #include <iterator>
 #include <string>
+
 #ifndef NOT_WXWIDGETS
 #include <wx/string.h>
 #endif // NOT_WXWIDGETS
