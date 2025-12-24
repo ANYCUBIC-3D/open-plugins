@@ -114,8 +114,8 @@ bool PluginsManagerImpl::LoadTranslationFromData(const wxString &domain,
                                                  void *data, size_t bytes) {
   assert(translations_loader_ != nullptr);
   wxString domainTmp = domain.IsEmpty() ? wxString::FromUTF8(domain_) : domain;
-  translations_loader_->RegisterCatalog(domainTmp,
-                                        wxString((char *)data, bytes));
+  translations_loader_->RegisterCatalog(
+      domainTmp, std::string((char *)data, bytes));
   return wxTranslations::Get()->AddCatalog(domainTmp);
 }
 
@@ -123,7 +123,7 @@ bool PluginsManagerImpl::LoadTranslationFromFile(const wxString &domain,
                                                  const wxString &path) {
   assert(translations_loader_ != nullptr);
   wxString domainTmp = domain.IsEmpty() ? wxString::FromUTF8(domain_) : domain;
-  translations_loader_->RegisterCatalog(domainTmp, path);
+  translations_loader_->RegisterCatalog(domainTmp, path.utf8_string());
   return wxTranslations::Get()->AddCatalog(domainTmp);
 }
 

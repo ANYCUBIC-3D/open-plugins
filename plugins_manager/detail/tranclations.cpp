@@ -2,6 +2,8 @@
 
 #include <easy_log/log.hxx>
 
+#include <boost/algorithm/string.hpp>
+
 wxMsgCatalog *acTranslationsLoader::LoadCatalog(const wxString &domain,
                                                 const wxString &lang) {
   // 默认行为不变更，加载文件系统中的翻译文件
@@ -20,13 +22,13 @@ wxMsgCatalog *acTranslationsLoader::LoadCatalog(const wxString &domain,
   // 判断是不是文件路径
 
   wxMsgCatalog *cat = nullptr;
-  if (it->second.EndsWith(wxT(".mo"))) {
+  if (boost::algorithm::ends_with(it->second, ".mo")) {
     cat = wxMsgCatalog::CreateFromFile(it->second, domain);
   } else {
     // 创建并加载内存中的翻译数据
-    auto data = it->second.utf8_string();
-    cat = wxMsgCatalog::CreateFromData(
-        wxCharBuffer::CreateOwned(data.data(), data.size()), domain);
+    auto buffer =
+        wxCharBuffer::CreateOwned(it->second.data(), it->second.size());
+    cat = wxMsgCatalog::CreateFromData(buffer, domain);
   }
   if (cat == nullptr) {
     LOG_ERROR("Failed to create catalog from data for domain {}",
@@ -36,7 +38,7 @@ wxMsgCatalog *acTranslationsLoader::LoadCatalog(const wxString &domain,
 }
 
 bool acTranslationsLoader::RegisterCatalog(const wxString &domain,
-                                           const wxString &path) {
+                                           const std::string &path) {
   auto it = std::ranges::find_if(catalogs_, [&domain](const CatalogInfo &info) {
     return info.first == domain;
   });

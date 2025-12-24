@@ -11,6 +11,12 @@ class InstanceBase;
 
 class WebviewApiHandler : public wxWebViewHandler {
 public:
+  template <typename _Ty,typename ...Args>
+  _Ty* AddInstanceT(Args &&...args){
+    _Ty *new_instance = new _Ty(std::forward<Args>(args)...);
+    AddInstance(new_instance);
+    return new_instance;
+  }
   void AddInstances(const std::initializer_list<InstanceBase *> &list);
   void AddInstance(InstanceBase *instance);
 

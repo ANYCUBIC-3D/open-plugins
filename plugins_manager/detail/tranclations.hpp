@@ -4,7 +4,7 @@
 
 class acTranslationsLoader : public wxFileTranslationsLoader {
 public:
-  bool RegisterCatalog(const wxString &domain, const wxString &data);
+  bool RegisterCatalog(const wxString &domain, const std::string &data);
 
 public:
   virtual ~acTranslationsLoader() = default;
@@ -12,6 +12,6 @@ public:
                             const wxString &lang) wxOVERRIDE;
 
 private:
-  using CatalogInfo = std::pair<wxString, wxString>;
+  using CatalogInfo = std::pair<wxString, std::string>;
   std::vector<CatalogInfo> catalogs_;
 };

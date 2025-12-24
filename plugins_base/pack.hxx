@@ -18,8 +18,10 @@ namespace Anycubic::Plugins {
 
 template <typename _Ty> size_t get_type_size(_Ty &v) {
   using value_t = std::decay_t<_Ty>;
-  if constexpr (std::is_same_v<value_t, wxString> ||
-                std::is_same_v<value_t, std::string>) {
+  if constexpr (std::is_same_v<value_t, wxString>) {
+    auto tmp = v.utf8_string();
+    return get_type_size(tmp);
+  } else if constexpr (std::is_same_v<value_t, std::string>) {
     return v.length() + sizeof(uint16_t);
   } else if constexpr (is_c_string_v<value_t>) {
     return strlen(v) + sizeof(uint16_t);
@@ -29,7 +31,7 @@ template <typename _Ty> size_t get_type_size(_Ty &v) {
   }
 }
 
-template <typename... Args> size_t get_bytes(Args... args) {
+template <typename... Args> size_t get_bytes(Args &&...args) {
   return (get_type_size(args) + ...);
 }
 
