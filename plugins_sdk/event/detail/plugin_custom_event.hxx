@@ -187,3 +187,6 @@ wxDECLARE_EVENT(EVT_POST_MOMODEL_DOWN_CLICK_EVENT, wxPluginEvent);
                 ========== postevent INFO ==============
 */
 
+
+wxDECLARE_EVENT(EVT_DIALOG_CLOSE_EVENT, wxCommandEvent);
+
