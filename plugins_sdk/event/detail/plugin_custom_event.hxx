@@ -3,7 +3,7 @@
 #include <wx/event.h>
 #include <wx/wx.h>
 #include "../plugin_event.hxx"
-#include "plugin_export.hpp"
+#include "plugin_export.hxx"
 
 using wxPluginEvent = Anycubic::Plugins::SDK::wxPluginEvent;
 //wxDECLARE_EXPORTED_EVENT(ACPLUGIN_API,EVT_GET_NOW_FILAMENT_LIST_INFO, wxPluginEvent);
