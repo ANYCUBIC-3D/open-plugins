@@ -45,7 +45,7 @@ private:
     MatcherBase *matcher_;
     HandlerBase *handler_;
   };
-  std::vector<Node> &get_handler(METHOD_TYPE method) const;
+  const std::vector<Node> &get_handler(METHOD_TYPE method) const;
   std::vector<Node> &get_handler(METHOD_TYPE method);
   std::vector<Node> m_get_handlers;
   std::vector<Node> m_post_handlers;

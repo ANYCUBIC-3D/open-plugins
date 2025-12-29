@@ -30,7 +30,7 @@ private:
   std::shared_ptr<void> m_sharedData;
 };
 
-wxPluginEvent::wxPluginEvent() : wxNotifyEvent(), m_private(nullptr) {}
+wxPluginEvent::wxPluginEvent() : wxPluginEvent(wxEVT_NULL,wxID_ANY) {}
 
 wxPluginEvent::wxPluginEvent(wxEventType type, int id)
     : wxNotifyEvent(type, id), m_private(new wxPluginEventPrivate) {}

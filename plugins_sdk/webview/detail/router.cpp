@@ -78,8 +78,28 @@ Router *Router::Create(void) { return new Router(); }
 MatcherBase *Router::make_matcher(const wxString &pattern) {
   return new RegexMatcher(pattern);
 }
-std::vector<Router::Node> &Router::get_handler(METHOD_TYPE method) const {
-  return get_handler(method);
+const std::vector<Router::Node> &Router::get_handler(METHOD_TYPE method) const {
+#define SWITCH_HANDLER(m, obj)                                                 \
+  case METHOD_TYPE::m:                                                         \
+    return obj;
+#define BEGIN_SWITCH(m) switch (m) {
+#define END_SWITCH()                                                           \
+  default:                                                                     \
+    assert(false);                                                             \
+    }
+  BEGIN_SWITCH(method)
+  SWITCH_HANDLER(MethodGET, m_get_handlers)
+  SWITCH_HANDLER(MethodPOST, m_post_handlers)
+  SWITCH_HANDLER(MethodDELETE, m_delete_handlers)
+  SWITCH_HANDLER(MethodPUT, m_put_handlers)
+  END_SWITCH()
+#undef SWITCH_HANDLER
+#undef BEGIN_SWITCH
+#undef END_SWITCH
+
+  static std::vector<Node> tmp;
+  tmp.clear();
+  return tmp;
 }
 std::vector<Router::Node> &Router::get_handler(METHOD_TYPE method) {
 #define SWITCH_HANDLER(m, obj)                                                 \

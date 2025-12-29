@@ -69,7 +69,12 @@ struct Converter {
     return end && *end == '\0';
   }
   template <typename To> static bool convert(const std::string &from, To &to) {
-    return convert(from.c_str(), to);
+    if constexpr (std::is_same_v<std::decay_t<To>, std::string>) {
+      to = from;
+      return true;
+    } else {
+      return convert(from.c_str(), to);
+    }
   }
 
   template <typename From>
@@ -96,7 +101,7 @@ struct Converter {
  * @return To 目标对象
  */
 template <typename To, typename From>
-typename std::enable_if_t<!std::is_same_v<To, From>, To>
+typename std::enable_if_t<!std::is_same_v<std::decay_t<To>, std::decay_t<From>>, To>
 lexical_cast(const From &from) {
   To to;
   if (detail::Converter::convert(from, to)) {
@@ -114,7 +119,7 @@ lexical_cast(const From &from) {
  * @return To 目标对象
  */
 template <typename To, typename From>
-typename std::enable_if_t<std::is_same_v<To, From>, To>
+typename std::enable_if_t<std::is_same_v<std::decay_t<To>, std::decay_t<From>>, To>
 lexical_cast(const From &from) {
   return from;
 }
