@@ -49,6 +49,7 @@ bool EventRouter::ExecuteFunction(const char *plugin, const char *fname,
     FUNC_LEAVE;
     return true;
   }
+  assert(false);
   FUNC_LEAVE2("function {} not found", fname);
   return false;
 }
