@@ -2,7 +2,7 @@
 
 #include <wx/string.h>
 
-#include <webview.h>
+#include <webview/webview.h>
 
 #include <sstream>
 #include <type_traits>
@@ -49,7 +49,7 @@ static bool IsTestScript() {
 }
 
 template <typename> inline constexpr bool always_false = false;
-template <typename T> wxString to_string(T &&t) {
+template <typename T> wxString argument_to_string(T &&t) {
   if constexpr (std::is_same_v<std::string, std::decay_t<T>>) {
     return wxString::Format("'%s'", wxString::FromUTF8(t));
   } else if constexpr (std::is_same_v<wxString, std::decay_t<T>>) {
@@ -107,12 +107,12 @@ wxString ScriptFormat(const wxString &func, Args &&...args) {
 template <typename... Args> wxString ArgumentFormat(Args &&...args) {
   wxArrayString result;
   if constexpr (sizeof...(args) > 0) {
-    (result.Add(to_string(std::forward<Args>(args))), ...);
+    (result.Add(argument_to_string(std::forward<Args>(args))), ...);
   }
   return wxJoin(result, ',');
 }
 
-bool RunScript(wxWebView *webView, const wxString &javascript) {
+static bool RunScript(wxWebView *webView, const wxString &javascript) {
   try {
     webView->RunScriptAsync(javascript);
   } catch (std::exception &) {
