@@ -2,7 +2,10 @@
 
 #include <wx/string.h>
 
+#include <webview.h>
+
 #include <sstream>
+#include <type_traits>
 
 template <typename _Ty> inline auto to_string(_Ty &&val) {
   using type_v = std::decay_t<_Ty>;
@@ -45,6 +48,21 @@ static bool IsTestScript() {
   return value != nullptr && ::strcmp(value, "1") == 0;
 }
 
+template <typename> inline constexpr bool always_false = false;
+template <typename T> wxString to_string(T &&t) {
+  if constexpr (std::is_same_v<std::string, std::decay_t<T>>) {
+    return wxString::Format("'%s'", wxString::FromUTF8(t));
+  } else if constexpr (std::is_same_v<wxString, std::decay_t<T>>) {
+    return wxString::Format("'%s'", t);
+  } else if constexpr (std::is_convertible_v<T, const char *>) {
+    return wxString::Format("'%s'", static_cast<const char *>(t));
+  } else if constexpr (std::is_arithmetic_v<std::decay_t<T>>) {
+    return wxString() << t; // 统一使用流式操作
+  } else {
+    static_assert(always_false<T>, "Unsupported type");
+    return wxEmptyString;
+  }
+}
 template <typename... Args>
 wxString ScriptFormat(const wxString &func, Args &&...args) {
   std::stringstream ss;
@@ -85,4 +103,19 @@ wxString ScriptFormat(const wxString &func, Args &&...args) {
   ss << ");";
   auto script = ss.str();
   return wxString::FromUTF8(script.data(), script.size());
+}
+template <typename... Args> wxString ArgumentFormat(Args &&...args) {
+  wxArrayString result;
+  if constexpr (sizeof...(args) > 0) {
+    (result.Add(to_string(std::forward<Args>(args))), ...);
+  }
+  return wxJoin(result, ',');
+}
+
+bool RunScript(wxWebView *webView, const wxString &javascript) {
+  try {
+    webView->RunScriptAsync(javascript);
+  } catch (std::exception &) {
+    return false;
+  }
 }
