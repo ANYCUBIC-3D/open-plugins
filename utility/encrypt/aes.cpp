@@ -74,9 +74,9 @@ std::string aesEncrypt(const std::string_view &plaintext,
 
     // 调整最终尺寸
     ciphertext.resize(SALT_SIZE + IV_SIZE + total_len);
+    return std::move(ciphertext);
   } while (false);
-
-  return std::move(ciphertext);
+  return std::string();
 }
 
 std::string aesDecrypt(const std::string_view &ciphertext,
@@ -121,7 +121,8 @@ std::string aesDecrypt(const std::string_view &ciphertext,
     total_len += len;
 
     plaintext.resize(total_len);
+    return std::move(plaintext);
   } while (false);
 
-  return std::move(plaintext);
+  return std::string();
 }
