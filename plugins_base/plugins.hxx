@@ -85,6 +85,13 @@ struct Plugin {
    * @return false 启动失败
    */
   virtual bool Start(void) = 0;
+
+  /**
+   * @brief 插件停止函数
+   *
+   */
+  virtual void Stop(void) = 0;
+
   /**
    * @brief 附加事件处理器
    *

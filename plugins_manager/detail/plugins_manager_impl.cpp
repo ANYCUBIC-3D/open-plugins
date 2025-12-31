@@ -389,10 +389,10 @@ void PluginsManagerImpl::EmitEvent(EventType event) {
     break;
   case EventType::kEventExitByGUI:
     router_.reset();
-    while (!instances_.empty()) {
-      // 确保插件释放顺序问题
-      instances_.pop_back();
+    for (auto instance : instances_) {
+      instance.second->Stop();
     }
+    instances_.clear();
     widgets_.clear();
     is_inited_ = 0;
     assert(router_ == nullptr && instances_.empty() && widgets_.empty());

@@ -30,11 +30,11 @@ void WebviewApiHandler::StartRequest(
   }
 }
 void WebviewApiHandler::Shutdown(void) {
+  m_router.reset();
   for (auto ptr : m_instances) {
     ptr->Release();
   }
   m_instances.clear();
-  m_router.reset();
 }
 
 void WebviewApiHandler::Reload(void) {
