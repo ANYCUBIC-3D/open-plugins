@@ -221,7 +221,8 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
 
 template <typename T> static inline void delete_plugin(T *plugin) {
   if (plugin != nullptr) {
-    LOG_DEBUG("Delete plugin");
+    auto name = plugin->Name();
+    LOG_DEBUG("Delete plugin:{}", name);
     plugin->Destroy();
   }
 }
@@ -388,10 +389,9 @@ void PluginsManagerImpl::EmitEvent(EventType event) {
     }
     break;
   case EventType::kEventExitByGUI:
+    std::for_each(instances_.rbegin(), instances_.rend(), 
+      [](auto &pair) { pair.second->Stop(); });
     router_.reset();
-    for (auto instance : instances_) {
-      instance.second->Stop();
-    }
     instances_.clear();
     widgets_.clear();
     is_inited_ = 0;
