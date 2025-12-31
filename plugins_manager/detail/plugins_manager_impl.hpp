@@ -99,7 +99,8 @@ private:
   };
   std::vector<WidgetsNode> widgets_;                    ///< 插件可用窗口列表
   std::vector<std::shared_ptr<LibraryBase>> libraries_; ///< 动态插件库列表
-  std::map<wxString, std::shared_ptr<struct Anycubic::Plugins::Plugin>>
+  std::vector<
+      std::pair<wxString, std::shared_ptr<struct Anycubic::Plugins::Plugin>>>
       instances_;                                ///< 插件实例列表
   std::shared_ptr<EventRouter> router_;          ///< 调用路由
   std::shared_ptr<MemoryFSHandler> fs_handler_;  ///< 内存文件系统处理器

@@ -114,8 +114,8 @@ bool PluginsManagerImpl::LoadTranslationFromData(const wxString &domain,
                                                  void *data, size_t bytes) {
   assert(translations_loader_ != nullptr);
   wxString domainTmp = domain.IsEmpty() ? wxString::FromUTF8(domain_) : domain;
-  translations_loader_->RegisterCatalog(
-      domainTmp, std::string((char *)data, bytes));
+  translations_loader_->RegisterCatalog(domainTmp,
+                                        std::string((char *)data, bytes));
   return wxTranslations::Get()->AddCatalog(domainTmp);
 }
 
@@ -242,8 +242,10 @@ bool PluginsManagerImpl::InitPlugin(std::shared_ptr<LibraryBase> lib) {
   router_->SetPluginName(info->name);
   if (Anycubic::Plugins::Plugin *instance = lib->SetupPlugin(this);
       instance != nullptr) {
-    instances_.try_emplace(wxString::FromUTF8(instance->Name()), instance,
-                           ::delete_plugin<Anycubic::Plugins::Plugin>);
+    instances_.emplace_back(
+        wxString::FromUTF8(instance->Name()),
+        std::shared_ptr<Anycubic::Plugins::Plugin>(
+            instance, ::delete_plugin<Anycubic::Plugins::Plugin>));
     LOG_INFO("Init plugin {} success", info->name);
   } else {
     LOG_ERROR("Setup plugin {} failed", info->name);
@@ -288,12 +290,17 @@ Anycubic::Plugins::PluginRouter *PluginsManagerImpl::Router(void) {
 }
 
 bool PluginsManagerImpl::HasPlugin(const char *name) {
-  return instances_.contains(wxString::FromUTF8(name));
+  auto n = wxString::FromUTF8(name);
+  return std::ranges::find_if(instances_, [n](const auto &pair) {
+           return pair.first == n;
+         }) != std::end(instances_);
 }
 
 Anycubic::Plugins::Plugin *PluginsManagerImpl::GetPlugin(const char *name) {
-  auto itr = instances_.find(wxString::FromUTF8(name));
-  if (itr == instances_.end()) {
+  auto n = wxString::FromUTF8(name);
+  auto itr = std::ranges::find_if(
+      instances_, [n](const auto &pair) { return pair.first == n; });
+  if (itr == std::end(instances_)) {
     return nullptr;
   }
   return itr->second.get();
@@ -382,7 +389,10 @@ void PluginsManagerImpl::EmitEvent(EventType event) {
     break;
   case EventType::kEventExitByGUI:
     router_.reset();
-    instances_.clear();
+    while (!instances_.empty()) {
+      // 确保插件释放顺序问题
+      instances_.pop_back();
+    }
     widgets_.clear();
     is_inited_ = 0;
     assert(router_ == nullptr && instances_.empty() && widgets_.empty());
