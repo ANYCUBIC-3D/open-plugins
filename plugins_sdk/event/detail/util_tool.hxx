@@ -3,6 +3,12 @@
 #include "program_color.hxx"
 #include <wx/graphics.h>
 
+struct GradientStop
+{
+    double   position;
+    wxColour color;
+};
+
 double calculateColorDifference_RGB(const wxColour& color1, const wxColour& color2)
 {
     int deltaR = color2.Red() - color1.Red();
