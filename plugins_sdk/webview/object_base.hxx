@@ -4,6 +4,11 @@
 #else
 #include <webview/webview.h>
 #endif // BUILD_WEBVIEW_API
+
+#ifdef __WXMSW__
+#undef DELETE
+#endif // __WXMSW__
+
 namespace Anycubic::Plugins::SDK {
 
 enum StatusCode {
