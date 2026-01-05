@@ -9,7 +9,7 @@ struct GradientStop
     wxColour color;
 };
 
-double calculateColorDifference_RGB(const wxColour& color1, const wxColour& color2)
+static double calculateColorDifference_RGB(const wxColour& color1, const wxColour& color2)
 {
     int deltaR = color2.Red() - color1.Red();
     int deltaG = color2.Green() - color1.Green();
@@ -19,7 +19,7 @@ double calculateColorDifference_RGB(const wxColour& color1, const wxColour& colo
     return std::sqrt(deltaR * deltaR + deltaG * deltaG + deltaB * deltaB + deltaA * deltaA);
 }
 
-inline wxColour getTextFitColor(const wxColour& color1)
+static wxColour getTextFitColor(const wxColour& color1)
 {
     wxColour whiteColor = COLOR_Neutral_01;
     wxColour blackColor = COLOR_Neutral_10;
@@ -28,7 +28,7 @@ inline wxColour getTextFitColor(const wxColour& color1)
     return (luminance > 140) ? blackColor : whiteColor;
 }
 
-inline wxColour InterpolateColor(const wxColour& c1, const wxColour& c2, double t)
+static wxColour InterpolateColor(const wxColour& c1, const wxColour& c2, double t)
 {
     int r = c1.Red() + (c2.Red() - c1.Red()) * t;
     int g = c1.Green() + (c2.Green() - c1.Green()) * t;
@@ -37,7 +37,7 @@ inline wxColour InterpolateColor(const wxColour& c1, const wxColour& c2, double 
     return wxColour(r, g, b, a);
 }
 
-inline wxColour GetGradientColor(const wxVector<GradientStop>& stops, double t)
+static wxColour GetGradientColor(const wxVector<GradientStop>& stops, double t)
 {
     if (stops.empty())
         return *wxBLACK;
@@ -57,7 +57,7 @@ inline wxColour GetGradientColor(const wxVector<GradientStop>& stops, double t)
 }
 
 
-inline wxVector<GradientStop> GenerateGradientStops(const wxVector<wxColour>& colors)
+static wxVector<GradientStop> GenerateGradientStops(const wxVector<wxColour>& colors)
 {
     wxVector<GradientStop> stops;
     size_t                 count = colors.size();
@@ -88,7 +88,7 @@ inline wxVector<GradientStop> GenerateGradientStops(const wxVector<wxColour>& co
     return stops;
 }
 
-inline void DrawGradientColorEvent(wxDC& dc, wxPoint circularPoint, wxVector<wxColour> colorList, int dipRadius, bool horizontal)
+static void DrawGradientColorEvent(wxDC& dc, wxPoint circularPoint, wxVector<wxColour> colorList, int dipRadius, bool horizontal)
 {
     int                    centerX  = circularPoint.x;
     int                    centerY  = circularPoint.y;
@@ -117,7 +117,7 @@ inline void DrawGradientColorEvent(wxDC& dc, wxPoint circularPoint, wxVector<wxC
     }
 }
 
-inline void DrawRoundedRectangleColorEvent(wxDC& dc, wxRect rect, wxVector<wxColour> colorList, int radius, bool roundTopCorners)
+static void DrawRoundedRectangleColorEvent(wxDC& dc, wxRect rect, wxVector<wxColour> colorList, int radius, bool roundTopCorners)
 {
     wxVector<GradientStop> stops = GenerateGradientStops(colorList);
 
@@ -191,7 +191,7 @@ inline void DrawRoundedRectangleColorEvent(wxDC& dc, wxRect rect, wxVector<wxCol
     }
 }
 
-inline void DrawRoundedRectangleColorVerticalEvent(wxDC& dc, wxRect rect, wxVector<wxColour> colorList, int radius, bool roundTopCorners)
+static void DrawRoundedRectangleColorVerticalEvent(wxDC& dc, wxRect rect, wxVector<wxColour> colorList, int radius, bool roundTopCorners)
 {
     wxVector<GradientStop> stops = GenerateGradientStops(colorList);
 
@@ -271,7 +271,7 @@ inline void DrawRoundedRectangleColorVerticalEvent(wxDC& dc, wxRect rect, wxVect
     }
 }
 
-inline void DrawRoundedRectangleColorEvent(wxGraphicsContext* gc, wxRect rect, wxVector<wxColour> colorList, int radius, bool verticalGradient, bool roundTopCorners)
+static void DrawRoundedRectangleColorEvent(wxGraphicsContext* gc, wxRect rect, wxVector<wxColour> colorList, int radius, bool verticalGradient, bool roundTopCorners)
 {
     wxVector<GradientStop> stops = GenerateGradientStops(colorList);
 
