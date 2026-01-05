@@ -11,17 +11,17 @@ namespace Anycubic::utility {
 void append(query_type &) {}
 
 static std::string escape(const std::string &src) {
-  auto pSrc = curl_escape(src.data(), static_cast<int>(src.size()));
+  auto pSrc = ::curl_escape(src.data(), static_cast<int>(src.size()));
 
   std::string res(pSrc);
 
-  curl_free(pSrc);
+  ::curl_free(pSrc);
   return res;
 }
 static std::string unescape(const std::string &src) {
-  auto pSrc = curl_unescape(src.data(), static_cast<int>(src.size()));
+  auto pSrc = ::curl_unescape(src.data(), static_cast<int>(src.size()));
   std::string res(pSrc);
-  curl_free(pSrc);
+  ::curl_free(pSrc);
   return res;
 }
 
