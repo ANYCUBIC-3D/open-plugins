@@ -114,7 +114,12 @@ template <typename... Args> wxString ArgumentFormat(Args &&...args) {
 
 static bool RunScript(wxWebView *webView, const wxString &javascript) {
   try {
-    webView->RunScriptAsync(javascript);
+    if (wxIsMainThread()) {
+      webView->RunScriptAsync(javascript);
+    } else {
+      webView->CallAfter(
+          [webView, javascript]() { webView->RunScriptAsync(javascript); });
+    }
     return true;
   } catch (std::exception &) {
     return false;
