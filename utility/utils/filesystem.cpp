@@ -1,5 +1,5 @@
 ﻿#include "filesystem.hxx"
-
+#ifndef NOT_WXWIDGETS
 #include <wx/filename.h>
 
 namespace Anycubic::utility {
@@ -43,3 +43,4 @@ bool CreatePaths(const wxString &path) {
   return dirName.Mkdir(wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
 }
 } // namespace Anycubic::utility
+#endif // NOT_WXWIDGETS

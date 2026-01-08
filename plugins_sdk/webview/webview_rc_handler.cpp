@@ -63,7 +63,11 @@ bool WebviewRCHandler::LoadPackageData() {
       // 读取文件内容
       size_t fileSize = entry->GetSize();
       if (fileSize > 0) {
-        auto &buffer = m_fileMap[entry->GetName()];
+        auto filename = entry->GetName();
+#if defined(__WXMSW__)
+        filename.Replace(wxASCII_STR("\\"), wxASCII_STR("/"));
+#endif // __WXMSW__
+        auto &buffer = m_fileMap[filename];
         buffer.resize(fileSize);
         zipStream.Read(buffer.data(), fileSize);
       }

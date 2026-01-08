@@ -1,5 +1,6 @@
 ﻿#include "string.hxx"
 namespace Anycubic::utility {
+#ifndef NOT_WXWIDGETS
 wxString FromUtf8(const std::string &str) { return wxString::FromUTF8(str); }
 
 std::string ToUtf8(const wxString &str) { return str.utf8_string(); }
@@ -20,4 +21,6 @@ void test2() {
   assert(items[2] == "c");
 }
 #endif
+
+#endif // NOT_WXWIDGETS
 } // namespace Anycubic::utility
