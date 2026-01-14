@@ -42,26 +42,32 @@ query_type parse_query(const std::string &query) {
   query_type q;
   std::string key;
   std::string value;
-  std::string *pCurrent = &key;
 
-  for (auto ch : query) {
-    if (ch == '?') {
-      continue;
-    } else if (ch == '=') {
-      pCurrent = &value;
-      continue;
-    } else if (ch == '&') {
+  auto begin = query.begin();
+  auto end = query.end();
 
-      q.emplace(unescape(key), unescape(value));
-      key.clear();
-      value.clear();
-      pCurrent = &key;
-      continue;
-    } else {
-      pCurrent->push_back(ch);
-    }
+  // 去掉可能存在的?
+  if (*begin == '?') {
+    begin++;
   }
-  q.emplace(unescape(key), unescape(value));
+
+  do {
+    // 找key
+    auto pos = std::find_if(begin, end, [](char ch) { return ch == '='; });
+    if (pos == end) {
+      break;
+    }
+    key.assign(begin, pos);
+    // 找value
+    begin = pos + 1;
+    pos = std::find_if(begin, end, [](char ch) { return ch == '&'; });
+    value.assign(begin, pos);
+    q.emplace(unescape(key), unescape(value));
+    if (pos == end) {
+      break;
+    }
+    begin = pos + 1;
+  } while (true);
   return q;
 }
 } // namespace Anycubic::utility
