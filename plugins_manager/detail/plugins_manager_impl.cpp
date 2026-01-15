@@ -389,8 +389,9 @@ void PluginsManagerImpl::EmitEvent(EventType event) {
     }
     break;
   case EventType::kEventExitByGUI:
-    std::for_each(instances_.rbegin(), instances_.rend(), 
-      [](auto &pair) { pair.second->Stop(); });
+    translations_loader_->Clear();
+    std::for_each(instances_.rbegin(), instances_.rend(),
+                  [](auto &pair) { pair.second->Stop(); });
     router_.reset();
     instances_.clear();
     widgets_.clear();
