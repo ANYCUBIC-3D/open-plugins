@@ -65,7 +65,10 @@ enum {
    PRESIGN, GETSLICERCONFIG, SETSLICERCONFIG, FORCE_LOGOUT,                    \
    BATCHTASKLIST, /*农场批量任务列表*/                                         \
    SLICERINFO,    /*农场切片信息*/                                             \
-   SENDFILSTOPRINTER /* 发送文件到打印机*/)
+   SENDFILSTOPRINTER, /* 发送文件到打印机*/ \
+   PRINTERTOOL, /* 打印机工具*/ \
+   PLUGINUPDATE, /* 插件更新*/ \
+  )
 
 EVENT_HELPER_DECLARE(impl_wxDECLARE_EVENT, EVT_CLOUD_CLIENT_,
                      CLOUD_CLIENT_EVENT_LIST)
