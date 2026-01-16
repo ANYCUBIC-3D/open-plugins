@@ -168,13 +168,12 @@ size_t PluginsManagerImpl::LoadPlugins(void) {
   }
 
   wxDir dir(wxString::FromUTF8(tmp_dir_));
-  if (!dir.IsOpened()) {
-    FUNC_LEAVE2("Open dir failed");
-    return 0;
-  }
-  // 递归获取所有子目录的插件
+
   std::vector<wxString> plugins;
-  TraverseDirectory(wxString::FromUTF8(tmp_dir_), plugins);
+  if (dir.IsOpened()) {
+    // 递归获取所有子目录的插件
+    TraverseDirectory(wxString::FromUTF8(tmp_dir_), plugins);
+  }
   libraries_.reserve(plugins.size() + PLUGINS_LIST_SIZE +
                      static_plugins_.size());
 #if PLUGINS_LIST_SIZE > 0
