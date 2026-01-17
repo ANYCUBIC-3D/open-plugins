@@ -41,6 +41,9 @@ private:
     path = plugin_packages_[index];
     return true;
   }
+
+  void SetPackageVisitor(PluginsVisitor_t visitor,
+                         void *ctx = nullptr) override;
   bool ExecuteFunction(const char *plugin, const char *fname,
                        Anycubic::Plugins::IStream *data,
                        Anycubic::Plugins::OStream *result) override;
@@ -111,4 +114,6 @@ private:
   std::map<wxString,
            std::function<bool(wxWindow *window)>>
       watchers_; ///< 窗口监听列表
+  std::function<bool(const wxString &package)>
+      package_visitor_; ///< 插件包加载观察函数
 };

@@ -35,6 +35,8 @@ PluginsManagerImpl::PluginsManagerImpl(const char *plugins,
       new WebviewHandler(create_webview_, [this](const wxString &name) {
         return GetPlugin(name.utf8_str());
       }));
+  // 默认有值
+  package_visitor_ = [](const wxString &package) { return true; };
   FUNC_LEAVE;
 }
 
@@ -149,6 +151,15 @@ size_t PluginsManagerImpl::Plugins(void) const {
   auto size = libraries_.size();
   FUNC_LEAVE2("size: {}", size);
   return size;
+}
+
+void PluginsManagerImpl::SetPackageVisitor(PluginsVisitor_t visitor,
+                                           void *ctx) {
+  if (visitor == nullptr) {
+    package_visitor_ = [](const wxString &package) { return true; };
+  } else {
+    package_visitor_ = std::bind(visitor, ctx, std::placeholders::_1);
+  }
 }
 
 bool PluginsManagerImpl::ExecuteFunction(const char *plugin, const char *fname,
@@ -468,6 +479,10 @@ bool PluginsManagerImpl::CheckPackage() {
   wxString filename;
   for (bool cont = pluginsDir.GetFirst(&filename, wxT("*.zip"), wxDIR_FILES);
        cont; cont = pluginsDir.GetNext(&filename)) {
+    if (!package_visitor_(filename)) {
+      // 被上层过滤丢充不加载和解压
+      continue;
+    }
     // 构造完整路径
     wxFileName zipFile(wxString::FromUTF8(plugins_), filename);
     if (!CheckPackage_(zipFile.GetFullPath().utf8_string())) {

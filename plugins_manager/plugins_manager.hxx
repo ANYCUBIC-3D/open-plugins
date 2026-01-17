@@ -108,9 +108,32 @@ struct PluginsManager {
    * @brief 获取已加载插件包路径
    *
    * @param index 插件包索引
-   * @return const char* 插件包路径
+   * @param path [输出] 插件包路径
+   * @return true 成功
+   * @return false 失败
    */
   virtual bool PackagePath(size_t index, wxString &path) = 0;
+
+  /**
+   * @brief 插件加载观察者函数类型
+   *
+   * @param ctx 自定义上下文指针
+   * @param package 插件包名
+   * @return true 加载插件包
+   * @return false 拒绝加载插件包
+   */
+  typedef bool (*PluginsVisitor_t)(void *, const wxString &);
+
+  /**
+   * @brief 设置包加载观察
+   *
+   * @param visitor 观察函数
+   * @param ctx 自定义上下文指针，默认为nullptr
+   * @return true 成功
+   * @return false 失败
+   */
+  virtual void SetPackageVisitor(PluginsVisitor_t visitor,
+                                 void *ctx = nullptr) = 0;
 
   /**
    * @brief 执行插件函数
