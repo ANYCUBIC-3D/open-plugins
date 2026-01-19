@@ -1,4 +1,15 @@
-﻿#pragma once
+﻿// Copyright (c) [Year] [name of copyright holder]
+// Open-Plugin is licensed under Mulan PSL v2.
+// You can use this software according to the terms and conditions of the Mulan
+// PSL v2.
+// You may obtain a copy of Mulan PSL v2 at:
+//          http://license.coscl.org.cn/MulanPSL2
+// THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY
+// KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+// NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+// See the Mulan PSL v2 for more details.
+
+#pragma once
 #include "arrry_wraper.hxx"
 
 #include <iguana/reflection.hpp>
@@ -8,6 +19,11 @@
 #include <algorithm>
 #include <type_traits>
 
+/**************************************************************************
+ * iguana 本身对顺序有要求的，但实际应用中，json
+ * 字符字段的顺序是不确定的，这里使用 iguana 一部分机制来重实现的c++14的
+ * 反射实现。主要给AnycubicSlicerNext 项目使用。
+ */
 namespace Anycubic::utility::json {
 
 // ArrayWrapper
