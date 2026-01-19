@@ -1,4 +1,15 @@
-﻿#include "plugin_event.hxx"
+﻿// Copyright (c) [Year] [name of copyright holder]
+// Open-Plugin is licensed under Mulan PSL v2.
+// You can use this software according to the terms and conditions of the Mulan
+// PSL v2.
+// You may obtain a copy of Mulan PSL v2 at:
+//          http://license.coscl.org.cn/MulanPSL2
+// THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY
+// KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+// NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+// See the Mulan PSL v2 for more details.
+
+#include "plugin_event.hxx"
 
 #include <map>
 
@@ -30,7 +41,7 @@ private:
   std::shared_ptr<void> m_sharedData;
 };
 
-wxPluginEvent::wxPluginEvent() : wxPluginEvent(wxEVT_NULL,wxID_ANY) {}
+wxPluginEvent::wxPluginEvent() : wxPluginEvent(wxEVT_NULL, wxID_ANY) {}
 
 wxPluginEvent::wxPluginEvent(wxEventType type, int id)
     : wxNotifyEvent(type, id), m_private(new wxPluginEventPrivate) {}

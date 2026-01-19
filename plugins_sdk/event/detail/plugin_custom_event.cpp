@@ -1,10 +1,19 @@
+// Copyright (c) [Year] [name of copyright holder]
+// Open-Plugin is licensed under Mulan PSL v2.
+// You can use this software according to the terms and conditions of the Mulan
+// PSL v2.
+// You may obtain a copy of Mulan PSL v2 at:
+//          http://license.coscl.org.cn/MulanPSL2
+// THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY
+// KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+// NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+// See the Mulan PSL v2 for more details.
+
 #include "plugin_custom_event.hxx"
 
-
-
 wxDEFINE_EVENT(EVT_GET_NOW_FILAMENT_LIST_INFO, wxPluginEvent);
-wxDEFINE_EVENT(EVT_ACCLOUD_FRAMGROUP_REMOTE, wxPluginEvent);//农场发送任务
-wxDEFINE_EVENT(EVT_ACCLOUD_PRINTER_REMOTE, wxPluginEvent); //远程打印
+wxDEFINE_EVENT(EVT_ACCLOUD_FRAMGROUP_REMOTE, wxPluginEvent); // 农场发送任务
+wxDEFINE_EVENT(EVT_ACCLOUD_PRINTER_REMOTE, wxPluginEvent);   // 远程打印
 
 wxDEFINE_EVENT(EVT_REMOTE_AMS_CHANGE, wxPluginEvent);
 wxDEFINE_EVENT(EVT_REMOTE_AMS_CHANGE_SEND, wxPluginEvent);
@@ -49,7 +58,6 @@ wxDEFINE_EVENT(EVT_ACTION_OPTIONS_FINISH, wxPluginEvent);
 wxDEFINE_EVENT(EVT_ACCLOUD_LOGIN_IN, wxPluginEvent);
 wxDEFINE_EVENT(EVT_ACCLOUD_PRINTERLIST, wxPluginEvent);
 
-
 wxDEFINE_EVENT(EVT_ACTION_UPLOAD, wxPluginEvent);
 wxDEFINE_EVENT(EVT_ACTION_REMOTEPRINTER, wxPluginEvent);
 wxDEFINE_EVENT(EVT_ACCLOUD_PRINTER_ADD, wxPluginEvent);
@@ -59,9 +67,7 @@ wxDEFINE_EVENT(EVT_ACCLOUD_PRINTER_AMS, wxPluginEvent);
 wxDEFINE_EVENT(EVT_CANCEL_ACCOULD_UPLOAD_GCODEUP_EVENT, wxPluginEvent);
 wxDEFINE_EVENT(EVT_ACCLOUD_PRINTER_PERIPHERIE, wxPluginEvent);
 
-
 wxDEFINE_EVENT(EVT_AMS_INFO_CHANGE_EVENT, wxPluginEvent);
-
 
 /*
                ========== LAN INFO ==============
@@ -169,9 +175,6 @@ wxDEFINE_EVENT(EVT_AMS_POP_SELECT, wxPluginEvent);
 
 wxDEFINE_EVENT(EVT_SELECT_SHOW_EVENT, wxPluginEvent);
 
-
-
-
 /*
                 ========== Upload INFO ==============
 */
@@ -184,7 +187,6 @@ wxDEFINE_EVENT(EVT_ACCLOUD_FILE_UPLOAD_CLOUD_PROGRESS, wxPluginEvent);
 /*
                 ========== Upload INFO ==============
 */
-
 
 /*
                 ========== postevent INFO ==============
@@ -201,12 +203,7 @@ wxDEFINE_EVENT(EVT_POST_MOMODEL_DOWN_CLICK_EVENT, wxPluginEvent);
                 ========== postevent INFO ==============
 */
 
-
-
-
 wxDEFINE_EVENT(EVT_DIALOG_CLOSE_EVENT, wxCommandEvent);
-
-
 
 wxDEFINE_EVENT(EVT_CHANGE_CODE_BTN, wxCommandEvent);
 wxDEFINE_EVENT(EVT_CHANGE_OPEN_WEB, wxCommandEvent);
@@ -241,7 +238,5 @@ wxDEFINE_EVENT(EVT_EN_LOGIN_CLOSE_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(EVT_OPEN_PREFERENCES_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(EVT_HOME_PAGE_RELOAD, wxCommandEvent);
 wxDEFINE_EVENT(EVT_SENSORS_SEND_EVENT, wxCommandEvent);
-
-
 
 wxDEFINE_EVENT(EVT_P_CLOSE_CAPTCHA_EVENT, wxCommandEvent);

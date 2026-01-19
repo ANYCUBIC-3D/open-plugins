@@ -1,4 +1,15 @@
-﻿#pragma once
+﻿// Copyright (c) [Year] [name of copyright holder]
+// Open-Plugin is licensed under Mulan PSL v2.
+// You can use this software according to the terms and conditions of the Mulan
+// PSL v2.
+// You may obtain a copy of Mulan PSL v2 at:
+//          http://license.coscl.org.cn/MulanPSL2
+// THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY
+// KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+// NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+// See the Mulan PSL v2 for more details.
+
+#pragma once
 
 #include <ctype.h>
 #include <stdint.h>
@@ -101,7 +112,8 @@ struct Converter {
  * @return To 目标对象
  */
 template <typename To, typename From>
-typename std::enable_if_t<!std::is_same_v<std::decay_t<To>, std::decay_t<From>>, To>
+typename std::enable_if_t<!std::is_same_v<std::decay_t<To>, std::decay_t<From>>,
+                          To>
 lexical_cast(const From &from) {
   To to;
   if (detail::Converter::convert(from, to)) {
@@ -119,7 +131,8 @@ lexical_cast(const From &from) {
  * @return To 目标对象
  */
 template <typename To, typename From>
-typename std::enable_if_t<std::is_same_v<std::decay_t<To>, std::decay_t<From>>, To>
+typename std::enable_if_t<std::is_same_v<std::decay_t<To>, std::decay_t<From>>,
+                          To>
 lexical_cast(const From &from) {
   return from;
 }

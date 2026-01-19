@@ -1,4 +1,15 @@
-﻿#pragma once
+﻿// Copyright (c) [Year] [name of copyright holder]
+// Open-Plugin is licensed under Mulan PSL v2.
+// You can use this software according to the terms and conditions of the Mulan
+// PSL v2.
+// You may obtain a copy of Mulan PSL v2 at:
+//          http://license.coscl.org.cn/MulanPSL2
+// THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY
+// KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+// NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+// See the Mulan PSL v2 for more details.
+
+#pragma once
 
 #include "event_helper.hxx"
 
@@ -63,11 +74,11 @@ enum {
    ENGINEVERSION,      /* 获取引擎版本*/                                       \
    UPDATEVERSION,      /*获取更新版本信息*/                                    \
    PRESIGN, GETSLICERCONFIG, SETSLICERCONFIG, FORCE_LOGOUT,                    \
-   BATCHTASKLIST, /*农场批量任务列表*/                                         \
-   SLICERINFO,    /*农场切片信息*/                                             \
-   SENDFILSTOPRINTER, /* 发送文件到打印机*/ \
-   PRINTERTOOL, /* 打印机工具*/ \
-   PLUGINUPDATE, /* 插件更新*/ \
+   BATCHTASKLIST,     /*农场批量任务列表*/                                     \
+   SLICERINFO,        /*农场切片信息*/                                         \
+   SENDFILSTOPRINTER, /* 发送文件到打印机*/                                    \
+   PRINTERTOOL,       /* 打印机工具*/                                          \
+   PLUGINUPDATE,      /* 插件更新*/                                            \
   )
 
 EVENT_HELPER_DECLARE(impl_wxDECLARE_EVENT, EVT_CLOUD_CLIENT_,

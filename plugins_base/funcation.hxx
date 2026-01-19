@@ -1,4 +1,15 @@
-﻿#pragma once
+﻿// Copyright (c) [Year] [name of copyright holder]
+// Open-Plugin is licensed under Mulan PSL v2.
+// You can use this software according to the terms and conditions of the Mulan
+// PSL v2.
+// You may obtain a copy of Mulan PSL v2 at:
+//          http://license.coscl.org.cn/MulanPSL2
+// THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY
+// KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+// NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+// See the Mulan PSL v2 for more details.
+
+#pragma once
 #include "function_traits.hxx"
 #include "pack.hxx"
 #include "plugins.hxx"
@@ -146,11 +157,11 @@ ret_type dispatch_call(PluginHost *host, const char *plugin, const char *fname,
   FUNC_ENTRY;
   auto router = host->Router();
   assert(router != nullptr);
-  if constexpr(std::is_void_v<ret_type>) {
+  if constexpr (std::is_void_v<ret_type>) {
     dispatch_call<void>(router, plugin, fname, std::forward<Args>(args)...);
     FUNC_LEAVE;
     return ret_type();
-  }else{
+  } else {
     auto result = dispatch_call<ret_type>(router, plugin, fname,
                                           std::forward<Args>(args)...);
     FUNC_LEAVE;
