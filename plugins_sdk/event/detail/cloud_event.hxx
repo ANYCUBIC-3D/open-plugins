@@ -23,7 +23,8 @@ enum {
 
 // 事件列表
 #define CLOUD_CLIENT_EVENT_LIST                                                \
-  (SPACEINFO,          /* 获取空间信息*/                                       \
+  (FORCE_LOGOUT,       /* 强制登出--这个事件由sdk产生*/                        \
+   SPACEINFO,          /* 获取空间信息*/                                       \
    FILERENAME,         /* 文件重命名*/                                         \
    FILEREMOVE,         /* 文件删除*/                                           \
    FILELIST,           /* 文件列表数据*/                                       \
