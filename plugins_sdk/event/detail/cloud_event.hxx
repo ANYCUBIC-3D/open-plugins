@@ -73,12 +73,15 @@ enum {
    DEVICESAVE,         /* 设备信息保存*/                                       \
    ENGINEVERSION,      /* 获取引擎版本*/                                       \
    UPDATEVERSION,      /*获取更新版本信息*/                                    \
-   PRESIGN, GETSLICERCONFIG, SETSLICERCONFIG, FORCE_LOGOUT,                    \
-   BATCHTASKLIST,     /*农场批量任务列表*/                                     \
-   SLICERINFO,        /*农场切片信息*/                                         \
-   SENDFILSTOPRINTER, /* 发送文件到打印机*/                                    \
-   PRINTERTOOL,       /* 打印机工具*/                                          \
-   PLUGINUPDATE,      /* 插件更新*/                                            \
+   PRESIGN,            /*预签名*/                                              \
+   GETSLICERCONFIG,    /*获取slicer配置信息*/                                  \
+   SETSLICERCONFIG,    /*设置slicer配置信息*/                                  \
+   BATCHPRINT,         /*批量打印*/                                            \
+   BATCHTASKLIST,      /* 获取批量任务列表*/                                   \
+   SLICERINFO,         /* 获取slicer信息*/                                     \
+   SENDFILETOPRINTERS, /* 发送文件到打印机*/                                   \
+   PRINTERTOOL,        /* 打印机详情工具*/                                     \
+   PLUGINUPDATE        /* 插件更新*/                                           \
   )
 
 EVENT_HELPER_DECLARE(impl_wxDECLARE_EVENT, EVT_CLOUD_CLIENT_,
