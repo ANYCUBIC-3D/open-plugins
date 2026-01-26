@@ -304,11 +304,14 @@ struct PLGINS_EXPORT OStream {
    */
   bool Write(const char *data) {
     assert(data != nullptr);
-    uint16_t length = static_cast<uint16_t>(strlen(data));
-    if (length == 0) {
-      return Write(length);
-    } else {
-      return Write(length) && Write(data, length);
+    uint16_t length = 0;
+    if (data != nullptr) {
+      length = static_cast<uint16_t>(strlen(data));
+    }
+    // 如果写失败了呢？
+    Write(length);
+    if (length > 0) {
+      return Write(data, length);
     }
   }
 
@@ -320,9 +323,7 @@ struct PLGINS_EXPORT OStream {
    */
   template <typename T>
   std::enable_if_t<std::is_pointer_v<T>, bool> Write(T data) {
-    if (data == nullptr) {
-      return false;
-    }
+    // 允许nullptr
     intptr_t value = reinterpret_cast<intptr_t>(data);
     return Write(value);
   }
