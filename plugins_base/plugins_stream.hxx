@@ -312,6 +312,7 @@ struct PLGINS_EXPORT OStream {
     if (length > 0) {
       return Write(data, length);
     }
+    return true;
   }
 
   /**
