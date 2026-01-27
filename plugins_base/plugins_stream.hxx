@@ -303,7 +303,6 @@ struct PLGINS_EXPORT OStream {
    * @return false 失败
    */
   bool Write(const char *data) {
-    assert(data != nullptr);
     uint16_t length = 0;
     if (data != nullptr) {
       length = static_cast<uint16_t>(strlen(data));

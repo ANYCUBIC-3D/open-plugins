@@ -35,6 +35,9 @@ template <typename _Ty> size_t get_type_size(_Ty &v) {
   } else if constexpr (std::is_same_v<value_t, std::string>) {
     return v.length() + sizeof(uint16_t);
   } else if constexpr (is_c_string_v<value_t>) {
+    if (v == nullptr) {
+      return sizeof(uint16_t);
+    }
     return strlen(v) + sizeof(uint16_t);
   } else if constexpr (std::is_arithmetic_v<value_t> ||
                        std::is_pointer_v<value_t> || std::is_pod_v<value_t>) {
