@@ -8,6 +8,9 @@
 // KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 // NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
+#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+#include < Windows.h>
+#endif
 
 #include "LibraryBase.hxx"
 #include "package.hxx"
@@ -15,6 +18,8 @@
 #include <easy_log/stackstrace.hxx>
 
 #include <assert.h>
+
+#include <wx/filename.h>
 
 PluginInfo *LibraryBase::GetPluginInfo() const {
   FUNC_ENTRY;
@@ -43,17 +48,34 @@ LibraryShared::LibraryShared() {
 LibraryShared::~LibraryShared() { UnloadLibrary(); }
 
 bool LibraryShared::LoadLibrary(const wxString &libName) {
-  if (Loaded())
+  FUNC_ENTRY2("libName = {}", libName.utf8_string());
+  if (Loaded()) {
+    FUNC_LEAVE
     return true;
+  }
   auto pluginName = GetPluginName(libName);
   if (pluginName.IsEmpty()) {
+    FUNC_LEAVE
     return false;
   }
+#if defined(__WXMSW__)
+  auto filename = wxFileName::FileName(libName);
+  SetDllDirectoryW(filename.GetPath().ToStdWstring().c_str());
+#endif()
   wxDynamicLibrary loaderDll;
-  if (!loaderDll.Load(libName, wxDL_DEFAULT | wxDL_QUIET))
+  if (!loaderDll.Load(libName, wxDL_DEFAULT | wxDL_QUIET)) {
+#if defined(__WXMSW__)
+    FUNC_LEAVE2("Failed to load shared library error code: {}", GetLastError());
+#else
+    FUNC_LEAVE2("Failed to load shared library error code: {}", errno);
+#endif
+
     return false;
+  }
   m_library.Attach(loaderDll.Detach());
-  return GetProcAddressAll(pluginName);
+  auto result = GetProcAddressAll(pluginName);
+  FUNC_LEAVE2("result = {}", result);
+  return result;
 }
 void LibraryShared::UnloadLibrary() {
   getInfo_ = nullptr;
