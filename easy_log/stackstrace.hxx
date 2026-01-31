@@ -32,6 +32,11 @@ extern "C" {
  * @return LOG_API 栈深度
  */
 LOG_API int get_stack_depth(bool entry);
+#ifndef NDEBUG
+LOG_API const char *get_module_name(const char *name);
+#else
+#define get_module_name(name) name
+#endif
 }
 
 namespace anycubic::tracer {
@@ -45,9 +50,11 @@ std::string strace_format(Args &&...args) {
   int stack_depth = get_stack_depth(entry);
 
   if constexpr (entry) {
-    ss << "ENTRY>> " << stack_depth << " ";
+    std::string stack_symbol(stack_depth, '>');
+    ss << "ENTRY " << stack_symbol << " " << stack_depth << " ";
   } else {
-    ss << "LEAVE<< " << stack_depth << " ";
+    std::string stack_symbol(stack_depth, '<');
+    ss << "LEAVE " << stack_symbol << " " << stack_depth << " ";
   }
   if constexpr (sizeof...(args) > 0) {
     ss << " " << logger::ac_format(std::forward<Args>(args)...);
@@ -63,10 +70,10 @@ std::string strace_format(Args &&...args) {
 #endif
 
 #define FUNC_ENTRY2(...)                                                       \
-  LOG_CORE(MODULE_NAME, anycubic::logger::trace,                               \
+  LOG_CORE(get_module_name(MODULE_NAME), anycubic::logger::trace,              \
            anycubic::tracer::strace_format<true>, __VA_ARGS__)
 #define FUNC_LEAVE2(...)                                                       \
-  LOG_CORE(MODULE_NAME, anycubic::logger::trace,                               \
+  LOG_CORE(get_module_name(MODULE_NAME), anycubic::logger::trace,              \
            anycubic::tracer::strace_format<false>, __VA_ARGS__)
 
 #define FUNC_ENTRYID(id) FUNC_ENTRY2(ac_to_string(id))

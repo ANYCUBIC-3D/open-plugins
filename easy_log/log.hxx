@@ -34,7 +34,7 @@ enum level_enum : int {
   n_levels
 };
 #ifndef NDEBUG
-#define DEFAULT_PATTERN "%Y%m%d%H%M %n %l %t %s:%# %! %v"
+#define DEFAULT_PATTERN "%Y%m%d%H%M.%e %l %t %s:%# %! %v"
 #else
 #define DEFAULT_PATTERN "%Y%m%d%H%M %n %l %t %s:%# %v"
 #endif // NDEBUG
@@ -138,11 +138,13 @@ std::string ac_format(const fmt_type &fmt, Args &&...args) {
 #define LOG_CORE(mname, level, func, ...)                                      \
   {                                                                            \
     CHECK_ARGS(__VA_ARGS__);                                                   \
-    if (anycubic::logger::should_log(mname, level)) {                          \
+    auto log_module_name = mname;                                              \
+    if (anycubic::logger::should_log(log_module_name, level)) {                \
       /*提前过滤不输出的日志，避免消耗 */                                      \
       anycubic::logger::log_(                                                  \
-          mname, anycubic::logger::source_loc{__FILE__, __LINE__, __func__},   \
-          level, func(__VA_ARGS__).c_str());                                   \
+          log_module_name,                                                     \
+          anycubic::logger::source_loc{__FILE__, __LINE__, __func__}, level,   \
+          func(__VA_ARGS__).c_str());                                          \
     }                                                                          \
   }
 
