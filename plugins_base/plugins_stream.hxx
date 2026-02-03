@@ -14,6 +14,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include <numeric>
 #include <string>

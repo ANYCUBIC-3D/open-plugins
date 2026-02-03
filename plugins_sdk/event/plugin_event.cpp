@@ -12,6 +12,7 @@
 #include "plugin_event.hxx"
 
 #include <map>
+#include <memory>
 
 namespace Anycubic::Plugins::SDK {
 

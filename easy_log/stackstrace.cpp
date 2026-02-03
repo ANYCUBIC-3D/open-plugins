@@ -12,6 +12,7 @@
 #include "easy_log_export.hxx"
 
 #include <assert.h>
+#include <string.h>
 
 #include <atomic>
 #include <utility>

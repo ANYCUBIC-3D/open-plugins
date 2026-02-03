@@ -63,7 +63,7 @@ bool LoadSignture(const char *plugins, std::vector<char> &buffer) {
 
 bool Decode(std::vector<char> &buffer) {
   FUNC_ENTRY;
-  auto str = ::aesDecrypt(std::string_view(buffer.data(), buffer.size()),
+  auto str = ::aesDecrypt(std::string(buffer.data(), buffer.size()),
                           AES_PASSWORD);
   if (str.empty()) {
     FUNC_LEAVE;
@@ -76,7 +76,7 @@ bool Decode(std::vector<char> &buffer) {
 
 bool Eecode(std::vector<char> &buffer) {
   FUNC_ENTRY;
-  auto str = ::aesEncrypt(std::string_view(buffer.data(), buffer.size()),
+  auto str = ::aesEncrypt(std::string(buffer.data(), buffer.size()),
                           AES_PASSWORD);
   if (str.empty()) {
     FUNC_LEAVE;
