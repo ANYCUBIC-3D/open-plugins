@@ -17,6 +17,7 @@
 
 #include <sstream>
 #include <type_traits>
+#include <atomic>
 
 template <typename _Ty> inline auto to_string(_Ty &&val) {
   using type_v = std::decay_t<_Ty>;
