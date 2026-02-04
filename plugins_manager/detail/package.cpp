@@ -17,15 +17,17 @@
 #include <utility/codec/md5.hxx>
 #include <utility/encrypt/aes.hxx>
 
+#include <iguana/detail/string_stream.hpp>
+#include <iguana/json.hpp>
+
 #include <wx/dir.h>
 #include <wx/file.h>
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
 
-#include <boost/json.hpp>
-#include <boost/pfr.hpp>
 #include <boost/scope_exit.hpp>
 
+REFLECTION(Package, version, build_time, name, files)
 bool LoadSignture(const char *plugins, std::vector<char> &buffer) {
   FUNC_ENTRY2("plugins = {}", plugins);
   // 步骤1：打开zip文件
@@ -63,8 +65,8 @@ bool LoadSignture(const char *plugins, std::vector<char> &buffer) {
 
 bool Decode(std::vector<char> &buffer) {
   FUNC_ENTRY;
-  auto str = ::aesDecrypt(std::string(buffer.data(), buffer.size()),
-                          AES_PASSWORD);
+  auto str =
+      ::aesDecrypt(std::string(buffer.data(), buffer.size()), AES_PASSWORD);
   if (str.empty()) {
     FUNC_LEAVE;
     return false;
@@ -76,8 +78,8 @@ bool Decode(std::vector<char> &buffer) {
 
 bool Eecode(std::vector<char> &buffer) {
   FUNC_ENTRY;
-  auto str = ::aesEncrypt(std::string(buffer.data(), buffer.size()),
-                          AES_PASSWORD);
+  auto str =
+      ::aesEncrypt(std::string(buffer.data(), buffer.size()), AES_PASSWORD);
   if (str.empty()) {
     FUNC_LEAVE;
     return false;
@@ -86,81 +88,15 @@ bool Eecode(std::vector<char> &buffer) {
   FUNC_LEAVE;
   return true;
 }
-namespace boost::json {
-// 反序列化
-template <typename T>
-static T tag_invoke(const value_to_tag<T> &, const value &jv) {
-  T c;
-  using type_v = std::decay_t<T>;
-  auto &tid = typeid(type_v);
-  FUNC_ENTRY2("type name:{}", tid.name());
-  try {
-    auto names = boost::pfr::names_as_array<T>();
-    auto &jo = jv.as_object();
-    boost::pfr::for_each_field(c, [&jo, &names](auto &field, auto index) {
-      FUNC_ENTRY2("field={}", std::string(names[index]));
-      using value_type = std::decay_t<decltype(field)>;
-      auto itr = jo.find(names[index]);
-      if (itr == jo.end() || itr->value().is_null()) {
-        FUNC_LEAVE2("field is null or not found");
-        return;
-      }
-      if constexpr (std::is_same_v<value_type, int64_t>) {
-        field = itr->value().as_int64();
-      } else if constexpr (std::is_same_v<value_type, std::string>) {
-        field = itr->value().as_string();
-      } else {
-        auto v = itr->value().as_object();
-        for (auto &[k, val] : v) {
-          field[k] = val.as_string();
-        }
-      }
-      FUNC_LEAVE
-    });
-  } catch (boost::system::system_error &e) {
-    FUNC_LEAVE2("failed,errno={1}, msg={0}", e.what(), e.code().value());
-  }
-  return c;
-}
-// 序列化
-template <typename T>
-void tag_invoke(const value_from_tag &, value &jv, T const &t) {
-  auto names = boost::pfr::names_as_array<T>();
-  object obj;
-
-  boost::pfr::for_each_field(t, [&obj, &names](auto &field, auto index) {
-    using value_type = std::decay_t<decltype(field)>;
-
-    if constexpr (std::is_same_v<value_type, int64_t>) {
-      obj[names[index]] = field;
-    } else if constexpr (std::is_same_v<value_type, std::string>) {
-      obj[names[index]] = field;
-    } else {
-      object nested;
-      for (auto &[k, v] : field) {
-        nested.emplace(k, v);
-      }
-      obj[names[index]] = nested;
-    }
-  });
-
-  jv = obj;
-}
-} // namespace boost::json
 
 bool ParseInfo(const std::vector<char> &buffer, Package *info) {
   FUNC_ENTRY;
-  boost::json::value json =
-      boost::json::parse(std::string(buffer.begin(), buffer.end()));
-  if (!json.is_object()) {
-    FUNC_LEAVE;
-    return false;
-  }
   try {
-    *info = boost::json::value_to<Package>(json);
+    iguana::json::reader_t reader(buffer.data(), buffer.size());
+    iguana::json::read_json(reader, *info);
     FUNC_LEAVE;
     return true;
-  } catch (const boost::json::system_error &e) {
+  } catch (const std::exception &e) {
     FUNC_LEAVE2("failed,errno={1}, msg={0}", e.what());
     return false;
   }
@@ -169,12 +105,9 @@ bool ParseInfo(const std::vector<char> &buffer, Package *info) {
 bool SaveInfo(const Package &info, std::vector<char> &buffer) {
   FUNC_ENTRY;
   try {
-    // 将结构体序列化为JSON
-    boost::json::value json = boost::json::value_from(info);
-
-    // 序列化JSON字符串
-    std::string json_str = boost::json::serialize(json);
-
+    iguana::string_stream ss;
+    iguana::json::to_json(ss, info);
+    auto json_str = ss.str();
     // 加密数据
     auto encrypted = ::aesEncrypt(json_str, AES_PASSWORD);
     if (encrypted.empty()) {
@@ -186,7 +119,7 @@ bool SaveInfo(const Package &info, std::vector<char> &buffer) {
     buffer.assign(encrypted.begin(), encrypted.end());
     FUNC_LEAVE;
     return true;
-  } catch (const boost::json::system_error &e) {
+  } catch (const std::exception &e) {
     FUNC_LEAVE2("SaveInfo failed: {}", e.what());
     return false;
   }
