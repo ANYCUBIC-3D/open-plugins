@@ -117,7 +117,7 @@ struct PLGINS_EXPORT IStream {
    * @return true 成功
    * @return false 失败
    */
-  bool Read(const char *&data) {
+  template <typename T> std::enable_if_t<is_c_string_v<T>, bool> Read(T &data) {
     uint16_t length = 0;
     if (!Read(length)) {
       return false;
@@ -177,13 +177,13 @@ struct PLGINS_EXPORT IStream {
    * @param data 输出指针引用
    * @return bool 成功true,其他false
    */
-  template <typename T>
-  std::enable_if_t<std::is_pointer_v<T>, bool> Read(T &data) {
+  template <typename _Ty>
+  std::enable_if_t<is_pointer_v<_Ty>, bool> Read(_Ty &data) {
     intptr_t ptr = 0;
     if (!Read(ptr)) {
       return false;
     }
-    data = reinterpret_cast<T>(ptr);
+    data = reinterpret_cast<_Ty>(ptr);
     return true;
   }
 
@@ -303,7 +303,9 @@ struct PLGINS_EXPORT OStream {
    * @return true 成功
    * @return false 失败
    */
-  bool Write(const char *data) {
+
+  template <typename _Ty>
+  std::enable_if_t<is_c_string_v<_Ty>, bool> Write(_Ty data) {
     uint16_t length = 0;
     if (data != nullptr) {
       length = static_cast<uint16_t>(strlen(data));
@@ -320,10 +322,10 @@ struct PLGINS_EXPORT OStream {
    * @brief 写入指针
    *
    * @param data 输入指针引用
-   * @return std::enable_if_t<std::is_pointer_v<T>, bool> 成功true,其他false
+   * @return std::enable_if_t<is_pointer_v<_Ty>, bool> 成功true,其他false
    */
-  template <typename T>
-  std::enable_if_t<std::is_pointer_v<T>, bool> Write(T data) {
+  template <typename _Ty>
+  std::enable_if_t<is_pointer_v<_Ty>, bool> Write(_Ty data) {
     // 允许nullptr
     intptr_t value = reinterpret_cast<intptr_t>(data);
     return Write(value);
