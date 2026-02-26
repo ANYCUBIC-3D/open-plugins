@@ -33,9 +33,10 @@ extern "C" {
  */
 LOG_API int get_stack_depth(bool entry);
 #ifndef NDEBUG
-LOG_API const char *get_module_name(const char *name,const char*funcName, void*funcAddress);
+LOG_API const char *get_module_name(const char *name, const char *funcName,
+                                    void *funcAddress);
 #else
-#define get_module_name(name) name
+#define get_module_name(name, ...) name
 #endif
 }
 
@@ -76,11 +77,13 @@ std::string strace_format(Args &&...args) {
 #endif
 
 #define FUNC_ENTRY2(...)                                                       \
-  LOG_CORE(get_module_name(MODULE_NAME,__FUNCTION__, GET_CALLER_ADDRESS()), anycubic::logger::trace,              \
-           anycubic::tracer::strace_format<true>, __VA_ARGS__)
+  LOG_CORE(get_module_name(MODULE_NAME, __func__, GET_CALLER_ADDRESS()),       \
+           anycubic::logger::trace, anycubic::tracer::strace_format<true>,     \
+           __VA_ARGS__)
 #define FUNC_LEAVE2(...)                                                       \
-  LOG_CORE(get_module_name(MODULE_NAME, __FUNCTION__, GET_CALLER_ADDRESS()), anycubic::logger::trace,              \
-           anycubic::tracer::strace_format<false>, __VA_ARGS__)
+  LOG_CORE(get_module_name(MODULE_NAME, __func__, GET_CALLER_ADDRESS()),       \
+           anycubic::logger::trace, anycubic::tracer::strace_format<false>,    \
+           __VA_ARGS__)
 
 #define FUNC_ENTRYID(id) FUNC_ENTRY2(ac_to_string(id))
 #define FUNC_LEAVEID(id) FUNC_LEAVE2(ac_to_string(id))
