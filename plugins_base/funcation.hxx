@@ -20,9 +20,11 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
-#define REGISTER_FUNCATION(type, func)                                         \
+#define REGISTER_FUNCATION_SELF(type, func, self)                              \
   AddFunction(BOOST_PP_STRINGIZE(func), Anycubic::Plugins::make_call(          \
-                                            &type::func, this))
+                                            &type::func, self))
+
+#define REGISTER_FUNCATION(type, func) REGISTER_FUNCATION_SELF(type, func, this)
 
 namespace Anycubic::Plugins {
 using FuncationType = std::function<void(IStream *data, OStream *result)>;
