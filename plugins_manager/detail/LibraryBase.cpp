@@ -61,7 +61,7 @@ bool LibraryShared::LoadLibrary(const wxString &libName) {
 #if defined(__WXMSW__)
   auto filename = wxFileName::FileName(libName);
   SetDllDirectoryW(filename.GetPath().ToStdWstring().c_str());
-#endif()
+#endif // __WXMSW__
   wxDynamicLibrary loaderDll;
   if (!loaderDll.Load(libName, wxDL_DEFAULT | wxDL_QUIET)) {
 #if defined(__WXMSW__)
