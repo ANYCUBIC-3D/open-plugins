@@ -73,9 +73,7 @@ template <typename Stream> void render_json_value(Stream &ss, uint64_t value) {
 template <typename Stream, typename T>
 std::enable_if_t<std::is_floating_point<T>::value> render_json_value(Stream &ss,
                                                                      T value) {
-  char temp[20];
-  sprintf(temp, "%f", value);
-  ss.write(temp);
+  ss.write(std::to_string(value).c_str());
 }
 
 template <typename Stream>

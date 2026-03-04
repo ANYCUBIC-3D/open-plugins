@@ -59,7 +59,7 @@ constexpr std::enable_if_t<is_reflection<T>::value> for_each(T &&t, F &&f) {
            std::make_index_sequence<M::value()>{});
 }
 template <typename T>
-struct is_cstirng
+struct is_cstring
     : std::integral_constant<bool,
                              std::is_same_v<std::remove_pointer_t<T>, char>> {};
 
@@ -83,7 +83,7 @@ read_json(reader &rd, T &val) {
 
 template <typename T>
 inline std::enable_if_t<std::is_enum<T>::value> read_json(reader &rd, T &val) {
-  typedef typename std::underlying_type<T>::type RAW_TYPE;
+  using RAW_TYPE = std::underlying_type_t<T>;
   read_json(rd, (RAW_TYPE &)val);
 }
 
@@ -185,10 +185,10 @@ inline std::enable_if_t<is_associat_container<T>::value> read_json(reader &rd,
   assert(rd.is_object());
   static_assert(
       is_template_instant_of<std::basic_string, typename T::key_type>::value,
-      "key must is std::basic_string");
-  for (auto r : rd.items()) {
-    typename T::key_type key = r.key();
-    read_json(r.value(), val[key]);
+      "key must be std::basic_string");
+  for (auto &item : rd.items()) {
+    typename T::key_type key = item.key();
+    read_json(item.value(), val[key]);
   }
 }
 
@@ -315,6 +315,29 @@ load_from_json(T &&t, reader &rd) {
  *
  * @tparam T 序列容器类型
  * @param v 序列容器对象
+ * @param rd JSON读取器对象
+ * @return bool 是否加载成功
+ */
+template <typename T>
+inline std::enable_if_t<is_associat_container<std::decay_t<T>>::value, bool>
+load_from_json(T &v, reader &rd) {
+  assert(rd.is_object());
+  v.clear();
+  using U = typename std::decay_t<T>::value_type;
+  using kt = typename U::first_type;
+  using vt = typename U::second_type;
+  for (auto &n : rd.items()) {
+    auto &[key, value] = n;
+    detail::assign<vt>(value, v[key]);
+  }
+  return true;
+}
+
+/**
+ * @brief 从JSON对象加载关联容器
+ *
+ * @tparam T 关联容器类型
+ * @param v 关联容器对象
  * @param rd JSON读取器对象
  * @return bool 是否加载成功
  */

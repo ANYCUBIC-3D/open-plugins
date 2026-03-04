@@ -1,5 +1,7 @@
 {
     "cmake.useCMakePresets": "always",
     "cmake.configureOnOpen": true,
-    "sonarlint.pathToCompileCommands": "${workspaceFolder}/vscode-build-Debug/compile_commands.json"
+    // "clang-format.executable": "clang-format.exe",
+    "coverage-gutters.highlightlight": "lightgreen",
+    "coverage-gutters.highlightdark": "darkgreen"
 }
