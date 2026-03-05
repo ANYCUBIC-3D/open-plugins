@@ -85,6 +85,4 @@ if(wxWidgets_FOUND)
 endif()
 
 add_subdirGTEST(Test)
-
-
-
+add_subdirBench(Bench)

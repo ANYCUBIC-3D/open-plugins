@@ -1,5 +1,6 @@
 ﻿option(ENABLE_TEST "打开Test目录编译" OFF)
 option(ENABLE_GTEST "打开GTest目录编译" OFF)
+option(ENABLE_BENCH "打开Bench目录编译" OFF)
 
 macro(add_subdirTEST subname)
     if(ENABLE_TEST)
@@ -39,7 +40,31 @@ macro(add_subdirGTEST subname)
     endif(ENABLE_GTEST)
 endmacro()
 
+macro(add_subdirBench subname)
+    if(ENABLE_BENCH)
+        include_directories(
+            ${CMAKE_CURRENT_BINARY_DIR}/${subname}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${subname}
+            )
+        find_package(benchmark CONFIG REQUIRED)
+        file(GLOB_RECURSE SRCS_G "${CMAKE_CURRENT_SOURCE_DIR}/${subname}/*_Bench.cpp" )
+        file(GLOB_RECURSE OtherSRC_G "${CMAKE_CURRENT_SOURCE_DIR}/${subname}/*cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${subname}/*.h*" )
+        foreach(item ${SRCS_G})
+            list(REMOVE_ITEM OtherSRC_G ${item})
+        endforeach(item)
 
+        foreach(FILE ${SRCS_G})
+            cmake_path(GET FILE STEM SUB_NAME)
+            add_executable(${SUB_NAME} ${FILE} ${OtherSRC_G})
+            target_link_libraries(${SUB_NAME} PRIVATE ${ARGN} benchmark::benchmark benchmark::benchmark_main)
+            set_target_properties(${SUB_NAME} PROPERTIES FOLDER "Bench")
+        endforeach(FILE)
+        file(GLOB_RECURSE CMAKE_G "${CMAKE_CURRENT_SOURCE_DIR}/${subname}/*.cmake" )
+        foreach(item ${CMAKE_G})
+            include(${item})
+        endforeach(item)
+    endif()
+endmacro()
 
 function(add_subdirs)
     foreach(sub ${ARGN})

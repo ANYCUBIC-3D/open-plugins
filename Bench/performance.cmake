@@ -1,0 +1,6 @@
+﻿if(TARGET diaptch_call_Bench)
+    find_package(wxWidgets 3.1 COMPONENTS core base adv)
+    find_package(OpenSSL 1.1 REQUIRED)
+    target_link_libraries(diaptch_call_Bench PRIVATE  plugins_base plugins_manager utility ${wxWidgets_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto)
+    target_compile_definitions(diaptch_call_Bench PRIVATE MODULE_NAME="diaptch_call_Bench" PLUGINS=1 ENABLE_STRACE=1 wxDEBUG_LEVEL=0)
+endif()
