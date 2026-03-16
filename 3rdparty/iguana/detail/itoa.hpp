@@ -217,7 +217,7 @@ namespace dec_ {
                 && std::is_integral<U>::value>* = nullptr>
 		static inline char* itoa( U u, char* p )
         {
-            return convert<D>::template itoa(p,u);
+            return convert<D>:: itoa(p,u);
         }
 
         // itoa: handle signed integral operands (selected by SFINAE)
@@ -253,7 +253,7 @@ namespace dec_ {
             // always produce at least one digit and it will overwrite the
             // minus sign when the value is not negative.
             if (D == Fwd) { *p = '-'; p += (mask&1); }
-            p = convert<D>::template itoa(p,u);
+            p = convert<D>:: itoa(p,u);
             if (D == Rev && mask) *--p = '-';
             return p;
         }
