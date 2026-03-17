@@ -21,6 +21,8 @@ extern "C" {
 #include <boost/nowide/cstdio.hpp>
 #include <boost/scope_exit.hpp>
 
+#include <vector>
+
 #if _WIN32
 #include <locale.h>
 #endif // _WIN32
