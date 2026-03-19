@@ -42,13 +42,19 @@ function(create_shared_target prefix suffix)
     endif()
     message("Create create_shared_target: ${projectname}")
 
- 
     add_library(${projectname} SHARED IMPORTED)
     set_property(TARGET ${projectname} APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
     set_property(TARGET ${projectname} APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
     set_target_properties(${projectname} PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${ROOT_DIR}include"
     )
+    if (${suffix} STREQUAL "instrument")
+        config_instrument(${projectname})
+        if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+            # 非Debug，没有生成插桩相关库
+            return()
+        endif()
+    endif()
     if(CMAKE_HOST_APPLE)
         set_target_properties(${projectname} PROPERTIES
             IMPORTED_LOCATION_RELEASE "${ROOT_DIR}lib/lib${suffix}.dylib"

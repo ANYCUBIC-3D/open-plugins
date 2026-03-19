@@ -30,7 +30,7 @@ BOOST_PP_SEQ_FOR_EACH(DECLARE_PLUGIN_FUNCTION, nil, PLUGINS_LIST_SEQ)
 #define DECLARE_FUNCTION(r, suffix, elem) BOOST_PP_CAT(elem, suffix),
 
 #define DEFINED_FUNCTION(r, suffix, elem)                                      \
-  std::shared_ptr<LibraryBase> BOOST_PP_CAT(elem, suffix)() {                  \
+  static std::shared_ptr<LibraryBase> BOOST_PP_CAT(elem, suffix)() {           \
     return std::shared_ptr<LibraryBase>(new LibraryStatic(                     \
         BOOST_PP_CAT(elem, _getInfo), BOOST_PP_CAT(elem, _setup)));            \
   }
