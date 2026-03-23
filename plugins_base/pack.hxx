@@ -31,12 +31,6 @@
 
 #include <string.h>
 
-namespace iguana::json {
-template <typename Stream, typename T> auto to_json(Stream &ss, const T &o) {
-  return render_json_value(ss, o);
-}
-} // namespace iguana::json
-
 namespace Anycubic::Plugins {
 
 template <typename _Ty>
@@ -103,7 +97,7 @@ inline bool write_value(struct OStream *stream, const _Ty &v) {
 } // namespace
 
 template <typename... Args> size_t get_bytes(Args &&...args) {
-  return (get_type_size(args) + ...);
+  return (get_type_size<Args>(std::forward<Args>(args)) + ...);
 }
 
 template <typename... Args>
