@@ -148,6 +148,32 @@ struct Plugin {
 };
 
 /**
+ * @brief 插件基础类
+ * @note  部分插件未使用功能提供默认实现
+ * @note  根据插件自身需求使用PluginBase或Plugin接口
+ *
+ */
+struct PluginBase : public Plugin {
+  virtual bool AttachEvt(wxEvtHandler *evt) { return true; }
+
+  virtual bool DetachEvt(wxEvtHandler *evt) { return true; }
+
+  virtual bool BindEvt(wxPanel *panel, wxWindow *parent = nullptr,
+                       wxString *bmp = nullptr) {
+    return true;
+  }
+
+  virtual bool BindEvt(wxWebView *view, wxWindow *parent = nullptr,
+                       wxString *bmp = nullptr) {
+    return true;
+  }
+  virtual bool CreateWebview(wxWebView *view, wxWindow *parent = nullptr,
+                             wxString *bmp = nullptr) {
+    return true;
+  }
+};
+
+/**
  * @brief 插件主机接口
  * @note 插件主机接口，定义了插件与主机环境的交互接口
  *
