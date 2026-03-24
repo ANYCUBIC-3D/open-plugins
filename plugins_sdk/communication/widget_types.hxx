@@ -84,18 +84,18 @@ struct RemotePrintObj {
 };
 
 struct OpAmsChange {
+  wxString deviceID;
   int countIndex;
   int slotNum;
   wxString slotFilament;
-  wxString deviceID;
 };
 
 struct AmsSlotObj {
   int count;
   int slotName;
-  int sourceBoxId{-2};
   wxString filament;
   wxColour filamentColor;
+  int sourceBoxId{-2};
 };
 
 struct FramGroupSendTaskObj {
@@ -364,13 +364,13 @@ struct ColorBoxAndName {
 
 struct PrinterSelectObj {
   int filamentNum;
-  int slotNum;
-  int sloopIndex;
-  int sourceBoxId{-2};
+  wxString filament;
   wxColour filamentColor;
+  int slotNum;
   wxColour slotColor;
   wxString slotFilament;
-  wxString filament;
+  int sloopIndex;
+  int sourceBoxId{-2};
 
 public:
   static bool CompareByIntNum(const PrinterSelectObj &obj1,
@@ -633,3 +633,10 @@ REFLECTION(PrinterOptions, auto_leveling_support,
 REFLECTION(Peripherie, camera, multiColorBox, udisk)
 REFLECTION(COTAVersion, isSupport, need_update, time_cost, force_update,
            panding, firmware_version, update_desc, target_version)
+REFLECTION(SendAmsInfoObj, m_backAmsBoxList, m_ids)
+REFLECTION(LANSendRemoteEventDataObjMap, dryingStateObjMapStr,
+           dryingStateObjMapObj)
+REFLECTION(LANSendRemoteEventDataObj, deviceID, printerAmsInfoList,
+           dryingStateObjMap, functionsList)
+
+REFLECTION(LANInfoObjList, lanInfoObjList)
