@@ -57,11 +57,7 @@
 class wxFSFile;
 class wxFileSystem;
 class wxWebView;
-enum class wxVersionContext
-{
-    RunTime,        // Version used during run-time.
-    BuildTime       // Version that the application was built with.
-};
+
 enum wxWebViewZoom
 {
     wxWEBVIEW_ZOOM_TINY,
