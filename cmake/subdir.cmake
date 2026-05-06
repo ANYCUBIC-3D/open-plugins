@@ -127,8 +127,6 @@ endmacro()
 macro(add_static sub_project_name MACRO_NAME)
     add_library(${sub_project_name} STATIC  ${ARGN})
     target_include_directories(${sub_project_name} PRIVATE ${CMAKE_BINARY_DIR}/${sub_project_name})
-    set_target_properties(${sub_project_name} PROPERTIES DEBUG_POSTFIX "_s${CMAKE_DEBUG_POSTFIX}")
-    set_target_properties(${sub_project_name} PROPERTIES RELWITHDEBINFO_POSTFIX "_s")
 endmacro()
 
 
