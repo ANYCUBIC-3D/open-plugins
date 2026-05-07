@@ -35,7 +35,6 @@
 #include <wx/sstream.h>
 
 #include "wx/gtk/control.h"
-#include "wx/gtk/private.h"
 #include "wx/filesys.h"
 #include "wx/base64.h"
 #include "wx/log.h"
