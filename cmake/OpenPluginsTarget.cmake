@@ -24,17 +24,17 @@ function(create_static_target prefix suffix)
     if(CMAKE_HOST_APPLE)
         set_target_properties(${projectname} PROPERTIES
             IMPORTED_LOCATION_RELEASE "${ROOT_DIR}lib/lib${suffix}.a"
-            IMPORTED_LOCATION_DEBUG "${ROOT_DIR}lib/lib${suffix}.a"
+            IMPORTED_LOCATION_DEBUG "${ROOT_DIR}lib/lib${suffix}d.a"
         )
     elseif(CMAKE_HOST_WIN32)
         set_target_properties(${projectname} PROPERTIES
             IMPORTED_IMPLIB_RELEASE "${ROOT_DIR}lib/${suffix}.lib"
-            IMPORTED_IMPLIB_DEBUG "${ROOT_DIR}lib/${suffix}.lib"
+            IMPORTED_IMPLIB_DEBUG "${ROOT_DIR}lib/${suffix}d.lib"
         )
     elseif(CMAKE_HOST_LINUX)
         set_target_properties(${projectname} PROPERTIES
             IMPORTED_LOCATION_RELEASE "${ROOT_DIR}lib/lib${suffix}.a"
-            IMPORTED_LOCATION_DEBUG "${ROOT_DIR}lib/lib${suffix}.a"
+            IMPORTED_LOCATION_DEBUG "${ROOT_DIR}lib/lib${suffix}d.a"
         )
     endif()
 endfunction()
