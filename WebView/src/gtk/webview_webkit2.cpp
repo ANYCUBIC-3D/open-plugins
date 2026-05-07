@@ -1953,8 +1953,7 @@ void wxWebViewWebKit::ProcessJavaScriptResult(GAsyncResult *res, wxWebKitRunScri
 
 void wxWebViewWebKit::RunScriptAsync(const wxString& javascript, void* clientData) const
 {
-    int               count = 0;
-    wxJSScriptWrapper wrapJS(javascript,&count);
+    wxJSScriptWrapper wrapJS(javascript,wxJSScriptWrapper::JS_OUTPUT_STRING);
 
     // Collect parameters for access from the callback
     wxWebKitRunScriptParams* params = new wxWebKitRunScriptParams;

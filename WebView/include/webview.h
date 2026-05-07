@@ -48,9 +48,7 @@
     private:                                                    \
         classname& operator=(const classname&) wxMEMBER_DELETE
 
-#define wxDECLARE_DYNAMIC_CLASS_NO_ASSIGN_DEF_COPY(name) \
-    wxDECLARE_NO_ASSIGN_DEF_COPY(name); \
-    wxDECLARE_DYNAMIC_CLASS(name);
+
 #define DATA_WEBVIEW(type) ACWEBVIEW_API type
 
 
@@ -459,10 +457,8 @@ private:
     wxWebViewNavigationActionFlags m_actionFlags;
     wxString m_messageHandler;
 
-    wxDECLARE_DYNAMIC_CLASS_NO_ASSIGN_DEF_COPY(wxWebViewEvent)
+    wxDECLARE_DYNAMIC_CLASS_NO_ASSIGN_DEF_COPY(wxWebViewEvent);
 };
-
-
 
 wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_CREATED, wxWebViewEvent );
 wxDECLARE_EXPORTED_EVENT( ACWEBVIEW_API, wxEVT_WEBVIEW_NAVIGATING, wxWebViewEvent );
