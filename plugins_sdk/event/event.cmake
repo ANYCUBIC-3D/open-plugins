@@ -1,4 +1,4 @@
-﻿find_package(wxWidgets 3.1 REQUIRED COMPONENTS core base adv)
+﻿find_package(wxWidgets 3.3 REQUIRED CONFIG COMPONENTS core base adv)
 include(${wxWidgets_USE_FILE})
 
 
