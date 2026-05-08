@@ -4,9 +4,7 @@
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-find_package(wxWidgets 3.1 REQUIRED COMPONENTS core base)
-set(USE_SANDBOX OFF)
-
+find_package(wxWidgets 3.3 CONFIG REQUIRED COMPONENTS core base)
 set(USE_SANDBOX OFF)
 include(${wxWidgets_USE_FILE})
 # Add sources from a ..._SRC variable and headers from a ..._HDR

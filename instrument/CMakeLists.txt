@@ -18,6 +18,9 @@ foreach(stacktrace stacktrace_windbg stacktrace_backtrace stacktrace_addr2line s
   endif()
 endforeach()
 
+if(CMAKE_HOST_WIN32)
+  target_link_libraries(instrument PRIVATE Dbghelp)
+endif()
 
 
 target_compile_definitions(instrument PRIVATE BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED=1 FMT_HEADER_ONLY=1 MODULE_NAME="instrument")

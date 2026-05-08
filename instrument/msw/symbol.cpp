@@ -9,10 +9,10 @@
 // NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
 #include "symbol.hpp"
-#include <dbghelp.h>
-#include <mutex>
-#include <psapi.h>
 #include <windows.h>
+#include <dbghelp.h>
+#include <psapi.h>
+#include <mutex>
 
 // 共享的符号初始化函数
 static bool ensure_sym_initialized() {

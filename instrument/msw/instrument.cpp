@@ -8,9 +8,13 @@
 // KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 // NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 // See the Mulan PSL v2 for more details.
-
+#include <windows.h>
+#include <intrin.h>
 
 #include "instrument_export.hxx"
+
+
+
 #include <mutex>
 #include <stdint.h>
 #include <stdio.h>
@@ -18,6 +22,7 @@
 #include <string.h>
 #include <string>
 #include <time.h>
+
 
 #define FUNC_ATTR __declspec(noinline)
 
