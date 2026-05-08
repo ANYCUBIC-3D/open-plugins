@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 深圳市纵维立方科技有限公司
+﻿// Copyright (c) 2026 深圳市纵维立方科技有限公司
 // Open-Plugin is licensed under Mulan PSL v2.
 // You can use this software according to the terms and conditions of the Mulan
 // PSL v2.
