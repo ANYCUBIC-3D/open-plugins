@@ -20,70 +20,108 @@ enum {
   LOGIN_EVENT_REJECT = -2, ///< 登录被拒绝
   LOGIN_EVENT_LOGOUT = 0   ///< 登出
 };
+#define NODE(x, y, z) z
+#define CLOUD_EVENT_DEFAULT_LIST                                               \
+  NODE(CloudEvent, EventSpaceInfo, SPACEINFO),                                 \
+      NODE(CloudEvent, EventFilerename, FILERENAME),                           \
+      NODE(CloudEvent, EventFileremove, FILEREMOVE),                           \
+      NODE(CloudEvent, EventFileLock, FILELOCK),                               \
+      NODE(CloudEvent, EventFileUnlock, FILEUNLOCK),                           \
+      NODE(CloudEvent, EventFileConfirmation, FILECONFIRMATION),               \
+      NODE(CloudEvent, EventSliceStatus, SLICESTATUS),                         \
+      NODE(CloudEvent, EventLogout, LOGOUT),                                   \
+      NODE(CloudEvent, EventCheckNick, CHECKNICK),                             \
+      NODE(CloudEvent, EventCAPTCHA, CAPTCHA),                                 \
+      NODE(CloudEvent, EventResetPWD, RESETPWD),                               \
+      NODE(CloudEvent, EventRegister, REGISTER),                               \
+      NODE(CloudEvent, EventDelPrinter, DELPRINTER),                           \
+      NODE(CloudEvent, EventRenamePrinter, RENAMEPRINTER),                     \
+      NODE(CloudEvent, EventRemotePrint, REMOTEPRINT),                         \
+      NODE(CloudEvent, EventFeedback, FEEDBACK),                               \
+      NODE(CloudEvent, EventPrintDetail, PRINTDETAIL),                         \
+      NODE(CloudEvent, EventHistoryDelete, HISTORYDELETE),                     \
+      NODE(CloudEvent, EventMessageSetRead, MESSAGESETREAD),                   \
+      NODE(CloudEvent, EventMessageNewTest, MESSAGENEWTEST),                   \
+      NODE(CloudEvent, EventMessageDelete, MESSAGEDELETE),                     \
+      NODE(CloudEvent, EventClientReport, CLIENTREPORT),                       \
+      NODE(CloudEvent, EventDeviceSave, DEVICESAVE),                           \
+      NODE(CloudEvent, EventBatchPrint, BATCHPRINT),                           \
+      NODE(CloudEvent, EventCleanPlate, CLEANPLATE),                           \
+      NODE(CloudEvent, EventCreateBulkTask, CREATEBULKTASK),                   \
+      NODE(CloudEvent, EventSubmitFeedback, SUBMITFEEDBACK),                   \
+      NODE(CloudEvent, EventFarmMessageDelete, FARMMESSAGEDELETE),             \
+      NODE(CloudEvent, EventAlarmMessageBatchSetRead,                          \
+           ALARMMESSAGEBATCHSETREAD)
 
-// 事件列表
-#define CLOUD_CLIENT_EVENT_LIST                                                \
-  (FORCE_LOGOUT,       /* 强制登出--这个事件由sdk产生*/                        \
-   SPACEINFO,          /* 获取空间信息*/                                       \
-   FILERENAME,         /* 文件重命名*/                                         \
-   FILEREMOVE,         /* 文件删除*/                                           \
-   FILELIST,           /* 文件列表数据*/                                       \
-   FILELOCK,           /* 文件空间锁定*/                                       \
-   FILEUNLOCK,         /* 文件空间解锁*/                                       \
-   FILECONFIRMATION,   /* 文件上传确认*/                                       \
-   FILEUPLOAD,         /* 文件上传*/                                           \
-   FILEDOWNLOAD,       /* 文件下载*/                                           \
-   SLICEINFO,          /* 切片文件信息*/                                       \
-   SLICESTATUS,        /* 切片文件状态(切片文件状态更准确)*/                   \
-   MODELINFO,          /* 模型文件信息*/                                       \
-   LOGIN,              /* 登录*/                                               \
-   LOGOUT,             /* 登出*/                                               \
-   CHECKNICK,          /* 检查昵称*/                                           \
-   CAPTCHA,            /* 获取验证码*/                                         \
-   RESETPWD,           /* 重置密码*/                                           \
-   REGISTER,           /* 用户注册*/                                           \
-   PRINTERLIST,        /* 打印机列表*/                                         \
-   MULTIBOXINFO,       /* 多功能盒子信息*/                                     \
-   ADDPRINTER,         /* 添加打印机*/                                         \
-   DELPRINTER,         /* 删除打印机*/                                         \
-   RENAMEPRINTER,      /* 重命名打印机*/                                       \
-   REMOTEPRINT,        /* 远程打印*/                                           \
-   FEEDBACK,           /* 反馈*/                                               \
-   COUNTRIES,          /* 国家列表*/                                           \
-   CTRLPRINTER,        /* 远程打印控制*/                                       \
-   PRINTTASKLIST,      /* 打印任务列表*/                                       \
-   PRINTHISTORY,       /* 打印历史列表*/                                       \
-   PRINTDETAIL,        /* 打印历史详细*/                                       \
-   HISTORYDELETE,      /* 打印历史删除*/                                       \
-   MESSAGELIST,        /* 消息列表*/                                           \
-   MESSAGECOUNT,       /* 数据数量*/                                           \
-   MESSAGESETREAD,     /* 标记已读*/                                           \
-   MESSAGENEWTEST,     /* 新消息标记获取*/                                     \
-   MESSAGEDELETE,      /* 消息删除*/                                           \
-   REASONS,            /* 错误码信息*/                                         \
-   PRINTERSTATUS,      /* 打印机状态*/                                         \
-   PRINTERDETAIL,      /* 打印机详细信息*/                                     \
-   PROJECTINFO,        /* 项目详细信息*/                                       \
-   CLIENTREPORT,       /* 客户端上报*/                                         \
-   GETREGION,          /* 获取区域信息*/                                       \
-   UPDATEUSER,         /* 更新用户信息*/                                       \
-   GETEXTERNALSHELVES, /* 获取外置料架信息*/                                   \
-   ACCESSTOKEN,        /* 获取accesstoken*/                                    \
-   MATERIAL,           /* 获取材料数据*/                                       \
-   PRINTOPTION,        /* 获取打印选项*/                                       \
-   DEVICESAVE,         /* 设备信息保存*/                                       \
-   ENGINEVERSION,      /* 获取引擎版本*/                                       \
-   UPDATEVERSION,      /*获取更新版本信息*/                                    \
-   PRESIGN,            /*预签名*/                                              \
-   GETSLICERCONFIG,    /*获取slicer配置信息*/                                  \
-   SETSLICERCONFIG,    /*设置slicer配置信息*/                                  \
-   BATCHPRINT,         /*批量打印*/                                            \
-   BATCHTASKLIST,      /* 获取批量任务列表*/                                   \
-   SLICERINFO,         /* 获取slicer信息*/                                     \
-   SENDFILETOPRINTERS, /* 发送文件到打印机*/                                   \
-   PRINTERTOOL,        /* 打印机详情工具*/                                     \
-   PLUGINUPDATE        /* 插件更新*/                                           \
-  )
+#define CLOUD_EVENT_SIG_LIST                                                   \
+  (NODE(ProgressResponse, EventFileDownload, FILEDOWNLOAD),                    \
+   CLOUD_EVENT_DEFAULT_LIST,                                                   \
+   NODE(ProgressResponse, EventFileUpload, FILEUPLOAD),                        \
+   NODE(LoginResponse, EventLogin, LOGIN),                                     \
+   NODE(AddPrinterResponse, EventAddPrinter, ADDPRINTER),                      \
+   NODE(PrinterDetailResponse, EventPrinterDetail, PRINTERDETAIL),             \
+   NODE(PrintProjectDetailResponse, EventPrintProjectDetail,                   \
+        PRINTPROJECTDETAIL),                                                   \
+   NODE(PrintHistoryDetailResponse, EventHistoryDetail, HISTORYDETAIL),        \
+   NODE(PrintHistoryFeedbackListResponse, EventGetFeedbackList,                \
+        GETFEEDBACKLIST),                                                      \
+   NODE(ProjectInfoResponse, EventProjectInfo, PROJECTINFO),                   \
+   NODE(ModelInfoResponse, EventModelInfo, MODELINFO),                         \
+   NODE(GCodeInfoResponse, EventSliceInfo, SLICEINFO),                         \
+   NODE(RegionResponse, EventGetRegion, GETREGION),                            \
+   NODE(UserInfoResponse, EventUpdateUser, UPDATEUSER),                        \
+   NODE(GetExternalShelvesResponse, EventGetExternalShelves,                   \
+        GETEXTERNALSHELVES),                                                   \
+   NODE(AccessTokenResponse, EventAccessToken, ACCESSTOKEN),                   \
+   NODE(EngineVersion, EventEngineVersion, ENGINEVERSION),                     \
+   NODE(UpdateResponse, EventUpdateVersion, UPDATEVERSION),                    \
+   NODE(SlicerFileInfoResponse, EventSlicerInfo, SLICERINFO),                  \
+   NODE(SendFileToPrintersResponse, EventSendFileToPrinters,                   \
+        SENDFILSTOPRINTER),                                                    \
+   NODE(PrinterToolResponse, EventPrinterTool, PRINTERTOOL),                   \
+   NODE(PluginUpdateResponse, EventPluginUpdate, PLUGINUPDATE),                \
+   NODE(PrinterReportInfoResponse, EventPrinterReportInfo, PRINTERREPORTINFO), \
+   NODE(SlicerDetailResponse, EventSlicerDetail, SLICERDETAIL),                \
+   NODE(AddUserColorGroupResponse, EventAddUserColorGroup, ADDUSERCOLORGROUP), \
+   NODE(EditUserColorGroupResponse, EventEditUserColorGroup,                   \
+        EDITUSERCOLORGROUP),                                                   \
+   NODE(DeleteUserColorGroupResponse, EventDeleteUserColorGroup,               \
+        DELETEUSERCOLORGROUP),                                                 \
+   NODE(TokenResponse, EventCtrlPrinter, CTRLPRINTER),                         \
+   NODE(SlicerConfigResponse, EventGetSlicerConfig, GETSLICERCONFIG),          \
+   NODE(MessageAggregateInfo, EventFarmMessageInfo, FARMMESSAGEINFO))
+
+#define CLOUD_EVENT_ARRAY_LIST                                                 \
+  (NODE(SlicerConfigResponse, EventSetSlicerConfig, SETSLICERCONFIG),          \
+   NODE(SlicerConfigResponse, EventPreSign, PRESIGN),                          \
+   NODE(PrinterResponse, EventPrinterList, PRINTERLIST),                       \
+   NODE(CountryResponse, EventCountries, COUNTRIES),                           \
+   NODE(MessageCountResponse, EventMessageCount, MESSAGECOUNT),                \
+   NODE(ReasonResponse, EventReasons, REASONS),                                \
+   NODE(PrinterStatusResponse, EventPrinterStatus, PRINTERSTATUS),             \
+   NODE(MultiBoxInfoResponse, EventMultiBoxInfo, MULTIBOXINFO),                \
+   NODE(MaterialResponse, EventMaterial, MATERIAL),                            \
+   NODE(PrintOptionsResponse, EventPrintOption, PRINTOPTION),                  \
+   NODE(ColorGroupListResponse, EventGetColorGroupList, GETCOLORGROUPLIST),    \
+   NODE(VideoThumbnailResponse, EventGetTimelapseDownloadUrls,                 \
+        GETTIMELAPSEDOWNLOADURLS),                                             \
+   NODE(LatestErrorInfo, EventFarmMessageLatest, FARMMESSAGELATEST))
+
+#define CLOUD_EVENT_ARRAY_LIST_DROP_COUNT 1
+
+#define CLOUD_EVENT_PAGE_LIST                                                  \
+  (NODE(MessageAggregateInfo, EventFarmMessageList, FARMMESSAGELIST),          \
+   NODE(FileInfoResponse, EventFilelist, FILELIST),                            \
+   NODE(PrintHistoryResponse, EventPrintHistory, PRINTHISTORY),                \
+   NODE(MessageListResponse, EventMessageList, MESSAGELIST),                   \
+   NODE(PrintTaskResponse, EventPrintTaskList, PRINTTASKLIST),                 \
+   NODE(TaskListResponse, EventBatchTaskList, BATCHTASKLIST),                  \
+   NODE(PrinterErrorInfo, EventFarmMessagePrinterErrorList,                    \
+        FARMMESSAGEPRINTERERRORLIST))
 
 EVENT_HELPER_DECLARE(impl_wxDECLARE_EVENT, EVT_CLOUD_CLIENT_,
-                     CLOUD_CLIENT_EVENT_LIST)
+                     CLOUD_EVENT_PAGE_LIST)
+EVENT_HELPER_DECLARE(impl_wxDECLARE_EVENT, EVT_CLOUD_CLIENT_,
+                     CLOUD_EVENT_ARRAY_LIST)
+EVENT_HELPER_DECLARE(impl_wxDECLARE_EVENT, EVT_CLOUD_CLIENT_,
+                     CLOUD_EVENT_SIG_LIST)
